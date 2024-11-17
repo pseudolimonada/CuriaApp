@@ -50,7 +50,6 @@ return: {
 		{"order_class_id": "int", "title": "str", "sellable_quantity": "int", "sold_quantity": "int"},
 		{"order_class_id": "int", "title": "str", "sellable_quantity": "int", "sold_quantity": "int"}
 	]
-
 }
 ```
 
