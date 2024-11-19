@@ -96,11 +96,11 @@ class Order_Screen(Column):
         '''
         
         # Send request to DB and receive data about the products and days and fill the __data variable with them
-        for i in range(2):
+        for i in range(10):
             self.__current_order[f"product {i}"] = 0
         
         self.__fill_days_row()
-        self.__fill_products_column()
+        self.__fill_products_column("15/11")
         
     # Clears the days row and refill it with new data from DB
     def __fill_days_row(self):
@@ -110,50 +110,62 @@ class Order_Screen(Column):
         
         self.__days_row.controls.clear()
         
-        date = "11/19"
-        button1 = ElevatedButton(
-            text=date,
-        )
-        self.__days_row.controls.append(button1)
-        date = "12/19"
-        button2 = ElevatedButton(
-            text=date,
-        )
-        self.__days_row.controls.append(button2)
-        date = "13/19"
-        button3 = ElevatedButton(
-            text=date,
-        )
-        self.__days_row.controls.append(button3)
-        date = "14/19"
-        button4 = ElevatedButton(
-            text=date,
-        )
-        self.__days_row.controls.append(button4)
-        date = "15/19"
-        button5 = ElevatedButton(
-            text=date,
-        )
-        self.__days_row.controls.append(button5)
+        self.__create_new_date_button("11/11")
+        self.__create_new_date_button("12/11")
+        self.__create_new_date_button("13/11")
+        self.__create_new_date_button("14/11")
+        self.__create_new_date_button("15/11")
         # Add the new days buttons to controls according to data from DB
         
-    # Clears the products column and refill it with new data from DB
-    def __fill_products_column(self):
+    # Clears the products column and refill it with new data from DB for a specific date
+    def __fill_products_column(self, date):
         '''
-        Clears the products column and refill it with new data from DB.
+        Clears the products column and refill it with new data from DB for a specific date.
         '''
         
         self.__products_column.controls.clear()
         
-        for i in range(2):
-            product = self.__create_new_product_row(f"product {i}", "1,50€")
-            self.__products_column.controls.append(product)
+        if date == "15/11":
+            for i in range(2):
+                product = self.__create_new_product_row(f"product {i}", "1,50€")
+                self.__products_column.controls.append(product)
+        elif date == "14/11":
+            for i in range(10):
+                product = self.__create_new_product_row(f"product {i}", "1,50€")
+                self.__products_column.controls.append(product)
         # Add the new products info and buttons to controls according to data from DB
     
     # Realizes an order when clicked in order_button
     def __realize_order(self, e):
         print("Test")
         pass
+    
+    # Creates and returns a button for a respective date
+    def __create_new_date_button(
+        self,
+        date: str
+    ):
+        '''
+        Creates and appends to the days list a button for a respective date.
+        '''
+        
+        self.__days_row.controls.append(
+            ElevatedButton(
+                text=date,
+                adaptive=True,
+                on_click=self.__change_date_product_list,
+                data=date
+            )
+        )
+        
+    # Changes the products list according to the date selected
+    def __change_date_product_list(self, e):
+        '''
+        Changes the products list according to the date selected.
+        '''
+        
+        self.__fill_products_column(e.control.data)
+        self.__page.update()
     
     # Creates and returns a row with the information about the product and two buttons ('+' and '-')
     def __create_new_product_row(
@@ -188,7 +200,7 @@ class Order_Screen(Column):
                                     shape=CircleBorder(),
                                     padding=padding.all(0)
                                 ),
-                                on_click=self.change_product_amount,
+                                on_click=self.__change_product_amount,
                                 data=("+", product_name)
                             ),
                             ElevatedButton(
@@ -198,7 +210,7 @@ class Order_Screen(Column):
                                     shape=CircleBorder(),
                                     padding=padding.all(0)
                                 ),
-                                on_click=self.change_product_amount,
+                                on_click=self.__change_product_amount,
                                 data=("-", product_name)
                             )
                         ],
@@ -210,7 +222,7 @@ class Order_Screen(Column):
         )
         
     # Changes the product amount in the current order list.
-    def change_product_amount(self, e):
+    def __change_product_amount(self, e):
         '''
         Changes the product amount in the current order list.
         '''

@@ -1,4 +1,4 @@
-from flet import Container, Column, Page
+from flet import Container, Page
 from present_snack_bar import present_snack_bar
 
 class Main_Container(Container):
