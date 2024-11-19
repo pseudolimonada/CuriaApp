@@ -11,6 +11,7 @@ class Order_Screen(Column):
     Column that represents a screen for the order realization
     '''
     
+    
     ORDER_BUTTON_TEXT: str = "Order"
     ALERT_DIALOG_TITLE_TEXT: str = "Alert confirmation"
     ALERT_DIALOG_CONTENT_TEXT: str = "By changing the day your current order will be cleared. If you still want to continue, press 'OK', otherwise press CANCEL."
