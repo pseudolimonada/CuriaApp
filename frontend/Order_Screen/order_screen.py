@@ -1,4 +1,4 @@
-from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, BorderSide
+from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, AlertDialog, TextButton
 from shared import shared_vars
 import requests
 
@@ -9,12 +9,17 @@ class Order_Screen(Column):
     
     
     ORDER_BUTTON_TEXT: str = "Order"
+    ALERT_DIALOG_TITLE_TEXT: str = "Alert confirmation"
+    ALERT_DIALOG_CONTENT_TEXT: str = "By changing the day your current order will be cleared. If you still want to continue, press 'OK', otherwise press CANCEL."
+    ALERT_DIALOG_OK_TEXT: str = "OK"
+    ALERT_DIALOG_CANCEL_TEXT: str = "CANCEL"
     
     __page: Page
     __data: dict
     
     __current_order: dict = {}
     __total_amount: int = 0
+    __current_date: str
     
     __days_row: Row = Row(
         alignment=MainAxisAlignment.START,
@@ -30,6 +35,13 @@ class Order_Screen(Column):
     )
     
     __order_button: ElevatedButton
+    
+    __alert = AlertDialog(
+        modal=True,
+        title=Text(ALERT_DIALOG_TITLE_TEXT),
+        content=Text(ALERT_DIALOG_CONTENT_TEXT),
+        actions_alignment=MainAxisAlignment.END
+    )
     
     # Constructor
     def __init__(
@@ -96,7 +108,7 @@ class Order_Screen(Column):
         '''
         
         # Send request to DB and receive data about the products and days and fill the __data variable with them
-        for i in range(10):
+        for i in range(20):
             self.__current_order[f"product {i}"] = 0
         
         self.__fill_days_row()
@@ -115,6 +127,7 @@ class Order_Screen(Column):
         self.__create_new_date_button("13/11")
         self.__create_new_date_button("14/11")
         self.__create_new_date_button("15/11")
+        self.__current_date = "15/11"
         # Add the new days buttons to controls according to data from DB
         
     # Clears the products column and refill it with new data from DB for a specific date
@@ -130,7 +143,7 @@ class Order_Screen(Column):
                 product = self.__create_new_product_row(f"product {i}", "1,50€")
                 self.__products_column.controls.append(product)
         elif date == "14/11":
-            for i in range(10):
+            for i in range(20):
                 product = self.__create_new_product_row(f"product {i}", "1,50€")
                 self.__products_column.controls.append(product)
         # Add the new products info and buttons to controls according to data from DB
@@ -164,7 +177,33 @@ class Order_Screen(Column):
         Changes the products list according to the date selected.
         '''
         
-        self.__fill_products_column(e.control.data)
+        if e.control.data != self.__current_date:
+            if self.__total_amount > 0:
+                self.__alert.actions=[
+                    TextButton(self.ALERT_DIALOG_OK_TEXT, on_click=self.__handle_close_dialog, data=e.control.data),
+                    TextButton(self.ALERT_DIALOG_CANCEL_TEXT, on_click=self.__handle_close_dialog)
+                ]
+                self.__page.open(self.__alert)
+            else:
+                self.__current_date = e.control.data
+                self.__fill_products_column(e.control.data)
+                self.__page.update()
+    
+    # Handles the close of the dialog alert
+    def __handle_close_dialog(self, e):
+        '''
+        Handles the close of the dialog alert.
+        '''
+        
+        self.page.close(self.__alert)
+        if e.control.text == self.ALERT_DIALOG_OK_TEXT:
+            for product in self.__current_order:
+                self.__current_order[product] = 0
+            self.__current_date = e.control.data
+            self.__order_button.disabled = True
+            self.__total_amount = 0
+            self.__fill_products_column(e.control.data)
+            
         self.__page.update()
     
     # Creates and returns a row with the information about the product and two buttons ('+' and '-')
