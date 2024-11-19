@@ -59,4 +59,8 @@ class Login_Screen(Column):
         
 
     def register(e):
-        pass
+        '''
+        Registers the user with the respective credentials in DB and makes the transition to the orders screen.
+        '''
+        
+        shared_vars["main_container"].change_screen("order_screen")
