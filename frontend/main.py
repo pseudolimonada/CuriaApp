@@ -30,7 +30,7 @@ from flet import (
     PagePlatform,
 )
 from main_container import Main_Container
-from login_screen import Login_Screen
+from Login_Screen.login_screen import Login_Screen
 
 
 # Program Function
@@ -39,11 +39,11 @@ def main(page: Page):
     Program Function
     """
 
-    main_container = Main_Container()
-    login_screen = Login_Screen()
+    main_container = Main_Container(page)
+    login_screen = Login_Screen(page)
 
-    main_container.content = login_screen
-    main_container.selected_screen_name = "login_screen"
+    main_container.add_screen_to_list(login_screen, "login_screen")
+    main_container.change_screen("login_screen")
 
     page.add(main_container)
 
