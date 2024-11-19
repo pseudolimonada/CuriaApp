@@ -1,4 +1,5 @@
 from flet import Column, MainAxisAlignment, ElevatedButton, TextField, Row, Page
+from shared import shared_vars
 
 class Login_Screen(Column):
     '''
@@ -53,7 +54,9 @@ class Login_Screen(Column):
         '''
         Verifies in DB if the inserted credentials exist and are valid. If they are makes the transition to the orders screen.
         '''
-        pass
+        
+        shared_vars["main_container"].change_screen("order_screen")
+        
 
     def register(e):
         pass

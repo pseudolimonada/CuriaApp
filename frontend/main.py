@@ -31,7 +31,8 @@ from flet import (
 )
 from main_container import Main_Container
 from Login_Screen.login_screen import Login_Screen
-
+from Order_Screen.order_screen import Order_Screen
+from shared import shared_vars
 
 # Program Function
 def main(page: Page):
@@ -39,13 +40,15 @@ def main(page: Page):
     Program Function
     """
 
-    main_container = Main_Container(page)
+    shared_vars["main_container"] = Main_Container(page)
     login_screen = Login_Screen(page)
+    order_screen = Order_Screen(page)
 
-    main_container.add_screen_to_list(login_screen, "login_screen")
-    main_container.change_screen("login_screen")
+    shared_vars["main_container"].add_screen_to_list(login_screen, "login_screen")
+    shared_vars["main_container"].add_screen_to_list(order_screen, "order_screen")
+    shared_vars["main_container"].change_screen("login_screen")
 
-    page.add(main_container)
+    page.add(shared_vars["main_container"])
 
 
 if __name__ == "__main__":

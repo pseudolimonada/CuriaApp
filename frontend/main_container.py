@@ -49,6 +49,7 @@ class Main_Container(Container):
         if screen_name in self.__screens_dict.keys():
             self.selected_screen_name = screen_name
             self.content = self.__screens_dict[screen_name]
+            self.__page.update()
         else:
             present_snack_bar(self.__page, self.CHANGE_SCREEN_ERROR_TEXT, "Red")
         
