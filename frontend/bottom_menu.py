@@ -16,7 +16,7 @@ class Bottom_Menu(Row):
         self.__order_page_button = IconButton(
             adaptive=True,
             enable_feedback=False,
-            icon_size=25,
+            icon_size=30,
             on_click= self.__go_to_order_screen,
             icon=icons.BORDER_COLOR
         )
@@ -24,7 +24,7 @@ class Bottom_Menu(Row):
         self.__check_orders_page_button = IconButton(
             adaptive=True,
             enable_feedback=False,
-            icon_size=25,
+            icon_size=30,
             on_click= self.__go_to_check_orders_screen,
             icon=icons.FORMAT_LIST_BULLETED
         )

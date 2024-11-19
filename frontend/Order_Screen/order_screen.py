@@ -58,7 +58,7 @@ class Order_Screen(Column):
                         shared_vars["bottom_menu"]
                     ],
                     alignment=MainAxisAlignment.START,
-                    spacing=5
+                    spacing=4
                 )
             ],
             alignment=MainAxisAlignment.START,
