@@ -1,6 +1,9 @@
 from flet import (
     app,
     Page,
+    Theme,
+    ColorScheme,
+    TextTheme,
     SnackBar,
     Text,
     TextThemeStyle,
@@ -33,7 +36,7 @@ from main_container import Main_Container
 from Login_Screen.login_screen import Login_Screen
 from Order_Screen.order_screen import Order_Screen
 from bottom_menu import Bottom_Menu
-from shared import shared_vars
+from shared import shared_vars, PRIM_COLOR, SEC_COLOR
 
 # Program Function
 def main(page: Page):
@@ -54,6 +57,37 @@ def main(page: Page):
     # Test Values
     page.window.width = 360
     page.window.height = 800
+    
+    page.padding = 0
+    page.theme = Theme(
+        color_scheme=ColorScheme(
+            ###primary="",      # Buttons Text, TextBox Outline, Icons Color
+            #on_primary="",
+            #primary_container="",
+            #on_primary_container="",
+            #secondary="",
+            #on_secondary="",
+            #secondary_container="",
+            #tertiary="",
+            #on_tertiary="",
+            #tertiary_container="",
+            #on_tertiary_container="",
+            #background="",
+            #on_background="",
+            #surface="",
+            ###on_surface="",       # Disabled Button Color
+            #surface_variant="",
+            ###on_surface_variant="",   # Textbox Text Color
+            #outline="",
+            ###outline_variant="",        # Dividers Color
+            #shadow="",
+            #scrim="",
+            #inverse_surface="",
+            #on_inverse_surface="",
+            #inverse_primary="",
+            #surface_tint=""
+        )
+    )
 
     page.add(shared_vars["main_container"])
     

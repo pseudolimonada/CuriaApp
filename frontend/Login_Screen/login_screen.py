@@ -13,6 +13,7 @@ class Login_Screen(Column):
     
     # Buttons
     login_button: ElevatedButton = ElevatedButton(text="LOGIN", scale=1.5)
+    # login_button: ElevatedButton = ElevatedButton(text="LOGIN", scale=1.5, bgcolor="#f39c12", color="#000000")    # Example of button color changing
     register_button: ElevatedButton = ElevatedButton(text="REGISTER", scale=1)
     login_register_column: Column
     

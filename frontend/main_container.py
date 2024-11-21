@@ -1,5 +1,6 @@
-from flet import Container, Page
+from flet import Container, Page, Theme, ColorScheme 
 from present_snack_bar import present_snack_bar
+from shared import PRIM_COLOR
 
 class Main_Container(Container):
     '''
@@ -17,7 +18,11 @@ class Main_Container(Container):
         self,
         page: Page
     ):
-        super().__init__(expand=True)
+        super().__init__(
+            expand=True,
+            # bgcolor=PRIM_COLOR,   # Main Background Color
+            border_radius=10
+        )
         self.__page = page
     
     # Adds the screen to the screens list and attributes a name to the screen.
