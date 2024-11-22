@@ -12,6 +12,7 @@ class Main_Container(Container):
     __screens_dict: dict = {}
     selected_screen_name: str = ""
     CHANGE_SCREEN_ERROR_TEXT: str = "Screen doesn't exist..."
+    CURRENT_SCREEN_NOT_RECOGNIZED: str = "Screen can't load because of an internal error..."
     
     # Constructor 
     def __init__(
@@ -52,6 +53,15 @@ class Main_Container(Container):
         '''
         
         if screen_name in self.__screens_dict.keys():
+            if screen_name is "full_order_screen":
+                if self.selected_screen_name is "order_screen":
+                    self.__screens_dict[screen_name].set_confirm_order_layout()
+                elif self.selected_screen_name is "check_orders_screen":
+                    self.__screens_dict[screen_name].set_order_details_layout()
+                else:
+                    present_snack_bar(self.__page, self.CURRENT_SCREEN_NOT_RECOGNIZED, "Red")
+                    return
+            
             self.selected_screen_name = screen_name
             self.content = self.__screens_dict[screen_name]
             self.__page.update()

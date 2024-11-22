@@ -1,6 +1,7 @@
 shared_vars = {
     "main_container": None,
-    "bottom_menu": None
+    "bottom_menu": None,
+    "current_order": None
 }
 
 PRIM_COLOR = '#f0cf7d'

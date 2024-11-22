@@ -17,7 +17,10 @@ class Order_Screen(Column):
     __page: Page
     __data: dict
     
-    __current_order: dict = {}
+    __current_order: dict = {
+        "date": str,
+        "products": dict
+    }
     __total_amount: int = 0
     __current_date: str
     
@@ -77,20 +80,22 @@ class Order_Screen(Column):
                 Column(
                     controls=[
                         Divider(),
-                        shared_vars["bottom_menu"]
+                        shared_vars["bottom_menu"],
+                        Divider()
                     ],
                     alignment=MainAxisAlignment.START,
-                    spacing=4
+                    spacing=1
                 )
             ],
             alignment=MainAxisAlignment.START,
-            spacing=40
+            spacing=20
         )
         
         # Updating controls of the screen
         self.controls = [
             Column(
                 controls=[
+                    Divider(),
                     self.__days_row,
                     Divider(),
                     self.__products_column,
@@ -107,12 +112,17 @@ class Order_Screen(Column):
         Refresh data about the days and products by full filling the rows and columns info again.
         '''
         
+        self.__current_order["products"] = {}
+        
         # Send request to DB and receive data about the products and days and fill the __data variable with them
         for i in range(20):
-            self.__current_order[f"product {i}"] = 0
-        
+            self.__current_order["products"][f"product {i}"] = {
+                "quantity": 0,
+                "cost": 1.5
+            }
+            
         self.__fill_days_row()
-        self.__fill_products_column("15/11")
+        self.__fill_products_column()
         
     # Clears the days row and refill it with new data from DB
     def __fill_days_row(self):
@@ -128,30 +138,31 @@ class Order_Screen(Column):
         self.__create_new_date_button("14/11")
         self.__create_new_date_button("15/11")
         self.__current_date = "15/11"
+        self.__current_order["date"] = self.__current_date
         # Add the new days buttons to controls according to data from DB
         
     # Clears the products column and refill it with new data from DB for a specific date
-    def __fill_products_column(self, date):
+    def __fill_products_column(self):
         '''
         Clears the products column and refill it with new data from DB for a specific date.
         '''
         
         self.__products_column.controls.clear()
         
-        if date == "15/11":
+        if self.__current_date == "15/11":
             for i in range(2):
-                product = self.__create_new_product_row(f"product {i}", "1,50€")
+                product = self.__create_new_product_row(f"product {i}", self.__current_order["products"][f"product {i}"]["cost"])
                 self.__products_column.controls.append(product)
-        elif date == "14/11":
+        elif self.__current_date == "14/11":
             for i in range(20):
-                product = self.__create_new_product_row(f"product {i}", "1,50€")
+                product = self.__create_new_product_row(f"product {i}", self.__current_order["products"][f"product {i}"]["cost"])
                 self.__products_column.controls.append(product)
         # Add the new products info and buttons to controls according to data from DB
     
     # Realizes an order when clicked in order_button
     def __realize_order(self, e):
-        print("Test")
-        pass
+        shared_vars["current_order"] = self.__current_order
+        shared_vars["main_container"].change_screen("full_order_screen")
     
     # Creates and returns a button for a respective date
     def __create_new_date_button(
@@ -186,7 +197,8 @@ class Order_Screen(Column):
                 self.__page.open(self.__alert)
             else:
                 self.__current_date = e.control.data
-                self.__fill_products_column(e.control.data)
+                self.__current_order["date"] = self.__current_date
+                self.__fill_products_column()
                 self.__page.update()
     
     # Handles the close of the dialog alert
@@ -197,12 +209,13 @@ class Order_Screen(Column):
         
         self.page.close(self.__alert)
         if e.control.text == self.ALERT_DIALOG_OK_TEXT:
-            for product in self.__current_order:
-                self.__current_order[product] = 0
+            for product in self.__current_order["products"]:
+                self.__current_order["products"][product]["quantity"] = 0
             self.__current_date = e.control.data
+            self.__current_order["date"] = self.__current_date
             self.__order_button.disabled = True
             self.__total_amount = 0
-            self.__fill_products_column(e.control.data)
+            self.__fill_products_column()
             
         self.__page.update()
     
@@ -210,7 +223,7 @@ class Order_Screen(Column):
     def __create_new_product_row(
         self,
         product_name: str,
-        product_cost: str
+        product_cost: float
     ):
         '''
         Creates and returns a row with the information about the product and two buttons ('+' and '-').
@@ -222,7 +235,7 @@ class Order_Screen(Column):
                     content=Row(
                             controls=[
                                 Text(product_name),
-                                Text(product_cost),
+                                Text(f"{product_cost}€"),
                             ],
                             alignment=MainAxisAlignment.SPACE_AROUND,
                     ),
@@ -267,13 +280,13 @@ class Order_Screen(Column):
         '''
         
         if e.control.data[0] == "+":
-            self.__current_order[e.control.data[1]] += 1
+            self.__current_order["products"][e.control.data[1]]["quantity"] += 1
             self.__total_amount += 1
             if self.__total_amount > 0:
                 self.__order_button.disabled = False
         elif e.control.data[0] == "-":
-            if self.__current_order[e.control.data[1]] > 0:
-                self.__current_order[e.control.data[1]] -= 1
+            if self.__current_order["products"][e.control.data[1]]["quantity"] > 0:
+                self.__current_order["products"][e.control.data[1]]["quantity"] -= 1
                 self.__total_amount -= 1
                 if self.__total_amount <= 0:
                     self.__order_button.disabled = True
