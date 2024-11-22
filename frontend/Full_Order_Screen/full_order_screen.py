@@ -113,8 +113,24 @@ class Full_Order_Screen(Column):
         
         return Row(
             controls=[
-                Text(value=f"{product_name} x{product_quantity}"),
-                Text(f"{product_quantity*product_cost}€"),
+                Container(
+                    content=Row(
+                        controls=[
+                            Container(
+                                content=Text(value=f"{product_name}\nx{product_quantity}"),
+                                padding=padding.only(left=10, right=20),
+                                expand=True
+                            ),
+                            Container(
+                                content=Text(f"{product_quantity*product_cost:.2f}€"),
+                                padding=padding.only(right=10)
+                            ),
+                        ],
+                        alignment=MainAxisAlignment.SPACE_AROUND
+                    ),
+                    height=100,
+                    expand=True
+                )
             ],
             alignment=MainAxisAlignment.SPACE_AROUND,
         )

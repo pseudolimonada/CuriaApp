@@ -33,6 +33,7 @@ class Order_Screen(Column):
         scroll=ScrollMode.ADAPTIVE,
         expand=True
     )
+    
     __order_row: Row = Row(
         alignment=MainAxisAlignment.CENTER
     )
@@ -116,7 +117,8 @@ class Order_Screen(Column):
         
         # Send request to DB and receive data about the products and days and fill the __data variable with them
         for i in range(20):
-            self.__current_order["products"][f"product {i}"] = {
+            self.__current_order["products"][f"Este é um Pao disto Daquilo e do Outro {i}"] = {
+                "quantity_text": Text(value="0"),
                 "quantity": 0,
                 "cost": 1.5
             }
@@ -151,11 +153,11 @@ class Order_Screen(Column):
         
         if self.__current_date == "15/11":
             for i in range(2):
-                product = self.__create_new_product_row(f"product {i}", self.__current_order["products"][f"product {i}"]["cost"])
+                product = self.__create_new_product_row(f"Este é um Pao disto Daquilo e do Outro {i}", self.__current_order["products"][f"Este é um Pao disto Daquilo e do Outro {i}"]["cost"])
                 self.__products_column.controls.append(product)
         elif self.__current_date == "14/11":
             for i in range(20):
-                product = self.__create_new_product_row(f"product {i}", self.__current_order["products"][f"product {i}"]["cost"])
+                product = self.__create_new_product_row(f"Este é um Pao disto Daquilo e do Outro {i}", self.__current_order["products"][f"Este é um Pao disto Daquilo e do Outro {i}"]["cost"])
                 self.__products_column.controls.append(product)
         # Add the new products info and buttons to controls according to data from DB
     
@@ -211,6 +213,7 @@ class Order_Screen(Column):
         if e.control.text == self.ALERT_DIALOG_OK_TEXT:
             for product in self.__current_order["products"]:
                 self.__current_order["products"][product]["quantity"] = 0
+                self.__current_order["products"][product]["quantity_text"].value = "0"
             self.__current_date = e.control.data
             self.__current_order["date"] = self.__current_date
             self.__order_button.disabled = True
@@ -233,41 +236,56 @@ class Order_Screen(Column):
             controls=[
                 Container(
                     content=Row(
-                            controls=[
-                                Text(product_name),
-                                Text(f"{product_cost}€"),
-                            ],
-                            alignment=MainAxisAlignment.SPACE_AROUND,
+                        controls=[
+                            Container(
+                                content=Text(product_name),
+                                padding=padding.only(left=10, right=20),
+                                expand=True
+                            ),
+                            Text(f"{product_cost:.2f}€"),
+                        ],
+                        alignment=MainAxisAlignment.SPACE_AROUND
                     ),
-                    width=200,
-                    height=30
+                    height=80,
+                    expand=True
                 ),
                 Container(
                     content=Row(
                         controls=[
-                            ElevatedButton(
-                                text="+",
-                                adaptive=True,
-                                style=ButtonStyle(
-                                    shape=CircleBorder(),
-                                    padding=padding.all(0)
+                            Container(
+                                content=ElevatedButton(
+                                    text="-",
+                                    adaptive=True,
+                                    style=ButtonStyle(
+                                        shape=CircleBorder(),
+                                        padding=padding.all(0)
+                                    ),
+                                    on_click=self.__change_product_amount,
+                                    data=("-", product_name)
                                 ),
-                                on_click=self.__change_product_amount,
-                                data=("+", product_name)
+                                width=40,
+                                height=40
                             ),
-                            ElevatedButton(
-                                text="-",
-                                adaptive=True,
-                                style=ButtonStyle(
-                                    shape=CircleBorder(),
-                                    padding=padding.all(0)
+                            self.__current_order["products"][product_name]["quantity_text"],
+                            Container(
+                                content=ElevatedButton(
+                                    text="+",
+                                    adaptive=True,
+                                    style=ButtonStyle(
+                                        shape=CircleBorder(),
+                                        padding=padding.all(0)
+                                    ),
+                                    on_click=self.__change_product_amount,
+                                    data=("+", product_name)
                                 ),
-                                on_click=self.__change_product_amount,
-                                data=("-", product_name)
+                                padding=padding.only(right=10),
+                                width=50,
+                                height=40
                             )
                         ],
                         alignment=MainAxisAlignment.START,
-                        spacing=1,
+                        spacing=10,
+                        expand=True
                     )
                 )
             ]
@@ -290,6 +308,8 @@ class Order_Screen(Column):
                 self.__total_amount -= 1
                 if self.__total_amount <= 0:
                     self.__order_button.disabled = True
+                    
+        self.__current_order["products"][e.control.data[1]]["quantity_text"].value = f"{self.__current_order["products"][e.control.data[1]]["quantity"]}"
         
         self.__page.update()
     
