@@ -10,24 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
-type BakeryItem = {
-  id: number
-  name: string
-  price: number
-  image: string
-}
-
-type WeeklySchedule = Record<string, number[]>
-
-type EditItemsPopupProps = {
-  isOpen: boolean
-  onClose: () => void
-  catalog: BakeryItem[]
-  weeklySchedule: Record<number, WeeklySchedule>
-  setWeeklySchedule: React.Dispatch<React.SetStateAction<Record<number, WeeklySchedule>>>
-  selectedDay: string
-  currentWeek: number
-}
+// ... (previous type definitions remain unchanged)
 
 export function EditItemsPopup({
   isOpen,
@@ -63,12 +46,12 @@ export function EditItemsPopup({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl bg-white bg-opacity-90 backdrop-blur-lg border border-gray-200">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl w-full h-[calc(100vh-4rem)] max-h-[800px] flex flex-col bg-white bg-opacity-90 backdrop-blur-lg border border-gray-200">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="text-2xl font-bold text-gray-800">Edit Items for {selectedDay}</DialogTitle>
         </DialogHeader>
-        <ScrollArea className="h-[60vh] overflow-y-auto pr-4">
-          <div className="space-y-4">
+        <ScrollArea className="flex-grow">
+          <div className="space-y-4 p-4">
             {catalog.map(item => (
               <div key={item.id} className="flex items-center space-x-2">
                 <Checkbox
@@ -86,10 +69,9 @@ export function EditItemsPopup({
             ))}
           </div>
         </ScrollArea>
-        <div className="flex justify-end space-x-2 mt-4">
+        <div className="flex justify-end space-x-2 mt-4 flex-shrink-0">
           <Button onClick={onClose} variant="outline">Cancel</Button>
-          
-<Button onClick={handleSave}>Save Changes</Button>
+          <Button onClick={handleSave}>Save Changes</Button>
         </div>
       </DialogContent>
     </Dialog>

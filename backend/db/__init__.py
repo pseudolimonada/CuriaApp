@@ -7,6 +7,7 @@ from constants import (
     DB_MAX_PWD_SIZE,
 )
 
+#TODO: user_name
 SCHEMA = f"""
 CREATE TYPE user_types AS ENUM ({','.join(f"'{i.value}'" for i in UserType
 )});
