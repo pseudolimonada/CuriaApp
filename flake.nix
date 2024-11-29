@@ -11,16 +11,25 @@
       });
     in
     {
-      devShells = forEachSupportedSystem ({ pkgs }: {
-        default = pkgs.mkShell {
+      devShells = forEachSupportedSystem ({ pkgs }: rec {
+	postgres = pkgs.mkShell {
+              nativeBuildInputs = with pkgs; [ glibcLocales postgresql lsof procps ];
+        };
+
+        venv = pkgs.mkShell {
           venvDir = ".venv";
-          packages = with pkgs; [ python311 ] ++
-            (with pkgs.python311Packages; [
+          packages = with pkgs; [ python312 ] ++
+            (with pkgs.python312Packages; [
+	      android-tools
+	      flet
+	      flutter
               pip
               venvShellHook
-	      flet
             ]);
+	  nativeBuildInputs = postgres.nativeBuildInputs;
         };
+
+	default = venv;
       });
     };
 }
