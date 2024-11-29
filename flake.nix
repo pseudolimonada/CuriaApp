@@ -13,7 +13,13 @@
     {
       devShells = forEachSupportedSystem ({ pkgs }: rec {
 	postgres = pkgs.mkShell {
-              nativeBuildInputs = with pkgs; [ glibcLocales postgresql lsof procps ];
+              nativeBuildInputs = with pkgs; [
+		      glibcLocales
+		      lsof
+		      pgcli
+		      postgresql_16
+		      procps
+	      ];
         };
 
         venv = pkgs.mkShell {
