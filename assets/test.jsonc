@@ -1,0 +1,139 @@
+[
+// POST /login  (pls SSL when real users)
+{
+	"user_name": "",
+	"user_password": ""
+}
+// response: (auth token in jwt)
+,{"user_id":"...", "user_type":"..."}
+
+// POST /register
+,{
+	"user_name": "",
+	"user_password": ""
+}
+// response: (auth token in jwt)
+,{"user_id":"...", "user_type":"..."}
+
+// POST /submit_order
+// payload
+,{
+	"user_id": "", 
+	"date": "",
+  	"order_data" : [
+		{"product_id":"...", "quantity":"..."},
+		{"product_id":"...", "quantity":"..."},
+		{"product_id":"...", "quantity":"..."}
+	]
+}
+// response
+,{ "200": "Order submitted successfully" }
+,{ "400": "Error submitting order" }
+
+// GET /product_catalog
+// response
+,{
+  "catalog": [
+	{"product_id":"", "image_url":"(opt)", "product_title":"", "product_price":"", "product_scarcity": 5 /* or 1 or null*/},
+	{"product_id":"", "image_url":"(opt)", "product_title":"", "product_price":"", "product_quantity": 5 /* or 1 or null*/},
+	{"product_id":"", "image_url":"(opt)", "product_title":"", "product_price":"", "product_quantity": 5 /* or 1 or null*/},
+	{"product_id":"", "image_url":"(opt)", "product_title":"", "product_price":"", "product_quantity": 5 /* or 1 or null*/}
+  ]
+}
+
+// GET /daily_catalog
+//query params: "monday_date"
+// reponse:
+,{
+  "monday": ["product_id", "product_id", "product_id", "..."],
+  "tuesday": ["product_id", "product_id", "product_id", "..."],
+  "wednesday": ["product_id", "product_id", "product_id", "..."],
+  "thursday": ["product_id", "product_id", "product_id", "..."],
+  "friday": ["product_id", "product_id", "product_id", "..."],
+  "saturday": ["product_id", "product_id", "product_id", "..."],
+  "sunday": ["product_id", "product_id", "product_id", "..."]
+}
+
+// POST /week_catalog
+// payload
+,{
+	"date": "...",
+	"catalog": ["product_id", "product_id", "product_id", "..."]
+}
+
+// POST /product_catalog
+,{
+	"image_url":"(opt)",
+	"product_title":"",
+	"product_price":""
+}
+// response
+// same as GET /product_catalog (but updated)
+
+// PUT /product_catalog/{product_id}
+,{
+	"image_url":"(opt)",
+	"product_title":"",
+	"product_price":""
+}
+// same as GET /product_catalog (but updated)
+
+// GET /order_list/{store_key}
+// available to admin
+//query params
+	// "monday"_date
+//IDEALLY WEBSOCKET FOR REAL TIME REFRESHING!!!)
+// reponse:
+,{
+  	"order_list": [
+		{
+			"order_id": "",
+			"user_name": "",
+			"order_data": [{"product_id":"...", "quantity":"..."}],
+			"order_state": "waiting_validation" // or "waiting_delivery" or "delivered"
+		},
+		{
+			"order_id": "",
+			"user_name": "",
+			"order_data": [{"product_id":"...", "quantity":"..."}],
+			"order_state": "waiting_validation"// or "waiting_delivery" or "delivered"
+		}
+	]
+}
+
+// GET /get_order_list/{user}
+// available to non admins
+//query params
+	// "monday"_date
+//IDEALLY WEBSOCKET FOR REAL TIME REFRESHING!!!)
+// reponse:
+,{
+  "order_list": [
+	{
+		"order_id": "",
+		"user_id": "",
+		"date": "",
+		"order_state": "",
+		"order_data" : [{"product_id":"...", "quantity":"..."},
+					{"product_id":"...", "quantity":"..."},
+					{"product_id":"...", "quantity":"..."}]
+		
+	},
+	{
+		"order_id": "",
+		"user_id": "",
+		"date": "",
+		"order_state": "",
+		"order_data" : [{"product_id":"...", "quantity":"..."},
+					{"product_id":"...", "quantity":"..."},
+					{"product_id":"...", "quantity":"..."}]
+		
+	}
+  ]
+}
+
+// /notification_for_new_orders
+//websocket
+// ???
+
+]
