@@ -11,9 +11,26 @@ sudo -u postgres psql
 ```
 
 ```shell
-postgres=# create database pgi2024;
-postgres=# create user admin with encrypted password 'pgi2024';
-postgres=# grant all privileges on database pgi2024 to admin;
+DROP DATABASE IF EXISTS pgi2024;
+
+CREATE DATABASE pgi2024;
+
+CREATE USER admin WITH ENCRYPTED PASSWORD 'admin';
+
+GRANT ALL PRIVILEGES ON DATABASE pgi2024 TO admin;
+
+ALTER DATABASE pgi2024 OWNER TO admin;
+
+GRANT ALL PRIVILEGES ON SCHEMA public TO admin;
+
+GRANT USAGE ON SCHEMA public TO admin;
+
+GRANT CREATE ON SCHEMA public TO admin;
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO admin;
+
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO admin;
+
 ```
 
 ## .env (example)
