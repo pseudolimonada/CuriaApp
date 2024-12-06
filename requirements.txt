@@ -1,4 +1,7 @@
 flet==0.24.1
-psycopg2==2.9.10
-Flask==3.0.3
+psycopg2-binary==2.9.10
 PyJWT[crypto]==2.9.0
+flask==3.0.3
+Flask-Cors==5.0.0
+flask-sqlalchemy==3.1.1
+python-dotenv==1.0.1

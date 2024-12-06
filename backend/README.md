@@ -11,20 +11,39 @@ sudo -u postgres psql
 ```
 
 ```shell
-postgres=# create database pgi2024;
-postgres=# create user admin with encrypted password 'pgi2024';
-postgres=# grant all privileges on database pgi2024 to admin;
+DROP DATABASE IF EXISTS pgi2024;
+
+CREATE DATABASE pgi2024;
+
+CREATE USER admin WITH ENCRYPTED PASSWORD 'admin';
+
+GRANT ALL PRIVILEGES ON DATABASE pgi2024 TO admin;
+
+ALTER DATABASE pgi2024 OWNER TO admin;
+
+GRANT ALL PRIVILEGES ON SCHEMA public TO admin;
+
+GRANT USAGE ON SCHEMA public TO admin;
+
+GRANT CREATE ON SCHEMA public TO admin;
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO admin;
+
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO admin;
+
 ```
+
+> [!NOTE]
+> if your admin user already exists with a different password, in the .env example put the db_user/pass with the correct name/password
+
+
 
 ## .env (example)
 
 ```
-DB_USER = pgi2024
-DB_PASS = 1234
-DB_HOST = 127.0.0.1
+DB_USER = admin
+DB_PASS = admin
+DB_HOST = localhost
 DB_PORT = 5432
 DB_NAME = pgi2024
-APP_HOST = 127.0.0.1
-APP_PORT = 8080
-APP_SECRET_KEY = secret_key
 ```
