@@ -4,12 +4,14 @@ from db_models import *
 import json
 from config import Config
 from extensions import db
+from db_setup import init_db
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})  # Enable CORS for all routes
 
 app.config.from_object(Config)
 db.init_app(app)  # Initialize the db instance with the app
+init_db()
 print("Backend at http://127.0.0.1:5000/")
 
 
