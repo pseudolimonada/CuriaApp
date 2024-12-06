@@ -1,0 +1,212 @@
+[
+    {
+      "product_name": "Brioche de laranja com amêndoas",
+      "product_price": 6.00,
+      "product_description": "De longa fermentação, com farinha de trigo T55, sumo natural de laranja, açúcar, manteiga, sal e massa mãe, coberto com lâminas de amêndoas."
+    },
+    {
+      "product_name": "Cruffin",
+      "product_price": 2.90,
+      "product_description": "Muffin de massa folhada recheado com doce de leite."
+    },
+    {
+      "product_name": "Pãozinho de milho doce",
+      "product_price": 1.20,
+      "product_description": "Feito com milho verde cozido, farinha de trigo, leite condensado, massa mãe e levedura seca."
+    },
+    {
+      "product_name": "Pão de trigo com batata doce roxa",
+      "product_price": 4.50,
+      "product_description": "Feito com trigo, centeio, batata doce roxa e azeite e polvilhado com sementes de sésamo."
+    },
+    {
+      "product_name": "Bolinho de fubá com goiabada",
+      "product_price": 2.75,
+      "product_description": "Bolinho doce, feito com farinha de trigo e fubá de milho, recheado com goiabada cremosa."
+    },
+    {
+      "product_name": "Fougasse",
+      "product_price": 3.85,
+      "product_description": "Pão em formato de folha, feito com massa mãe, farinha, azeite e azeitonas."
+    },
+    {
+      "product_name": "Focaccia decorada",
+      "product_price": 35.00,
+      "product_description": ""
+    },
+    {
+      "product_name": "100% centeio",
+      "product_price": 5.00,
+      "product_description": "Pão escuro, feito com centeio Integral, massa mãe (levain) de centeio, água e sal. Um pão denso, húmido e de sabor intenso."
+    },
+    {
+      "product_name": "Bolinho de maçã com massa mãe",
+      "product_price": 2.00,
+      "product_description": "Deliciosamente amanteigado, com um toque de canela."
+    },
+    {
+      "product_name": "Pão de espelta Bio",
+      "product_price": 6.50,
+      "product_description": "De massa mãe e longa fermentação, com blend de espelta branca e integral."
+    },
+    {
+      "product_name": "Pão de trigo 100% integral (em forma)",
+      "product_price": 5.00,
+      "product_description": "Com um suave toque de azeite, macio e muito saboroso."
+    },
+    {
+      "product_name": "Bolachas (cookie) de massa mãe com gotas de chocolate",
+      "product_price": 1.50,
+      "product_description": ""
+    },
+    {
+      "product_name": "Bolinho de abóbora com especiarias",
+      "product_price": 2.00,
+      "product_description": "Com massa mãe, canela e cravinho."
+    },
+    {
+      "product_name": "Pão de abóbora com nozes",
+      "product_price": 6.00,
+      "product_description": "Feito com farinha de trigo, puré natural de abóbora, com um leve toque de açafrão da Índia e açúcar amarelo. De fermentação 100% com massa mãe."
+    },
+    {
+      "product_name": "Pãozinho de Queijo",
+      "product_price": 1.25,
+      "product_description": "Produto artesanal, feito com queijo e polvilho, farinha obtida da mandioca, sendo naturalmente isenta de glúten. Cada pãozinho pesa cerca de 65 a 70g."
+    },
+    {
+      "product_name": "Bolo de banana com massa mãe",
+      "product_price": 2.00,
+      "product_description": ""
+    },
+    {
+      "product_name": "Croissant folhado",
+      "product_price": 1.80,
+      "product_description": ""
+    },
+    {
+      "product_name": "Pain au chocolate",
+      "product_price": 2.00,
+      "product_description": ""
+    },
+    {
+      "product_name": "Rústico semi-integral",
+      "product_price": 4.50,
+      "product_description": "Feito com massa mãe, farinha T80 e longa fermentação."
+    },
+    {
+      "product_name": "Bolo de cacau com gotas de chocolate",
+      "product_price": 2.00,
+      "product_description": "Feito com massa mãe."
+    },
+    {
+      "product_name": "Mix de Sementes",
+      "product_price": 5.50,
+      "product_description": "Pão rústico de fermentação natural com massa mãe, com farinha semi-integral e seleção de sementes como chia, linhaça, sésamo, girassol e abóbora."
+    },
+    {
+      "product_name": "Focaccia de chouriço e cebola roxa",
+      "product_price": 8.00,
+      "product_description": "De fermentação natural com massa mãe, azeite, chouriço e cebolas roxas."
+    },
+    {
+      "product_name": "Multigrãos em forma",
+      "product_price": 6.00,
+      "product_description": "Com farinha semi-integral, sementes de chia, linhaça, abóbora, girassol e sésamo, um leve toque de mel e manteiga. Saboroso e saciante. Perfeito para sandes e tostas."
+    },
+    {
+      "product_name": "Focaccia de tomates",
+      "product_price": 7.00,
+      "product_description": "De fermentação natural com massa mãe, azeite, tomates, sésamo e alecrim."
+    },
+    {
+      "product_name": "Focaccia de tomates, azeitona e queijo",
+      "product_price": 8.00,
+      "product_description": "De fermentação natural com massa mãe, com bastante azeite, sésamo e alecrim."
+    },
+    {
+      "product_name": "Brioche francês",
+      "product_price": 6.50,
+      "product_description": "Tradicional pão à base de ovos e manteiga, extremamente suave e guloso. Feito com massa mãe e longa fermentação, associada a um ínfimo percentual de levedura."
+    },
+    {
+      "product_name": "Delícia da Bella",
+      "product_price": 0.75,
+      "product_description": "Pãozinho de leite, de fermentação longa, com levedura. Massa suave e adocicada, com um toque de leite condensado e coco ralado na superfície."
+    },
+    {
+      "product_name": "Rústico de trigo e centeio (mistura)",
+      "product_price": 4.50,
+      "product_description": "Feito com massa mãe e um blend de trigo semi-integral, integral e centeio, esse pão tem sabor marcante e muito apreciado."
+    },
+    {
+      "product_name": "Rústico Integral",
+      "product_price": 4.50,
+      "product_description": "Feito com massa mãe, longa fermentação e farinha moída em mós de pedra."
+    },
+    {
+      "product_name": "Pão de abóbora",
+      "product_price": 5.50,
+      "product_description": "Levemente adocicado, este pão leva trigo, puré de abóbora, massa mãe e um suave toque de cúrcuma e mel, que lhe conferem sabor único."
+    },
+    {
+      "product_name": "Pão de trigo e alfarroba",
+      "product_price": 5.50,
+      "product_description": "Pão de fermentação natural, com uma combinação de trigo, farelos de trigo e alfarroba."
+    },
+    {
+      "product_name": "Mini-baguete com chouriço",
+      "product_price": 2.00,
+      "product_description": "Baguete em formato menor que a tradicional, recheada com finas fatias de chouriço."
+    },
+    {
+      "product_name": "Rústico com tomate e sementes de papoila",
+      "product_price": 6.50,
+      "product_description": "Pão de trigo, água, sal e massa mãe, com tomates e sementes de papoila envolvidos na massa."
+    },
+    {
+      "product_name": "Rústico especial de cacau, chocolate e noz",
+      "product_price": 7.50,
+      "product_description": "Com cacau, nozes picadas e gotas de chocolate."
+    },
+    {
+      "product_name": "Rústico com azeitonas",
+      "product_price": 5.50,
+      "product_description": "Com azeitonas e ervas aromáticas."
+    },
+    {
+      "product_name": "Rústico com batata doce",
+      "product_price": 5.50,
+      "product_description": "De fermentação natural, com trigo, centeio e batata doce laranja."
+    },
+    {
+      "product_name": "Rústico com chouriço",
+      "product_price": 6.50,
+      "product_description": "fermentação natural com massa mãe, trigo, água, sal e recheado com fatias de chouriço."
+    },
+    {
+      "product_name": "Rústico com tâmara e noz",
+      "product_price": 6.50,
+      "product_description": "Farinha T80, com tâmara e noz."
+    },
+    {
+      "product_name": "Rústico com uva passa",
+      "product_price": 5.50,
+      "product_description": "De fermentação natural, com farinha, água, sal e uvas passas."
+    },
+    {
+      "product_name": "Pão de cacau e mel (australiano)",
+      "product_price": 6.00,
+      "product_description": "Pão de sabor diferenciado, com cacau, mel, manteiga e um leve toque de cravinho."
+    },
+    {
+      "product_name": "Pão de leite",
+      "product_price": 5.50,
+      "product_description": "Pão de fermentação natural, em forma. Macio, ideal para sands e tostas, leva leite e manteiga."
+    },
+    {
+      "product_name": "Rústico especial com queijo e ervas",
+      "product_price": 5.50,
+      "product_description": "De longa fermentação, com farinha de trigo T80, moída em mós de pedra, água, sal e massa mãe com um toque de queijo na superfície e ervas desidratadas."
+    }
+  ]
