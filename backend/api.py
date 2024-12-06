@@ -10,7 +10,6 @@ CORS(app, resources={r"/*": {"origins": "*"}})  # Enable CORS for all routes
 
 app.config.from_object(Config)
 db.init_app(app)  # Initialize the db instance with the app
-print("Frontend at http://127.0.0.1:8000/")
 print("Backend at http://127.0.0.1:5000/")
 
 
