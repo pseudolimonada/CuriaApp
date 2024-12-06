@@ -33,15 +33,17 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO admin;
 
 ```
 
+> [!NOTE]
+> if your admin user already exists with a different password, in the .env example put the db_user/pass with the correct name/password
+
+
+
 ## .env (example)
 
 ```
-DB_USER = pgi2024
-DB_PASS = 1234
-DB_HOST = 127.0.0.1
+DB_USER = admin
+DB_PASS = admin
+DB_HOST = localhost
 DB_PORT = 5432
 DB_NAME = pgi2024
-APP_HOST = 127.0.0.1
-APP_PORT = 8080
-APP_SECRET_KEY = secret_key
 ```

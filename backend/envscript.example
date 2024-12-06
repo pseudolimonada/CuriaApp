@@ -1,0 +1,25 @@
+# vim: foldmethod=marker
+# shellcheck disable=SC2034
+
+# PGADMIN {{{
+
+PGADMIN_DEFAULT_EMAIL=admin@email.com
+PGADMIN_DEFAULT_PASSWORD=adminpassword
+PGADMIN_DEFAULT_PORT=5050
+
+# }}}
+
+# POSTGRES {{{
+
+POSTGRES_DB=pgi2024
+POSTGRES_PASSWORD=password
+POSTGRES_USER=admin
+POSTGRES_PORT=5432
+
+DB_USER=admin
+DB_PASSWORD=admin
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=pgi2024
+
+# }}}
