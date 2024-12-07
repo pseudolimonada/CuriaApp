@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from db_models import *
-import json
 from config import Config, APP_PORT, APP_URL
 from extensions import db
 from psycopg2.errors import UniqueViolation
