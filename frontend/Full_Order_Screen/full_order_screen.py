@@ -105,7 +105,7 @@ class Full_Order_Screen(Column):
         self,
         product_name: str,
         product_quantity: int,
-        product_cost: float
+        product_cost: str
     ):
         '''
         Creates a new product row with the ordered products and their cost.
@@ -122,7 +122,7 @@ class Full_Order_Screen(Column):
                                 expand=True
                             ),
                             Container(
-                                content=Text(f"{product_quantity*product_cost:.2f}€"),
+                                content=Text(f"{product_quantity*float(product_cost[:-1]):.2f}€"),
                                 padding=padding.only(right=10)
                             ),
                         ],

@@ -11,7 +11,8 @@ shared_vars = {
 
 endpoints_urls = {
     "LOGIN": "/login",
-    "REGISTER": "/register"
+    "REGISTER": "/register",
+    "GET_CATALOG": "/businesses/$business_id/products"
 }
 
 STATUS_CODES = {"SUCCESS": 200, "INVALID_CREDENTIALS": 401, "INTERNAL_ERROR": 500, "BAD_REQUEST": 400}
