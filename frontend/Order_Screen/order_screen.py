@@ -1,4 +1,4 @@
-from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, AlertDialog, TextButton, TextStyle, Padding, alignment
+from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight
 from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls
 from present_snack_bar import present_snack_bar
 from datetime import datetime, timedelta
@@ -27,6 +27,12 @@ class Order_Screen(Column):
     __total_amount: int = 0
     __current_date: datetime
     __current_week_day: str
+    
+    __business_title: Text = Text(
+        size=30,
+        text_align=TextAlign.CENTER,
+        width=FontWeight.BOLD
+    )
     
     __days_row: Row = Row(
         alignment=MainAxisAlignment.CENTER,
@@ -62,11 +68,13 @@ class Order_Screen(Column):
         super().__init__(alignment=MainAxisAlignment.SPACE_BETWEEN, expand=True)
         
         self.__page = page
+        self.__business_title.value = "Farinha e Afeto"
         
         # Get today's date
         self.__current_date = datetime.today()
         self.__current_week_day = self.__current_date.strftime("%A")
         
+        # Getting all the data from DB and storing it to use
         self.refresh_data()
         
         # Setting up order button (starts disabled)
@@ -107,7 +115,11 @@ class Order_Screen(Column):
         self.controls = [
             Column(
                 controls=[
-                    Divider(),
+                    Container(
+                        content = self.__business_title,
+                        padding=Padding(left=1, top=5, right=1, bottom=5),
+                        alignment=alignment.center
+                    ),
                     Container(
                         content = self.__days_row,
                         padding=Padding(left=8, top=2, right=8, bottom=2),
