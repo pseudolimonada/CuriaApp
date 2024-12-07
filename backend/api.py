@@ -18,6 +18,7 @@ with app.app_context():
     print("Tables created")
 print(f"Backend at {APP_URL}:{APP_PORT}/")
 
+ENDPOINT_TO_BE_IMPLEMENTED = (jsonify({ "error": "TO BE IMPLEMETED" }), 501)
 
 @app.route("/", methods=["GET"])
 def index():
@@ -32,6 +33,7 @@ def get_users():
 
 @app.route("/users", methods=["POST"])
 def register_or_login_user():
+    assert request.json is not None, "Request Json is None"
 
     user_data = {
         "user_name": request.json.get("user_name"),
@@ -74,6 +76,10 @@ def register_or_login_user():
         db.session.rollback()
         return jsonify({"error": str(e)}), 400
 
+@app.route('/register', methods=["POST"])
+def register():
+    return ENDPOINT_TO_BE_IMPLEMENTED
+
 
 @app.route("/businesses", methods=["GET"])
 def get_businesses():
@@ -83,6 +89,8 @@ def get_businesses():
 
 @app.route("/businesses", methods=["POST"])
 def create_business():
+    assert request.json is not None, "Request Json is None"
+
     business_data = {
         "business_name": request.json.get("business_name"),
     }
@@ -106,7 +114,52 @@ def create_business():
 # @validate_business_user
 @app.route("/businesses/<int:business_id>", methods=["GET"])
 def create_order():
-    pass
+    assert request.json is not None, "Request Json is None"
+
+    return ENDPOINT_TO_BE_IMPLEMENTED
+
+@app.route('/businesses/<int:business_id>/orders', methods=['POST'])
+def submit_order():
+    assert request.json is not None, "Request Json is None"
+
+    return ENDPOINT_TO_BE_IMPLEMENTED
+
+@app.route('/businesses/<int:business_id>/products', methods=['GET'])
+def get_products():
+    assert request.json is not None, "Request Json is None"
+
+    return ENDPOINT_TO_BE_IMPLEMENTED
+
+@app.route('/businesses/<int:business_id>/products', methods=['POST'])
+def post_product():
+    assert request.json is not None, "Request Json is None"
+
+    return ENDPOINT_TO_BE_IMPLEMENTED
+
+@app.route('/businesses/<int:business_id>/products/<int:product_id>', methods=['PUT'])
+def put_product():
+    assert request.json is not None, "Request Json is None"
+
+    return ENDPOINT_TO_BE_IMPLEMENTED
+
+@app.route('/businesses/<int:business_id>/catalogs', methods=['GET'])
+def get_catalogs():
+    assert request.json is not None, "Request Json is None"
+
+    return ENDPOINT_TO_BE_IMPLEMENTED
+
+@app.route('/businesses/<int:business_id>/catalogs', methods=['POST'])
+def post_catalogs():
+    assert request.json is not None, "Request Json is None"
+
+    return ENDPOINT_TO_BE_IMPLEMENTED
+
+@app.route('/businesses/<int:business_id>/orders', methods=['GET'])
+def get_orders():
+    assert request.json is not None, "Request Json is None"
+
+    return ENDPOINT_TO_BE_IMPLEMENTED
+
 
 
 if __name__ == "__main__":
