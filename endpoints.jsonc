@@ -6,6 +6,13 @@
 }
 // response: (auth token in jwt)
 ,{"user_id":"...", "manager_business_ids":["...", "..."]}
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+    "SUCCESS": 200,
+    "INVALID_CREDENTIALS": 401,
+    "INTERNAL_ERROR": 500,
+    "BAD_REQUEST": 400
+}
 
 // POST /register
 ,{
@@ -14,6 +21,13 @@
 }
 // response: (auth token in jwt)
 ,{"user_id":"...", "manager_business_ids":["...", "..."]}
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+    "SUCCESS": 200,
+    "INVALID_CREDENTIALS": 401,
+    "INTERNAL_ERROR": 500,
+    "BAD_REQUEST": 400
+}
 
 
 // POST /businesses/{business_id}/orders
@@ -31,6 +45,13 @@
 // response
 ,{ "200": "Order submitted successfully" }
 ,{ "400": "Error submitting order" }
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+    "SUCCESS": 200,
+    "INTERNAL_ERROR": 500,
+    "BAD_REQUEST": 400
+}
+
 
 // GET /businesses/{business_id}/products
 // header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
@@ -43,6 +64,11 @@
 	{"product_id":"", "image_url":"(opt)", "product_title":"", "product_description":"", "product_price":"", "product_quantity": 5 /* or 1 or null*/}
   ]
 }
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+    "SUCCESS": 200,
+    "INTERNAL_ERROR": 500
+}
 
 // POST /businesses/{business_id}/products
 // header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
@@ -54,6 +80,11 @@
 	"product_price":""
 }
 // response (same as GET /businesses/{business_id}/products but updated)
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+    "SUCCESS": 200,
+    "INTERNAL_ERROR": 500
+}
 
 // PUT /businesses/{business_id}/products/{product_id}
 // header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
@@ -65,7 +96,11 @@
 	"product_price":"(opt)"
 }
 // response (same as GET /businesses/{business_id}/products but updated)
-
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+    "SUCCESS": 200,
+    "INTERNAL_ERROR": 500
+}
 
 
 // GET /businesses/{business_id}/catalogs
@@ -81,6 +116,12 @@
   "saturday": ["product_id", "product_id", "product_id", "..."],
   "sunday": ["product_id", "product_id", "product_id", "..."]
 }
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+    "SUCCESS": 200,
+    "INTERNAL_ERROR": 500
+}
+
 
 // POST /businesses/{business_id}/catalogs
 // header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
@@ -89,6 +130,12 @@
 	"catalog_date": "...",
 	"catalog_products": ["product_id", "product_id", "product_id", "..."]
 }
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+    "SUCCESS": 200,
+    "INTERNAL_ERROR": 500
+}
+
 
 // GET /businesses/{business_id}/orders
 // header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
@@ -113,6 +160,11 @@
 			"order_state": "waiting_validation"// or "waiting_delivery" or "delivered"
 		}
 	]
+}
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+    "SUCCESS": 200,
+    "INTERNAL_ERROR": 500
 }
 
 // /notification_for_new_orders
