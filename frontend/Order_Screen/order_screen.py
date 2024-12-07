@@ -1,4 +1,4 @@
-from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight
+from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight, IconButton, icons, CrossAxisAlignment, VisualDensity
 from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls
 from present_snack_bar import present_snack_bar
 from datetime import datetime, timedelta
@@ -21,18 +21,30 @@ class Order_Screen(Column):
     __current_week_catalog: dict = {}
     
     __current_order: dict = {
-        "date": datetime,
+        "date": str,
         "products": dict
     }
     __total_amount: int = 0
-    __current_date: datetime
+    __current_date: str
     __current_week_day: str
     
     __business_title: Text = Text(
-        size=30,
+        size=25,
         text_align=TextAlign.CENTER,
         width=FontWeight.BOLD
     )
+    
+    __pass_week_section: Container = Container(
+        alignment=alignment.center
+    )
+    
+    __current_week_text: Text = Text(
+        size=15,
+        width=FontWeight.BOLD
+    )
+    
+    __pass_week_forward_button: IconButton
+    __pass_week_backward_button: IconButton
     
     __days_row: Row = Row(
         alignment=MainAxisAlignment.CENTER,
@@ -71,8 +83,64 @@ class Order_Screen(Column):
         self.__business_title.value = "Farinha e Afeto"
         
         # Get today's date
-        self.__current_date = datetime.today()
-        self.__current_week_day = self.__current_date.strftime("%A")
+        today = datetime.today()
+        self.__current_date = today.strftime("%d/%m/%Y")
+        self.__current_week_day = today.strftime("%A")
+        
+        self.__pass_week_forward_button = IconButton(
+            icon = icons.ARROW_FORWARD_IOS,
+            icon_size = 12,
+            enable_feedback=False,
+            adaptive=True,
+            on_click=self.__change_current_week,
+            data="forward",
+            style=ButtonStyle(
+                padding=padding.all(0),
+                visual_density=VisualDensity.COMPACT
+            )
+        )
+        self.__pass_week_backward_button = IconButton(
+            icon = icons.ARROW_BACK_IOS,
+            icon_size = 12,
+            enable_feedback=False,
+            adaptive=True,
+            on_click=self.__change_current_week,
+            data="backward",
+            style=ButtonStyle(
+                padding=padding.all(0),
+                visual_density=VisualDensity.COMPACT
+            )
+        )
+        
+        # Updating the week section
+        days_to_monday = today.weekday()
+        monday = today - timedelta(days=days_to_monday)
+        sunday = monday + timedelta(days=6)
+        self.__current_week_text.value = f"{monday.strftime('%d/%m')} - {sunday.strftime('%d/%m')}"
+        self.__pass_week_section.content = Column(
+            controls=[
+                Container(
+                    content=self.__current_week_text,
+                    padding=Padding(left=1, top=3, right=1, bottom=0),
+                    alignment=alignment.center
+                ),
+                Container(
+                    content=Row(
+                        controls=[
+                            self.__pass_week_backward_button,
+                            self.__pass_week_forward_button
+                        ],
+                        alignment=MainAxisAlignment.CENTER,
+                        spacing=5
+                    ),
+                    padding=Padding(left=1, top=0, right=1, bottom=0),
+                    alignment=alignment.center
+                )
+            ],
+            horizontal_alignment=CrossAxisAlignment.CENTER,
+            alignment=MainAxisAlignment.CENTER,
+            spacing=1
+        )
         
         # Getting all the data from DB and storing it to use
         self.refresh_data()
@@ -116,7 +184,13 @@ class Order_Screen(Column):
             Column(
                 controls=[
                     Container(
-                        content = self.__business_title,
+                        content = Row(
+                            controls=[
+                                self.__business_title,
+                                self.__pass_week_section
+                            ],
+                            alignment=MainAxisAlignment.SPACE_AROUND
+                        ),
                         padding=Padding(left=1, top=5, right=1, bottom=5),
                         alignment=alignment.center
                     ),
@@ -141,9 +215,10 @@ class Order_Screen(Column):
         '''
         
         # Calculate the number of days to subtract to get to Monday
-        days_to_monday = self.__current_date.weekday()  # weekday() returns 0 for Monday, 1 for Tuesday, etc.
+        current_date_datetime = datetime.strptime(self.__current_date, "%d/%m/%Y")
+        days_to_monday = current_date_datetime.weekday()  # weekday() returns 0 for Monday, 1 for Tuesday, etc.
         # Subtract the number of days to get to Monday
-        monday = self.__current_date - timedelta(days=days_to_monday)
+        monday = current_date_datetime - timedelta(days=days_to_monday)
         
         ###########################################################################
         #        ------- REMOVE THIS IF CASE FOR REAL TEST !!!!!!! -------        #
@@ -284,13 +359,13 @@ class Order_Screen(Column):
         
         self.__days_row.controls.clear()
         
-        self.__create_new_date_button("Mon", monday)
-        self.__create_new_date_button("Tue", (monday + timedelta(days=1)))
-        self.__create_new_date_button("Wed", (monday + timedelta(days=2)))
-        self.__create_new_date_button("Thu", (monday + timedelta(days=3)))
-        self.__create_new_date_button("Fri", (monday + timedelta(days=4)))
-        self.__create_new_date_button("Sat", (monday + timedelta(days=5)))
-        self.__create_new_date_button("Sun", (monday + timedelta(days=6)))
+        self.__create_new_date_button("Mon", monday.strftime("%d/%m/%Y"))
+        self.__create_new_date_button("Tue", (monday + timedelta(days=1)).strftime("%d/%m/%Y"))
+        self.__create_new_date_button("Wed", (monday + timedelta(days=2)).strftime("%d/%m/%Y"))
+        self.__create_new_date_button("Thu", (monday + timedelta(days=3)).strftime("%d/%m/%Y"))
+        self.__create_new_date_button("Fri", (monday + timedelta(days=4)).strftime("%d/%m/%Y"))
+        self.__create_new_date_button("Sat", (monday + timedelta(days=5)).strftime("%d/%m/%Y"))
+        self.__create_new_date_button("Sun", (monday + timedelta(days=6)).strftime("%d/%m/%Y"))
         
     # Clears the products column and refill it with new data from DB for a specific date
     def __fill_products_column(self):
@@ -305,12 +380,18 @@ class Order_Screen(Column):
         ###########################################################################
         testing = True
         if testing:
-            if self.__current_week_day == "Wed":
+            if self.__current_week_day == "Wed" and self.__current_date == "04/12/2024":
                 num = 20
-            elif self.__current_week_day == "Thu":
+            elif self.__current_week_day == "Thu" and self.__current_date == "05/12/2024":
                 num = 5
-            elif self.__current_week_day == "Fri":
+            elif self.__current_week_day == "Fri" and self.__current_date == "06/12/2024":
                 num = 2
+            elif self.__current_week_day == "Wed":
+                num = 10
+            elif self.__current_week_day == "Thu":
+                num = 1
+            elif self.__current_week_day == "Fri":
+                num = 8
             else:
                 num = 0
             for i in range(num):
@@ -332,7 +413,7 @@ class Order_Screen(Column):
     def __create_new_date_button(
         self,
         week_day: str,
-        date: datetime
+        date: str
     ):
         '''
         Creates and appends to the days list a button for a respective date.
@@ -378,18 +459,41 @@ class Order_Screen(Column):
         '''
         Handles the close of the dialog alert.
         '''
-        
         self.page.close(self.__alert)
+        
         if e.control.text == self.ALERT_DIALOG_OK_TEXT:
-            for product in self.__current_order["products"]:
-                self.__current_order["products"][product]["quantity"] = 0
-                self.__current_order["products"][product]["quantity_text"].value = "0"
-            self.__current_date = e.control.data[1]
-            self.__current_week_day = e.control.data[0]
-            self.__current_order["date"] = self.__current_date
-            self.__order_button.disabled = True
-            self.__total_amount = 0
-            self.__fill_products_column()
+            if e.control.data in ["forward", "backward"]:
+                current_date_datetime = datetime.strptime(self.__current_date, "%d/%m/%Y")
+                if e.control.data == "forward":
+                    current_date_datetime += timedelta(days=7)
+                elif e.control.data == "backward":
+                    current_date_datetime -= timedelta(days=7)
+                
+                days_to_monday = current_date_datetime.weekday()
+                monday = current_date_datetime - timedelta(days=days_to_monday)
+                sunday = monday + timedelta(days=6)
+                self.__current_date = current_date_datetime.strftime("%d/%m/%Y")
+                self.__current_week_text.value = f"{monday.strftime('%d/%m')} - {sunday.strftime('%d/%m')}"
+                
+                for product in self.__current_order["products"]:
+                    self.__current_order["products"][product]["quantity"] = 0
+                    self.__current_order["products"][product]["quantity_text"].value = "0"
+                self.__current_order["date"] = self.__current_date
+                self.__order_button.disabled = True
+                self.__total_amount = 0
+                self.__page.update()
+                
+                self.refresh_data()
+            else:
+                for product in self.__current_order["products"]:
+                    self.__current_order["products"][product]["quantity"] = 0
+                    self.__current_order["products"][product]["quantity_text"].value = "0"
+                self.__current_date = e.control.data[1]
+                self.__current_week_day = e.control.data[0]
+                self.__current_order["date"] = self.__current_date
+                self.__order_button.disabled = True
+                self.__total_amount = 0
+                self.__fill_products_column()
             
         self.__page.update()
     
@@ -484,3 +588,31 @@ class Order_Screen(Column):
         
         self.__page.update()
     
+    # Changes the current week
+    def __change_current_week(self, e):
+        '''
+        Changes the current week
+        '''
+        
+        if self.__total_amount > 0:
+            self.__alert.actions=[
+                TextButton(self.ALERT_DIALOG_OK_TEXT, on_click=self.__handle_close_dialog, data=e.control.data),
+                TextButton(self.ALERT_DIALOG_CANCEL_TEXT, on_click=self.__handle_close_dialog)
+            ]
+            self.__page.open(self.__alert)
+        else:        
+            current_date_datetime = datetime.strptime(self.__current_date, "%d/%m/%Y")
+            if e.control.data == "forward":
+                current_date_datetime += timedelta(days=7)
+            elif e.control.data == "backward":
+                current_date_datetime -= timedelta(days=7)
+            
+            days_to_monday = current_date_datetime.weekday()
+            monday = current_date_datetime - timedelta(days=days_to_monday)
+            sunday = monday + timedelta(days=6)
+            self.__current_date = current_date_datetime.strftime("%d/%m/%Y")
+            self.__current_week_text.value = f"{monday.strftime('%d/%m')} - {sunday.strftime('%d/%m')}"
+            self.__current_order["date"] = self.__current_date
+            
+            self.refresh_data()
+            self.__page.update()
