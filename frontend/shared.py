@@ -1,8 +1,20 @@
+user_ids = {
+    "user_id": str,
+    "manager_business_ids": list
+}
+
 shared_vars = {
     "main_container": None,
     "bottom_menu": None,
     "current_order": None
 }
+
+endpoints_urls = {
+    "LOGIN": "/login",
+    "REGISTER": "/register"
+}
+
+STATUS_CODES = {"SUCCESS": 200, "INVALID_CREDENTIALS": 401, "INTERNAL_ERROR": 500, "BAD_REQUEST": 400}
 
 PRIM_COLOR = '#f0cf7d'
 SEC_COLOR = '#4c4c4c'
