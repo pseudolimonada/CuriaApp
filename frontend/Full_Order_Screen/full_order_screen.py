@@ -22,6 +22,8 @@ class Full_Order_Screen(Column):
     CONFIRM_BUTTON_TEXT: str = "Confirm!"
     CANCEL_BUTTON_TEXT: str = "Cancel"
     BACK_BUTTON_TEXT: str = "Back"
+    APPROVE_BUTTON_TEXT: str = "Approve"
+    DENY_BUTTON_TEXT: str = "Deny"
     ALERT_DIALOG_TITLE_TEXT: str = "Your Order Is Done"
     ALERT_DIALOG_CONTENT_TEXT: str = "You can check order details in orders details menu."
     ALERT_DIALOG_OK_TEXT: str = "OK"
@@ -55,6 +57,8 @@ class Full_Order_Screen(Column):
     __confirm_order_button: ElevatedButton
     __cancel_button: ElevatedButton
     __back_button: ElevatedButton
+    __approve_order_button: ElevatedButton
+    __deny_order_button: ElevatedButton
     
     ###############################
     # Initializing and setting up the alert dialog
@@ -116,27 +120,41 @@ class Full_Order_Screen(Column):
         
         ###############################
         # Setting up the buttons
-        self.__confirm_order_button = ElevatedButton(
-            text=self.CONFIRM_BUTTON_TEXT,
-            icon=icons.CHECK,
-            adaptive=True,
-            on_click=self.__confirm_order,
-        )
-        
-        self.__cancel_button = ElevatedButton(
-            text=self.CANCEL_BUTTON_TEXT,
-            icon=icons.CANCEL,
-            adaptive=True,
-            on_click=self.__cancel_order,
-        )
-        
         self.__back_button = ElevatedButton(
             text=self.CANCEL_BUTTON_TEXT,
             icon=icons.KEYBOARD_RETURN,
             adaptive=True,
             on_click=self.__turn_back,
-            scale=1.5
         )
+        
+        if user_ids["is_admin"]:
+            self.__back_button.scale=0.8
+            self.__approve_order_button = ElevatedButton(
+                text=self.APPROVE_BUTTON_TEXT,
+                icon=icons.CHECK,
+                adaptive=True,
+                on_click=self.__approve_order,
+            )
+            self.__deny_order_button = ElevatedButton(
+                text=self.DENY_BUTTON_TEXT,
+                icon=icons.CANCEL,
+                adaptive=True,
+                on_click=self.__deny_order,
+            )
+        else:
+            self.__back_button.scale=1.5
+            self.__confirm_order_button = ElevatedButton(
+                text=self.CONFIRM_BUTTON_TEXT,
+                icon=icons.CHECK,
+                adaptive=True,
+                on_click=self.__confirm_order,
+            )
+            self.__cancel_button = ElevatedButton(
+                text=self.CANCEL_BUTTON_TEXT,
+                icon=icons.CANCEL,
+                adaptive=True,
+                on_click=self.__cancel_order,
+            )
     
     
     #############################################
@@ -186,8 +204,30 @@ class Full_Order_Screen(Column):
             if products_dict[product]["quantity"] > 0:
                 self.__products_column.controls.append(self.__create_new_product_row(product, products_dict[product]["quantity"], products_dict[product]["cost"]))
         
-        # Adding the back button
-        self.__buttons_row.controls.append(self.__back_button)
+        if user_ids["is_admin"]:
+            self.__buttons_row.controls.append(
+                Container(
+                    content=Column(
+                        controls=[
+                            Row(
+                                controls=[
+                                    self.__deny_order_button,
+                                    self.__approve_order_button
+                                ],
+                                alignment=MainAxisAlignment.CENTER
+                            ),
+                            self.__back_button
+                        ],
+                        alignment=MainAxisAlignment.CENTER,
+                        horizontal_alignment=CrossAxisAlignment.CENTER,
+                        spacing=5
+                    ),
+                    alignment=alignment.center
+                )
+            )
+        else:
+            # Adding the back button
+            self.__buttons_row.controls.append(self.__back_button)
     
     
     #############################################
@@ -321,7 +361,13 @@ class Full_Order_Screen(Column):
         '''
         
         shared_vars["main_container"].change_screen("order_screen")
-        
+    
+    def __approve_order (self, e):
+        pass
+    
+    def __deny_order(self, e):
+        pass
+    
     # Goes back to the check orders screen
     def __turn_back(self, e):
         '''
