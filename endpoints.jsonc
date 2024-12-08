@@ -167,9 +167,18 @@
     "INTERNAL_ERROR": 500
 }
 
-// /notification_for_new_orders
+// notification_for_new_orders
+// WEBSOCKET/business/{business_id}/notifications_for_new_orders
 // header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
-//websocket
-// ???
-
+// description: Establish a Websocket connection to receive real-time notifications for new orders.
+// payload: None (It doens't need to, serves notifications as they occur=
+// response:
+,{
+	"order_id": "",
+	"order_date": "",
+	"order_data": [{"product_id":"...", "quantity":"..."}],
+	"user_name": "",
+	"order_state": "waiting_validation" // or "waiting_delivery" or "delivered"
+}
+// Possible Status Codes: (for internal error,...)
 ]
