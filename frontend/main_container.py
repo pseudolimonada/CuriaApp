@@ -63,7 +63,7 @@ class Main_Container(Container):
                     return
             elif screen_name == "order_screen" and self.selected_screen_name == "full_order_screen":
                 self.__screens_dict[screen_name].reset_current_order()
-                self.__screens_dict[screen_name].refresh_data()
+                self.__screens_dict[screen_name].refresh_data(False)
             
             self.selected_screen_name = screen_name
             self.content = self.__screens_dict[screen_name]
