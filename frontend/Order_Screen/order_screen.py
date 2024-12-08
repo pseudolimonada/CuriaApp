@@ -1,6 +1,6 @@
 from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight, IconButton, icons, CrossAxisAlignment, VisualDensity
 from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls
-from frontend.utils import present_snack_bar, get_refreshed_catalog
+from utils import present_snack_bar, get_refreshed_catalog
 from datetime import datetime, timedelta
 from string import Template
 from typing import Optional

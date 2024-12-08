@@ -1,6 +1,6 @@
 from flet import Column, padding, CrossAxisAlignment, MainAxisAlignment, Page, ElevatedButton, ScrollMode, Text, icons, Divider, Row, Container, TextButton, AlertDialog, alignment, Icon, ButtonStyle
 from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls
-from frontend.utils import present_snack_bar
+from utils import present_snack_bar
 from string import Template
 import requests
 
