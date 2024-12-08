@@ -53,10 +53,10 @@ class Main_Container(Container):
         '''
         
         if screen_name in self.__screens_dict.keys():
-            if screen_name is "full_order_screen":
-                if self.selected_screen_name is "order_screen":
+            if screen_name == "full_order_screen":
+                if self.selected_screen_name == "order_screen":
                     self.__screens_dict[screen_name].set_confirm_order_layout()
-                elif self.selected_screen_name is "check_orders_screen":
+                elif self.selected_screen_name == "check_orders_screen":
                     self.__screens_dict[screen_name].set_order_details_layout()
                 else:
                     present_snack_bar(self.__page, self.CURRENT_SCREEN_NOT_RECOGNIZED, "Red")
