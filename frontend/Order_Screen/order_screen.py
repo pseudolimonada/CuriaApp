@@ -228,6 +228,7 @@ class Order_Screen(Column):
             self.__current_order["products"] = {}
             for i in range(20):
                 self.__current_order["products"][f"Este é um Pao disto assim {i}"] = {
+                    "product_id": f"{i}",
                     "quantity_text": Text(value="0"),
                     "quantity": 0,
                     "cost": "1.50€"
@@ -243,6 +244,7 @@ class Order_Screen(Column):
                 self.__current_order["products"] = {}
                 for product_id in self.__catalog.keys():
                     self.__current_order["products"][self.__catalog[product_id]["product_title"]] = {
+                        "product_id": product_id,
                         "quantity_text": Text(value="0"),
                         "quantity": 0,
                         "cost": self.__catalog[product_id]["product_price"]
