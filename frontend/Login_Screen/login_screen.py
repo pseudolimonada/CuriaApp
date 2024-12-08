@@ -2,6 +2,9 @@ from flet import Column, MainAxisAlignment, ElevatedButton, TextField, Row, Page
 from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls
 from utils import present_snack_bar
 import requests
+from Order_Screen.order_screen import Order_Screen
+from Full_Order_Screen.full_order_screen import Full_Order_Screen
+from Check_Orders_Screen.check_orders_page import Check_Orders_Page
 
 class Login_Screen(Column):
     '''
@@ -71,6 +74,7 @@ class Login_Screen(Column):
         #        ------- REMOVE THIS IF CASE FOR REAL TEST !!!!!!! -------        #
         ###########################################################################
         if self.name_textfield.value == "" and self.password_textfield.value == "":
+            self.__init_client_mode()
             shared_vars["main_container"].change_screen("order_screen")
         else:
 
@@ -88,6 +92,7 @@ class Login_Screen(Column):
                     # Set user ids
                     user_ids["user_id"] = response["user_id"]
                     user_ids["manager_business_ids"] = response["manager_business_ids"]
+                    self.__init_client_mode()
                     
                     # Change screen
                     shared_vars["main_container"].change_screen("order_screen")
@@ -112,6 +117,7 @@ class Login_Screen(Column):
         #        ------- REMOVE THIS IF CASE FOR REAL TEST !!!!!!! -------        #
         ###########################################################################
         if self.name_textfield.value == "" and self.password_textfield.value == "":
+            self.__init_client_mode()
             shared_vars["main_container"].change_screen("order_screen")
         else:
 
@@ -130,6 +136,7 @@ class Login_Screen(Column):
                     # Set user ids
                     user_ids["user_id"] = response["user_id"]
                     user_ids["manager_business_ids"] = response["manager_business_ids"]
+                    self.__init_client_mode()
                     
                     # Change screen
                     shared_vars["main_container"].change_screen("order_screen")
@@ -144,3 +151,19 @@ class Login_Screen(Column):
             except requests.exceptions.RequestException as e:
                 # Handle network-related errors
                 present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
+    
+    # Initializes all screen of a client user         
+    def __init_client_mode(self):
+        '''
+        Initializes all screen of a client user
+        '''
+        
+        order_screen = Order_Screen(self.__page)
+        full_order_screen = Full_Order_Screen(self.__page)
+        check_orders_screen = Check_Orders_Page(self.__page)
+        
+        shared_vars["main_container"].add_screen_to_list(order_screen, "order_screen")
+        shared_vars["main_container"].add_screen_to_list(full_order_screen, "full_order_screen")
+        shared_vars["main_container"].add_screen_to_list(check_orders_screen,"check_orders_screen")
+    
+        
