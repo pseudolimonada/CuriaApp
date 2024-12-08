@@ -3,6 +3,7 @@ from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls
 from present_snack_bar import present_snack_bar
 from datetime import datetime, timedelta
 from string import Template
+from typing import Optional
 import requests
 
 class Order_Screen(Column):
@@ -18,6 +19,9 @@ class Order_Screen(Column):
     INTERNAL_ERROR_TEXT: str = "An internal error occurred, please wait and try again..."
     UNRECOGNIZED_ERROR_TEXT: str = "An unexpected error occurred, please verify if your app is updated..."
     NETWORK_ERROR_TEXT: str = "Please verify your internet connection and try again..."
+    PRODUCT_SCARCITY_5_TEXT: str = "\nOnly 5 or less available!"
+    PRODUCT_SCARCITY_1_TEXT: str = "\nOnly 1 available!"
+    PRODUCT_SCARCITY_0_TEXT: str = "\nOut of stock to order"
     
     __page: Page
     __catalog: dict = {}
@@ -242,7 +246,7 @@ class Order_Screen(Column):
             return
         
         if self.__refresh_catalog(self):
-            if self.__refresh_week_catalog(self, str(monday)):
+            if self.__refresh_week_catalog(self, monday.strftime("%d/%m/%Y")):
                 # Initialize all the available products
                 self.__current_order["products"] = {}
                 for product_id in self.__catalog.keys():
@@ -387,27 +391,35 @@ class Order_Screen(Column):
         if testing:
             if self.__current_week_day == "Wed" and self.__current_date == "04/12/2024":
                 num = 20
+                product_scarcity = None
             elif self.__current_week_day == "Thu" and self.__current_date == "05/12/2024":
                 num = 5
+                product_scarcity = 1
             elif self.__current_week_day == "Fri" and self.__current_date == "06/12/2024":
                 num = 2
+                product_scarcity = 0
             elif self.__current_week_day == "Wed":
                 num = 10
+                product_scarcity = 5
             elif self.__current_week_day == "Thu":
                 num = 1
+                product_scarcity = None
             elif self.__current_week_day == "Fri":
                 num = 8
+                product_scarcity = 1
             else:
                 num = 0
             for i in range(num):
-                    product_row = self.__create_new_product_row(f"Este é um Pao disto assim {i}", self.__current_order["products"][f"Este é um Pao disto assim {i}"]["cost"])
-                    self.__products_column.controls.append(product_row)
+                product_row = self.__create_new_product_row(f"Este é um Pao disto assim {i}", self.__current_order["products"][f"Este é um Pao disto assim {i}"]["cost"], product_scarcity)
+                self.__products_column.controls.append(product_row)
             return
         
         # Add products rows according to the products in the catalog day
-        for id_product in self.__current_week_catalog[self.__current_week_day]:
-                product_row = self.__create_new_product_row(self.__catalog[id_product]["product_title"], self.__catalog[id_product]["product_price"])
-                self.__products_column.controls.append(product_row)
+        for product in self.__current_week_catalog[self.__current_week_day]:
+            product_id = product["product_id"]
+            product_scarcity = product["product_scarcity"]
+            product_row = self.__create_new_product_row(self.__catalog[product_id]["product_title"], self.__catalog[product_id]["product_price"], product_scarcity)
+            self.__products_column.controls.append(product_row)
     
     # Realizes an order when clicked in order_button
     def __realize_order(self, e):
@@ -497,11 +509,22 @@ class Order_Screen(Column):
     def __create_new_product_row(
         self,
         product_name: str,
-        product_cost: str
+        product_cost: str,
+        product_scarcity: Optional[int] = None
     ):
         '''
         Creates and returns a row with the information about the product and two buttons ('+' and '-').
         '''
+        
+        match product_scarcity:
+            case None:
+                product_scarcity_text = ""
+            case 5:
+                product_scarcity_text = self.PRODUCT_SCARCITY_5_TEXT
+            case 1:
+                product_scarcity_text = self.PRODUCT_SCARCITY_1_TEXT
+            case 0:
+                product_scarcity_text = self.PRODUCT_SCARCITY_0_TEXT
         
         return Row(
             controls=[
@@ -509,7 +532,9 @@ class Order_Screen(Column):
                     content=Row(
                         controls=[
                             Container(
-                                content=Text(product_name),
+                                content=Text(
+                                    value= f"{product_name}{product_scarcity_text}"
+                                ),
                                 padding=padding.only(left=10, right=20),
                                 expand=True
                             ),
@@ -569,10 +594,22 @@ class Order_Screen(Column):
         '''
         
         if e.control.data[0] == "+":
-            self.__current_order["products"][e.control.data[1]]["quantity"] += 1
-            self.__total_amount += 1
-            if self.__total_amount > 0:
-                self.__order_button.disabled = False
+            testing = True
+            if testing:
+                product_scarcity = None
+            else:
+                product_scarcity = self.__current_week_catalog[self.__current_week_day]["product_scarcity"]
+            
+            increment = True
+            if product_scarcity is not None:
+                if self.__current_order["products"][e.control.data[1]]["quantity"] >= product_scarcity:
+                    increment = False
+            if increment:
+                self.__current_order["products"][e.control.data[1]]["quantity"] += 1
+                self.__total_amount += 1
+                if self.__total_amount > 0:
+                    self.__order_button.disabled = False
+                
         elif e.control.data[0] == "-":
             if self.__current_order["products"][e.control.data[1]]["quantity"] > 0:
                 self.__current_order["products"][e.control.data[1]]["quantity"] -= 1
