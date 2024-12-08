@@ -58,10 +58,10 @@
 // response  (the product_idX are basically the actual ids of the products)
 ,{
   "catalog": {
-	"product_id1": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":"", "product_scarcity": 5 /* or 1 or null*/},
-	"product_id2": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":"", "product_scarcity": 5 /* or 1 or null*/},
-	"product_id3": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":"", "product_scarcity": 5 /* or 1 or null*/},
-	"product_id4": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":"", "product_scarcity": 5 /* or 1 or null*/}
+	"product_id1": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""},
+	"product_id2": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""},
+	"product_id3": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""},
+	"product_id4": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""}
   }
 }
 // Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
@@ -108,13 +108,13 @@
 //query params: "monday_date" (assumes this date as monday and sends available products for the week)
 // reponse:
 ,{
-  "Mon": ["product_id", "product_id", "product_id", "..."],
-  "Tue": ["product_id", "product_id", "product_id", "..."],
-  "Wed": ["product_id", "product_id", "product_id", "..."],
-  "Thu": ["product_id", "product_id", "product_id", "..."],
-  "Fri": ["product_id", "product_id", "product_id", "..."],
-  "Sat": ["product_id", "product_id", "product_id", "..."],
-  "Sun": ["product_id", "product_id", "product_id", "..."]
+  "Mon": [{"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}, {"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}],
+  "Tue": [{"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}, {"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}],
+  "Wed": [{"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}, {"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}],
+  "Thu": [{"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}, {"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}],
+  "Fri": [{"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}, {"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}],
+  "Sat": [{"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}, {"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}],
+  "Sun": [{"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}, {"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}]
 }
 // Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
 ,{
