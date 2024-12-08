@@ -52,12 +52,14 @@ def main(page: Page):
     login_screen = Login_Screen(page)
     order_screen = Order_Screen(page)
     full_order_screen = Full_Order_Screen(page)
+    check_order_screen = check_order_screen(page)
     
-
+    shared_vars["main_container"].add_screen_to_list(check_order_screen,"check_order_screen")
     shared_vars["main_container"].add_screen_to_list(login_screen, "login_screen")
     shared_vars["main_container"].add_screen_to_list(order_screen, "order_screen")
     shared_vars["main_container"].add_screen_to_list(full_order_screen, "full_order_screen")
     shared_vars["main_container"].change_screen("login_screen")
+    
 
     # Test Values
     page.window.width = 360
