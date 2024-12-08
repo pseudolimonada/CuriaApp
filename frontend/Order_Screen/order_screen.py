@@ -15,6 +15,9 @@ class Order_Screen(Column):
     ALERT_DIALOG_CONTENT_TEXT: str = "By changing the day your current order will be cleared. If you still want to continue, press 'OK', otherwise press CANCEL."
     ALERT_DIALOG_OK_TEXT: str = "OK"
     ALERT_DIALOG_CANCEL_TEXT: str = "CANCEL"
+    INTERNAL_ERROR_TEXT: str = "An internal error occurred, please wait and try again..."
+    UNRECOGNIZED_ERROR_TEXT: str = "An unexpected error occurred, please verify if your app is updated..."
+    NETWORK_ERROR_TEXT: str = "Please verify your internet connection and try again..."
     
     __page: Page
     __catalog: dict = {}
