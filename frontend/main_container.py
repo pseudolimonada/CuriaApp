@@ -1,5 +1,5 @@
 from flet import Container, Page, Theme, ColorScheme 
-from present_snack_bar import present_snack_bar
+from frontend.utils import present_snack_bar
 from shared import PRIM_COLOR
 
 class Main_Container(Container):
