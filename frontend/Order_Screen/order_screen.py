@@ -22,7 +22,7 @@ class Order_Screen(Column):
     PRODUCT_SCARCITY_5_TEXT: str = "\nOnly 5 or less available!"
     PRODUCT_SCARCITY_1_TEXT: str = "\nOnly 1 available!"
     PRODUCT_SCARCITY_0_TEXT: str = "\nOut of stock to order"
-    
+
     __page: Page
     __catalog: dict = {}
     __current_week_catalog: dict = {}
