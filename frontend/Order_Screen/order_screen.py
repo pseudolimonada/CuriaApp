@@ -15,6 +15,9 @@ class Order_Screen(Column):
     ALERT_DIALOG_CONTENT_TEXT: str = "By changing the day your current order will be cleared. If you still want to continue, press 'OK', otherwise press CANCEL."
     ALERT_DIALOG_OK_TEXT: str = "OK"
     ALERT_DIALOG_CANCEL_TEXT: str = "CANCEL"
+    INTERNAL_ERROR_TEXT: str = "An internal error occurred, please wait and try again..."
+    UNRECOGNIZED_ERROR_TEXT: str = "An unexpected error occurred, please verify if your app is updated..."
+    NETWORK_ERROR_TEXT: str = "Please verify your internet connection and try again..."
     
     __page: Page
     __catalog: dict = {}
@@ -276,7 +279,7 @@ class Order_Screen(Column):
             "manager_business_ids": user_ids["manager_business_ids"]
         }
         url_template = Template(endpoints_urls["GET_CATALOG"])
-        get_catalog_url = url_template.safe_substitute(business_id=user_ids["manager_business_ids"][0])
+        get_catalog_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"])
         
         try:
             # Sending request and getting response
@@ -322,7 +325,7 @@ class Order_Screen(Column):
             "monday_date": monday_date,
         }
         url_template = Template(endpoints_urls["GET_CATALOG"])
-        get_catalog_url = url_template.safe_substitute(business_id=user_ids["manager_business_ids"][0])
+        get_catalog_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"])
         
         try:
             # Sending request and getting response
@@ -461,7 +464,7 @@ class Order_Screen(Column):
         '''
         Handles the close of the dialog alert.
         '''
-        self.page.close(self.__alert)
+        self.__page.close(self.__alert)
         
         if e.control.text == self.ALERT_DIALOG_OK_TEXT:
             if e.control.data in ["forward", "backward"]:
@@ -477,24 +480,15 @@ class Order_Screen(Column):
                 self.__current_date = current_date_datetime.strftime("%d/%m/%Y")
                 self.__current_week_text.value = f"{monday.strftime('%d/%m')} - {sunday.strftime('%d/%m')}"
                 
-                for product in self.__current_order["products"]:
-                    self.__current_order["products"][product]["quantity"] = 0
-                    self.__current_order["products"][product]["quantity_text"].value = "0"
-                self.__current_order["date"] = self.__current_date
-                self.__order_button.disabled = True
-                self.__total_amount = 0
+                self.reset_current_order()
                 self.__page.update()
                 
                 self.refresh_data()
             else:
-                for product in self.__current_order["products"]:
-                    self.__current_order["products"][product]["quantity"] = 0
-                    self.__current_order["products"][product]["quantity_text"].value = "0"
                 self.__current_date = e.control.data[1]
                 self.__current_week_day = e.control.data[0]
-                self.__current_order["date"] = self.__current_date
-                self.__order_button.disabled = True
-                self.__total_amount = 0
+                
+                self.reset_current_order()
                 self.__fill_products_column()
             
         self.__page.update()
@@ -618,3 +612,15 @@ class Order_Screen(Column):
             
             self.refresh_data()
             self.__page.update()
+    
+    # Resets the current order
+    def reset_current_order(self):
+        '''
+        Resets the current order and actualize its date
+        '''
+        for product in self.__current_order["products"]:
+            self.__current_order["products"][product]["quantity"] = 0
+            self.__current_order["products"][product]["quantity_text"].value = "0"
+        self.__current_order["date"] = self.__current_date
+        self.__order_button.disabled = True
+        self.__total_amount = 0

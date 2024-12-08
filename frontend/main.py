@@ -45,6 +45,8 @@ def main(page: Page):
     Program Function
     """
 
+    shared_vars["current_business"]["name"] = "Farinha e Afeto"
+    shared_vars["current_business"]["id"] = "1"
     shared_vars["main_container"] = Main_Container(page)
     shared_vars["bottom_menu"] = Bottom_Menu()
     login_screen = Login_Screen(page)

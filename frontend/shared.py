@@ -6,13 +6,15 @@ user_ids = {
 shared_vars = {
     "main_container": None,
     "bottom_menu": None,
-    "current_order": None
+    "current_order": None,
+    "current_business": {}
 }
 
 endpoints_urls = {
     "LOGIN": "/login",
     "REGISTER": "/register",
-    "GET_CATALOG": "/businesses/$business_id/products"
+    "GET_CATALOG": "/businesses/$business_id/products",
+    "POST_ORDER": "/businesses/$business_id/orders"
 }
 
 STATUS_CODES = {"SUCCESS": 200, "INVALID_CREDENTIALS": 401, "INTERNAL_ERROR": 500, "BAD_REQUEST": 400}
