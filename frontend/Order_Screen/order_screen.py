@@ -1,6 +1,6 @@
 from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight, IconButton, icons, CrossAxisAlignment, VisualDensity
 from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls
-from present_snack_bar import present_snack_bar
+from frontend.utils import present_snack_bar, get_refreshed_catalog
 from datetime import datetime, timedelta
 from string import Template
 from typing import Optional
@@ -270,7 +270,6 @@ class Order_Screen(Column):
     #           "product_title":"...",
     #           "product_description":"...",
     #           "product_price":"...",
-    #           "product_scarcity": (5 or 1 or null)
     #       },
     #       "product_id2": {
     #           ...
@@ -278,43 +277,25 @@ class Order_Screen(Column):
     #   }
     #
     def __refresh_catalog(self):
-        headers = {
-            "user_id": user_ids["user_id"],
-            "manager_business_ids": user_ids["manager_business_ids"]
-        }
-        url_template = Template(endpoints_urls["GET_CATALOG"])
-        get_catalog_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"])
-        
-        try:
-            # Sending request and getting response
-            response = requests.get(get_catalog_url, headers=headers)
-            
-            # Check the response
-            if response.status_code == STATUS_CODES["SUCCESS"]:
-                # Save the refreshed catalog
-                self.__catalog = response["catalog"]
-                return True
-            elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
-                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
-            else:
-                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
-        except requests.exceptions.RequestException as e:
-            # Handle network-related errors
-            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
+        catalog = get_refreshed_catalog(self.__page)
+        if catalog is not None:
+            self.__catalog = catalog
+            return True
         
         return False
         
+        
     # Refreshes the week catalog for the actual business and save it in self.__current_week_catalog
     # If any error occurs return false, otherwise return true
-    # Week Catalog Structure:
+    # Week Catalog Structure:  (product_scarcity can be 5, 1, 0 or null, the null is in case there are more then 5)
     #   {
-    #       "Mon": ["product_id", "product_id", "product_id", "..."],
-    #       "Tue": ["product_id", "product_id", "product_id", "..."],
-    #       "Wed": ["product_id", "product_id", "product_id", "..."],
-    #       "Thu": ["product_id", "product_id", "product_id", "..."],
-    #       "Fri": ["product_id", "product_id", "product_id", "..."],
-    #       "Sat": ["product_id", "product_id", "product_id", "..."],
-    #       "Sun": ["product_id", "product_id", "product_id", "..."]
+    #       "Mon": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}],
+    #       "Tue": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}],
+    #       "Wed": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}],
+    #       "Thu": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}],
+    #       "Fri": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}],
+    #       "Sat": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}],
+    #       "Sun": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}]
     #   }
     #
     def __refresh_week_catalog(

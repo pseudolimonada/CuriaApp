@@ -1,6 +1,6 @@
 from flet import Column, MainAxisAlignment, ElevatedButton, TextField, Row, Page
 from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls
-from present_snack_bar import present_snack_bar
+from frontend.utils import present_snack_bar
 import requests
 
 class Login_Screen(Column):
