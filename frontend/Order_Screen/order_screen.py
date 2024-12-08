@@ -244,6 +244,11 @@ class Order_Screen(Column):
     #                Main Methods               #
     #############################################
     
+    
+    #############################################
+    #                Main Methods               #
+    #############################################
+    
     # Refresh data about the days and products by full filling the rows and columns info again
     def refresh_data(
         self,
@@ -461,7 +466,6 @@ class Order_Screen(Column):
             return True
         
         return False
-        
         
     # Refreshes the week catalog for the actual business and save it in self.__current_week_catalog
     # If any error occurs return false, otherwise return true
