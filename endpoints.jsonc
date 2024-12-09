@@ -6,6 +6,13 @@
 }
 // response: (auth token in jwt)
 ,{"user_id":"...", "manager_business_ids":["...", "..."]}
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+	"SUCCESS": 200,
+	"INVALID_CREDENTIALS": 401,
+	"INTERNAL_ERROR": 500,
+	"BAD_REQUEST": 400
+}
 
 // POST /register
 ,{
@@ -14,17 +21,29 @@
 }
 // response: (auth token in jwt)
 ,{"user_id":"...", "manager_business_ids":["...", "..."]}
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+	"SUCCESS": 200,
+	"INVALID_CREDENTIALS": 401,
+	"INTERNAL_ERROR": 500,
+	"BAD_REQUEST": 400
+}
 
 // GET /businesses/{business_id}/products
 // header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
-// response
+// response  (the product_idX are basically the actual ids of the products)
 ,{
-  "catalog": [
-	{"product_id":"", "image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""},
-	{"product_id":"", "image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""},
-	{"product_id":"", "image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""},
-	{"product_id":"", "image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""}
-  ]
+	"catalog": {
+	"product_id1": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""},
+	"product_id2": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""},
+	"product_id3": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""},
+	"product_id4": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""}
+	}
+}
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+	"SUCCESS": 200,
+	"INTERNAL_ERROR": 500
 }
 
 // POST /businesses/{business_id}/products
@@ -37,6 +56,11 @@
 	"product_price":""
 }
 // response (same as GET /businesses/{business_id}/products but updated)
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+	"SUCCESS": 200,
+	"INTERNAL_ERROR": 500
+}
 
 // PUT /businesses/{business_id}/products/{product_id}
 // header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
@@ -48,7 +72,11 @@
 	"product_price":"(opt)"
 }
 // response (same as GET /businesses/{business_id}/products but updated)
-
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+	"SUCCESS": 200,
+	"INTERNAL_ERROR": 500
+}
 
 
 // GET /businesses/{business_id}/catalogs
@@ -56,14 +84,20 @@
 //query params: "monday_date" (assumes this date as monday and sends available products for the week)
 // reponse:
 ,{
-  "monday": ["product_id", "product_id", "product_id", "..."],
-  "tuesday": ["product_id", "product_id", "product_id", "..."],
-  "wednesday": ["product_id", "product_id", "product_id", "..."],
-  "thursday": ["product_id", "product_id", "product_id", "..."],
-  "friday": ["product_id", "product_id", "product_id", "..."],
-  "saturday": ["product_id", "product_id", "product_id", "..."],
-  "sunday": ["product_id", "product_id", "product_id", "..."]
+	"Mon": [{"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}, {"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}],
+	"Tue": [{"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}, {"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}],
+	"Wed": [{"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}, {"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}],
+	"Thu": [{"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}, {"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}],
+	"Fri": [{"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}, {"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}],
+	"Sat": [{"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}, {"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}],
+	"Sun": [{"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}, {"product_id":"...", "product_scarcity": 5 /* or 1 or null*/}]
 }
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+	"SUCCESS": 200,
+	"INTERNAL_ERROR": 500
+}
+
 
 // POST /businesses/{business_id}/catalogs
 // header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
@@ -71,6 +105,11 @@
 ,{
 	"catalog_date": "...",
 	"catalog_products": ["product_id", "product_id", "product_id", "..."]
+}
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+	"SUCCESS": 200,
+	"INTERNAL_ERROR": 500
 }
 
 // PUT /businesses/{business_id}/catalogs
@@ -82,6 +121,12 @@
 	"product_quantity": "..."
 }
 // logic: if product id exists in catalog updates quantity, else does nothing
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+	"SUCCESS": 200,
+	"INTERNAL_ERROR": 500
+}
+
 
 // GET /businesses/{business_id}/orders
 // header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
@@ -90,7 +135,7 @@
 //IF TOKEN IS ADMIN FOR THAT BUSINESS, THEN ALL ORDERS, ELSE ONLY USER'S ORDERS
 // reponse:
 ,{
-  	"orders": [
+	"orders": [
 		{
 			"order_id": "",
 			"user_name": "",
@@ -107,6 +152,11 @@
 		}
 	]
 }
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+	"SUCCESS": 200,
+	"INTERNAL_ERROR": 500
+}
 
 // POST /businesses/{business_id}/orders
 // header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
@@ -114,7 +164,7 @@
 ,{
 	"user_id": "", 
 	"order_date": "",
-  	"order_data" : [
+	"order_data" : [
 		{"product_id":"...", "product_quantity":"..."},
 		{"product_id":"...", "product_quantity":"..."},
 		{"product_id":"...", "product_quantity":"..."}
@@ -123,12 +173,11 @@
 // response
 ,{ "200": "Order submitted successfully" }
 ,{ "400": "Error submitting order" }
-
-// PUT /businesses/{business_id}/orders/{order_id}
-// header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
-// payload
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
 ,{
-	"order_state": "waiting_delivery" // or "delivered"
+	"SUCCESS": 200,
+	"INTERNAL_ERROR": 500,
+	"BAD_REQUEST": 400
 }
 
 // /notification_for_new_orders
