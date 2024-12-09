@@ -43,5 +43,4 @@ async def websocket_new_orders(websocket: WebSocket, business_id: str):
     finally:
         redis_client.srem(redis_key, conn_id)
         active_connections.pop(conn_id, None)
-
         
