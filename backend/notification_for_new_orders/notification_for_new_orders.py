@@ -30,6 +30,7 @@ async def notify_new_order(business_id: str, notification:dict):
             active_connections.pop(con_id.decode(),None)
             
 @app.websocket("/businesses/<int:business_id>/notifications_for_new_orders")
+<<<<<<< HEAD
 async def websocket_new_orders(websocket: WebSocket, business_id):
     """
     WebSocket endpoint for real-time order notification
@@ -42,6 +43,14 @@ async def websocket_new_orders(websocket: WebSocket, business_id):
 
     conn_id = str(id(websocket)) # Unique ID for a connection
     redis_key = f"business:<business_id>.connections"
+=======
+async def websocket_new_orders(websocket: WebSocket, business_id: str):
+    """
+    WebSocket endpoint for real-time order notification
+    """
+    conn_id = str(id(websocket)) # Unique ID for a connection
+    redis_key = f"business:{business_id}.connections"
+>>>>>>> 7958eb9 (Added second version (almost completed) of notification_for_new_orders.py)
     await websocket.accept()
     redis_client.sadd(redis_key, conn_id)
     active_connections[conn_id] = websocket
@@ -55,3 +64,8 @@ async def websocket_new_orders(websocket: WebSocket, business_id):
     finally:
         redis_client.srem(redis_key, conn_id)
         active_connections.pop(conn_id, None)
+<<<<<<< HEAD
+=======
+
+        
+>>>>>>> 7958eb9 (Added second version (almost completed) of notification_for_new_orders.py)
