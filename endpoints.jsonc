@@ -180,6 +180,23 @@
 	"BAD_REQUEST": 400
 }
 
+// PUT /businesses/{business_id}/orders/{order_id}
+// header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
+// payload
+,{
+	"order_state": "waiting_delivery" // or "delivered"
+}
+// response
+,{ "200": "Order submitted successfully" }
+,{ "400": "Error submitting order" }
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+	"SUCCESS": 200,
+	"INTERNAL_ERROR": 500,
+	"BAD_REQUEST": 400
+}
+
+
 // /notification_for_new_orders
 // header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
 //websocket
