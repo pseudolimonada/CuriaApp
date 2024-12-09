@@ -215,7 +215,7 @@ class Order_Screen(Column):
             self.__edit_day_button = ElevatedButton(
                 text=self.EDIT_BUTTON_TEXT,
                 adaptive=True,
-                on_click=self.__edit_current_day,
+                on_click=self.__edit_current_week,
                 style=ButtonStyle(
                     padding=padding.symmetric(10, 70)
                 ),
