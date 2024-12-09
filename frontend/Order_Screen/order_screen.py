@@ -215,7 +215,7 @@ class Order_Screen(Column):
             self.__edit_day_button = ElevatedButton(
                 text=self.EDIT_BUTTON_TEXT,
                 adaptive=True,
-                on_click=self.__edit_current_week,
+                on_click=self.__edit_current_day,
                 style=ButtonStyle(
                     padding=padding.symmetric(10, 70)
                 ),
@@ -468,18 +468,6 @@ class Order_Screen(Column):
         return False
         
     # Refreshes the week catalog for the actual business and save it in self.__current_week_catalog
-    # If any error occurs return false, otherwise return true
-    # Week Catalog Structure:  (product_scarcity can be 5, 1, 0 or null, the null is in case there are more then 5)
-    #   {
-    #       "Mon": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}],
-    #       "Tue": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}],
-    #       "Wed": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}],
-    #       "Thu": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}],
-    #       "Fri": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}],
-    #       "Sat": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}],
-    #       "Sun": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}]
-    #   }
-    #
     def __refresh_week_catalog(
         self,
         monday_date:str

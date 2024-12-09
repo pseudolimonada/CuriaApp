@@ -2,7 +2,6 @@ user_ids = {
     "user_id": str,
     "manager_business_ids": list,
     "is_admin": bool
-    ""
 }
 
 shared_vars = {
