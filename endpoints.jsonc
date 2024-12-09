@@ -104,23 +104,8 @@
 // payload
 ,{
 	"catalog_date": "...",
-	"catalog_products": ["product_id", "product_id", "product_id", "..."]
+	"catalog_products": [{"product_id":"...", "product_quantity":"..."}, {"product_id":"...", "product_quantity":"..."}],
 }
-// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
-,{
-	"SUCCESS": 200,
-	"INTERNAL_ERROR": 500
-}
-
-// PUT /businesses/{business_id}/catalogs
-// header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
-// payload
-,{
-	"catalog_date": "...",
-	"product_id": "...",
-	"product_quantity": "..."
-}
-// logic: if product id exists in catalog updates quantity, else does nothing
 // Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
 ,{
 	"SUCCESS": 200,
