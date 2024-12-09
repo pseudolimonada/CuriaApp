@@ -1,6 +1,6 @@
-from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight, IconButton, icons, CrossAxisAlignment, VisualDensity
+from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight, IconButton, icons, CrossAxisAlignment, VisualDensity, Checkbox, TextField
 from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls
-from utils import present_snack_bar, get_refreshed_catalog
+from utils import Smart_TextField, present_snack_bar, get_refreshed_catalog
 from datetime import datetime, timedelta
 from string import Template
 from typing import Optional
@@ -41,6 +41,11 @@ class Order_Screen(Column):
         "date": str,
         "products": dict
     }
+    
+    ###############################
+    # Initializing editing tools variables and objects
+    __editing: bool = False
+    __current_date_catalog_edit: dict = {}
     
     ###############################
     # Initializing help variables and objects
@@ -195,7 +200,7 @@ class Order_Screen(Column):
             self.__edit_day_button = ElevatedButton(
                 text=self.ORDER_BUTTON_TEXT,
                 adaptive=True,
-                on_click=self.__edit_current_day,
+                on_click=self.__edit_current_week,
                 style=ButtonStyle(
                     padding=padding.symmetric(10, 70)
                 ),
@@ -216,55 +221,8 @@ class Order_Screen(Column):
             self.__main_button_row.controls = [self.__order_button]
         
         ###############################
-        # Creating a column that makes the union between the main
-        # button row and pages menu row
-        main_button_row_and_pages_menu_row = Column(
-            controls=[
-                Divider(),
-                self.__main_button_row,
-                Column(
-                    controls=[
-                        Divider(),
-                        shared_vars["bottom_menu"],
-                        Divider()
-                    ],
-                    alignment=MainAxisAlignment.START,
-                    spacing=1
-                )
-            ],
-            alignment=MainAxisAlignment.START,
-            spacing=20
-        )
-        
-        ###############################
         # Final setting up the main column controls with everything
-        self.controls = [
-            Column(
-                controls=[
-                    Container(
-                        content = Row(
-                            controls=[
-                                self.__business_title,
-                                self.__pass_week_section
-                            ],
-                            alignment=MainAxisAlignment.SPACE_AROUND
-                        ),
-                        padding=Padding(left=1, top=5, right=1, bottom=5),
-                        alignment=alignment.center
-                    ),
-                    Container(
-                        content = self.__days_row,
-                        padding=Padding(left=8, top=2, right=8, bottom=2),
-                        alignment=alignment.center
-                    ),
-                    Divider(),
-                    self.__products_column,
-                ],
-                alignment=MainAxisAlignment.START,
-                expand=True
-            ),
-            main_button_row_and_pages_menu_row
-        ]
+        self.__update_controls()
     
     
     #############################################
@@ -335,7 +293,68 @@ class Order_Screen(Column):
     
     # Changes the actual screen to the edit screen
     def __edit_current_day(self, e):
-        pass
+        __editing = True
+        __current_date_catalog_edit = {}
+        self.__update_controls()
+        
+        self.__products_column.controls.clear()
+        
+        ###########################################################################
+        #        ------- REMOVE THIS IF CASE FOR REAL TEST !!!!!!! -------        #
+        ###########################################################################
+        testing = True
+        if testing:
+            if self.__current_week_day == "Wed" and self.__current_date == "04/12/2024":
+                num = 20
+                product_scarcity = None
+            elif self.__current_week_day == "Thu" and self.__current_date == "05/12/2024":
+                num = 5
+                product_scarcity = 1
+            elif self.__current_week_day == "Fri" and self.__current_date == "06/12/2024":
+                num = 2
+                product_scarcity = 0
+            elif self.__current_week_day == "Wed":
+                num = 10
+                product_scarcity = 5
+            elif self.__current_week_day == "Thu":
+                num = 1
+                product_scarcity = None
+            elif self.__current_week_day == "Fri":
+                num = 8
+                product_scarcity = 1
+            else:
+                num = 0
+            for i in range(num):
+                product_row = self.__create_new_product_row(f"Este é um Pao disto assim {i}", self.__current_order["products"][f"Este é um Pao disto assim {i}"]["cost"], product_scarcity)
+                self.__products_column.controls.append(product_row)
+            return
+        
+        ###############################
+        # Adding products rows according to the products in the catalog day
+        product_containers = []
+        for product_id in self.__catalog.keys():
+            self.__current_date_catalog_edit[product_id] = {
+                "quantity": None, #TODO
+                "state": 
+            }
+            
+            new_container = self.__create_new_product_container(self.__catalog[product_id]["product_title"])
+            product_containers.append(new_container)
+            
+        catalog_length = len(self.__catalog)
+        for i in range(0, catalog_length, 2):
+            new_row = Row(
+                alignment=MainAxisAlignment.CENTER,
+                spacing=5,
+                wrap=True
+            )
+
+            if i + 1 < catalog_length:
+                new_row.controls.append(product_containers[i + 1])
+            
+            self.__products_column.controls.append(new_row)
+        
+        self.__page.update()
     
     
     #############################################
@@ -491,7 +510,9 @@ class Order_Screen(Column):
     #############################################
     #          Data Management Methods          #
     #############################################
-          
+    {
+        
+    }
     # Changes the current week
     def __change_current_week(self, e):
         '''
@@ -580,6 +601,36 @@ class Order_Screen(Column):
         self.__current_order["products"][e.control.data[1]]["quantity_text"].value = f"{self.__current_order["products"][e.control.data[1]]["quantity"]}"
         self.__page.update()
     
+    # Edits the product state by removing or adding it to the current week catalog
+    def __edit_product_state(self, e):
+        '''
+        Edits the product state by removing or adding it to the current week catalog
+        '''
+        
+        is_checked = e.control.value
+        product_id = e.control.data
+        
+        if is_checked:
+            self.__current_week_catalog[self.__current_week_day].append({"product_id": product_id, "quantity": 0})
+        else:
+            for product in self.__current_week_catalog[self.__current_week_day]:
+                if product["product_id"] == product_id:
+                    self.__current_week_catalog[self.__current_week_day].remove(product)
+        
+    # Edits the current week catalog with the new defined product quantity
+    def __edit_product_amount(self, e):
+        '''
+        Edits the current week catalog with the new defined product quantity
+        '''
+        
+        product_id = e.control.data
+        for product in self.__current_week_catalog[self.__current_week_day]:
+            if product["product_id"] == product_id:
+                if e.control.value == "":
+                    product["quantity"] = 0
+                else:
+                    product["quantity"] = int(e.control.value)
+    
     # Handles the close of the dialog alert
     def __handle_close_dialog(self, e):
         '''
@@ -661,7 +712,7 @@ class Order_Screen(Column):
     def __create_new_product_row(
         self,
         product_name: str,
-        product_cost: str,
+        product_cost: Optional[str],
         product_scarcity: Optional[int] = None
     ):
         '''
@@ -741,6 +792,45 @@ class Order_Screen(Column):
             ]
         )
     
+    def __create_new_product_container(
+        self,
+        product_name: str,
+        product_id: str,
+        current_state: bool
+    ):
+        Container(
+            content=Column(
+                controls=[
+                    Text(
+                        value= f"{product_name}"
+                    ),
+                    Row(
+                        controls=[
+                            Checkbox(
+                                adaptive=True,
+                                value=current_state,
+                                data=product_id,
+                                on_change=self.__edit_product_state
+                            ),
+                            Smart_TextField(
+                                page=self.__page,
+                                label="",
+                                hint_text="",
+                                numeric=True,
+                                data=product_id,
+                                on_blur=self.__edit_product_amount
+                            )
+                        ],
+                        alignment=MainAxisAlignment.CENTER
+                    )
+                ],
+                alignment=MainAxisAlignment.SPACE_AROUND
+            ),
+            alignment=alignment.center,
+            expand=True
+        )
+        
+    
     # Resets the current order
     def reset_current_order(self):
         '''
@@ -752,4 +842,83 @@ class Order_Screen(Column):
         self.__current_order["date"] = self.__current_date
         self.__order_button.disabled = True
         self.__total_amount = 0
-        
+    
+    # Updates the controls according to if the user is in edit mode or not
+    def __update_controls(self):
+        if self.__editing:
+            self.controls = [
+                Column(
+                    controls=[
+                        Container(
+                            content = Column(
+                                controls=[
+                                    self.__business_title,
+                                    Text(
+                                        value=f"{EDITING_SUBTITLE_TEXT}{self.__current_date}"
+                                    )
+                                ],
+                                alignment=MainAxisAlignment.CENTER,
+                                horizontal_alignment=CrossAxisAlignment.CENTER
+                            ),
+                            padding=Padding(left=1, top=5, right=1, bottom=5),
+                            alignment=alignment.center
+                        ),
+                        Divider(),
+                        self.__products_column,
+                    ],
+                    alignment=MainAxisAlignment.START,
+                    expand=True
+                ),
+                self.__main_button_row
+            ]
+            
+        else:
+            ###############################
+            # Creating a column that makes the union between the main
+            # button row and pages menu row
+            main_button_row_and_pages_menu_row = Column(
+                controls=[
+                    Divider(),
+                    self.__main_button_row,
+                    Column(
+                        controls=[
+                            Divider(),
+                            shared_vars["bottom_menu"],
+                            Divider()
+                        ],
+                        alignment=MainAxisAlignment.START,
+                        spacing=1
+                    )
+                ],
+                alignment=MainAxisAlignment.START,
+                spacing=20
+            )
+            
+            self.controls = [
+                Column(
+                    controls=[
+                        Container(
+                            content = Row(
+                                controls=[
+                                    self.__business_title,
+                                    self.__pass_week_section
+                                ],
+                                alignment=MainAxisAlignment.SPACE_AROUND
+                            ),
+                            padding=Padding(left=1, top=5, right=1, bottom=5),
+                            alignment=alignment.center
+                        ),
+                        Container(
+                            content = self.__days_row,
+                            padding=Padding(left=8, top=2, right=8, bottom=2),
+                            alignment=alignment.center
+                        ),
+                        Divider(),
+                        self.__products_column,
+                    ],
+                    alignment=MainAxisAlignment.START,
+                    expand=True
+                ),
+                main_button_row_and_pages_menu_row
+            ]
+            
