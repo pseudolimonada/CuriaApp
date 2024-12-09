@@ -1,4 +1,4 @@
-from flet import Page, SnackBar, Text, TextThemeStyle, TextField
+from flet import Page, SnackBar, Text, TextThemeStyle, TextField, TextStyle
 from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls
 from string import Template
 from typing import Optional, Callable, Any
@@ -22,8 +22,11 @@ class Smart_TextField(TextField):
         hint_text: str = "Hint Text",
         disabled: Optional[bool] = False,
         numeric: Optional[bool] = False,
+        expand: Optional[bool] = False,
         max_length: Optional[int] = None,
         on_blur: Optional[Callable] = None,
+        label_style: Optional[TextStyle] = None,
+        hint_style: Optional[TextStyle] = None,
         data: Any = None
     ):
         self.__page = page
@@ -34,7 +37,10 @@ class Smart_TextField(TextField):
             on_change=self.change_value,
             data=data,
             disabled=disabled,
-            max_length=max_length
+            max_length=max_length,
+            expand=expand,
+            label_style=label_style,
+            hint_style=hint_style
         )
         self.__is_numeric = numeric
         if on_blur:

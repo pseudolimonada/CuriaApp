@@ -1,5 +1,5 @@
-from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight, IconButton, icons, CrossAxisAlignment, VisualDensity, Checkbox, TextField
-from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls
+from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight, IconButton, icons, CrossAxisAlignment, VisualDensity, Checkbox, ResponsiveRow
+from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls, TESTING
 from utils import Smart_TextField, present_snack_bar, get_refreshed_catalog
 from datetime import datetime, timedelta
 from string import Template
@@ -18,6 +18,11 @@ class Order_Screen(Column):
     ###############################
     # Initializing the texts strings
     ORDER_BUTTON_TEXT: str = "Order"
+    CONFIRM_BUTTON_TEXT: str = "Confirm"
+    EDIT_BUTTON_TEXT: str = "Edit"
+    EDIT_TEXTFIELD_TEXT: str = "Quantity"
+    EDIT_TEXTFIELD_HINT_TEXT: str = "e.g.: 23"
+    EDITING_SUBTITLE_TEXT: str = "Edit day: "
     ALERT_DIALOG_TITLE_TEXT: str = "Alert confirmation"
     ALERT_DIALOG_CONTENT_TEXT: str = "By changing the day your current order will be cleared. If you still want to continue, press 'OK', otherwise press CANCEL."
     ALERT_DIALOG_OK_TEXT: str = "OK"
@@ -97,6 +102,7 @@ class Order_Screen(Column):
     )
     __order_button: ElevatedButton
     __edit_day_button: ElevatedButton
+    __confirm_button: ElevatedButton
     
     ###############################
     # Initializing and setting up the alert dialog
@@ -192,15 +198,24 @@ class Order_Screen(Column):
         
         ###############################
         # Refreshing data for the current date
-        self.refresh_data(True)
+        self.refresh_data(update_days_row=True)
         
         ###############################
-        # Setting up the order / edit button
+        # Setting up the order / confirm & edit button
         if user_ids["is_admin"]:
-            self.__edit_day_button = ElevatedButton(
-                text=self.ORDER_BUTTON_TEXT,
+            self.__confirm_button = ElevatedButton(
+                text=self.CONFIRM_BUTTON_TEXT,
                 adaptive=True,
-                on_click=self.__edit_current_week,
+                on_click=self.__update_current_day,
+                style=ButtonStyle(
+                    padding=padding.symmetric(10, 70)
+                ),
+                scale=1.2
+            )
+            self.__edit_day_button = ElevatedButton(
+                text=self.EDIT_BUTTON_TEXT,
+                adaptive=True,
+                on_click=self.__edit_current_day,
                 style=ButtonStyle(
                     padding=padding.symmetric(10, 70)
                 ),
@@ -247,8 +262,7 @@ class Order_Screen(Column):
         ###########################################################################
         #        ------- REMOVE THIS IF CASE FOR REAL TEST !!!!!!! -------        #
         ###########################################################################
-        testing = True
-        if testing:
+        if TESTING:
             self.__current_order["products"] = {}
             for i in range(20):
                 self.__current_order["products"][f"Este é um Pao disto assim {i}"] = {
@@ -267,7 +281,6 @@ class Order_Screen(Column):
         # Refreshing catalog then week catalog and finally update objects
         if self.__refresh_catalog(self):
             if self.__refresh_week_catalog(self, monday.strftime("%d/%m/%Y")):
-                
                 ###############################
                 # Initializing/Resetting current order products
                 self.__current_order["products"] = {}
@@ -288,95 +301,160 @@ class Order_Screen(Column):
     
     # Realizes an order when clicked in order_button
     def __realize_order(self, e):
+        '''
+        Realizes an order when clicked in order_button
+        '''
+        
         shared_vars["current_order"] = self.__current_order
         shared_vars["main_container"].change_screen("full_order_screen")
     
     # Changes the actual screen to the edit screen
     def __edit_current_day(self, e):
-        __editing = True
-        __current_date_catalog_edit = {}
-        self.__update_controls()
+        '''
+        Enters in the edit mode for the current day catalog
+        '''
+        if not TESTING:
+            ###############################
+            # Refreshing the catalog
+            if not self.__refresh_catalog():
+                return
         
+        ###############################
+        # Entering in edit mode
+        self.__editing = True
+        self.__current_date_catalog_edit = {}
+        self.__main_button_row.controls = [self.__confirm_button]
         self.__products_column.controls.clear()
         
         ###########################################################################
         #        ------- REMOVE THIS IF CASE FOR REAL TEST !!!!!!! -------        #
         ###########################################################################
-        testing = True
-        if testing:
+
+        if TESTING:
             if self.__current_week_day == "Wed" and self.__current_date == "04/12/2024":
                 num = 20
-                product_scarcity = None
             elif self.__current_week_day == "Thu" and self.__current_date == "05/12/2024":
                 num = 5
-                product_scarcity = 1
             elif self.__current_week_day == "Fri" and self.__current_date == "06/12/2024":
                 num = 2
-                product_scarcity = 0
             elif self.__current_week_day == "Wed":
                 num = 10
-                product_scarcity = 5
             elif self.__current_week_day == "Thu":
                 num = 1
-                product_scarcity = None
             elif self.__current_week_day == "Fri":
                 num = 8
-                product_scarcity = 1
             else:
                 num = 0
+
+            state = False
             for i in range(num):
-                product_row = self.__create_new_product_row(f"Este é um Pao disto assim {i}", self.__current_order["products"][f"Este é um Pao disto assim {i}"]["cost"], product_scarcity)
-                self.__products_column.controls.append(product_row)
+                new_container = self.__create_new_product_container(f"Este é um Pao disto assim {i}", i, state)
+                self.__products_column.controls.append(new_container)
+            
+            self.__update_controls()
             return
         
         ###############################
-        # Adding products rows according to the products in the catalog day
-        product_containers = []
+        # Creating and adding products containers according to the products in the catalog
         for product_id in self.__catalog.keys():
+            if product_id in self.__current_week_catalog[self.__current_week_day].keys():
+                state = True
+            else:
+                state = False
+                
             self.__current_date_catalog_edit[product_id] = {
                 "quantity": None, #TODO
-                "state": 
+                "state": state
             }
             
-            new_container = self.__create_new_product_container(self.__catalog[product_id]["product_title"])
-            product_containers.append(new_container)
-            
-        catalog_length = len(self.__catalog)
-        for i in range(0, catalog_length, 2):
-            new_row = Row(
-                alignment=MainAxisAlignment.CENTER,
-                spacing=5,
-                wrap=True
-            )
-
-            if i + 1 < catalog_length:
-                new_row.controls.append(product_containers[i + 1])
-            
-            self.__products_column.controls.append(new_row)
+            new_container = self.__create_new_product_container(self.__catalog[product_id]["product_title"], product_id, state)
+            self.__products_column.controls.append(new_container)
         
-        self.__page.update()
+        ###############################
+        # Updating the screen to the new format
+        self.__update_controls()
     
+    # Updates the current day after the edit
+    def __update_current_day(self, e):
+        '''
+        Updates the current day after the edit
+        '''
+        
+        ###########################################################################
+        #        ------- REMOVE THIS IF CASE FOR REAL TEST !!!!!!! -------        #
+        ###########################################################################
+        if TESTING:
+            self.__editing = False
+            self.__main_button_row.controls = [self.__edit_day_button]
+            
+            self.refresh_data(update_days_row=True)
+            self.__update_controls()
+        
+        ###############################
+        # Setting up all requirements for the request
+        new_date_catalog = {}
+        for product_id in self.__current_date_catalog_edit.keys():
+            if self.__current_date_catalog_edit[product_id]["state"]:
+                new_date_catalog[product_id] = self.__current_date_catalog_edit[product_id]["quantity"]
+        
+        headers = {
+            "user_id": user_ids["user_id"],
+            "manager_business_ids": user_ids["manager_business_ids"]
+        }
+        payload = {
+            "new_date_catalog": new_date_catalog,
+        }
+        url_template = Template(endpoints_urls[""])
+        get_catalog_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"])
+        
+        ###############################
+        # Making and processing the request
+        try:
+            # Sending request and getting response
+            response = requests.post(get_catalog_url, headers=headers, json=payload)
+            
+            # Check the response
+            if response.status_code == STATUS_CODES["SUCCESS"]:
+                present_snack_bar(self.__page, self.DATE_CATALOG_EDIT_SUCCESS_TEXT, "Green")
+                
+            elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
+                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
+            else:
+                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
+        except requests.exceptions.RequestException as e:
+            # Handle network-related errors
+            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
+        
+        ###############################
+        # Exits the edit mode and updates screen
+        self.__editing = False
+        self.__main_button_row.controls = [self.__edit_day_button]
+        self.refresh_data(update_days_row=True)
+        self.__update_controls()
+
     
     #############################################
     #             Refreshing Methods            #
     #############################################
     
     # Refreshes the catalog for the actual business and save it in self.__catalog
-    # If any error occurs return false, otherwise return true
-    # Catalog Structure:
-    #   {
-    #       "product_id1": {
-    #           "image_url":"(opt)",
-    #           "product_title":"...",
-    #           "product_description":"...",
-    #           "product_price":"...",
-    #       },
-    #       "product_id2": {
-    #           ...
-    #       },
-    #   }
-    #
     def __refresh_catalog(self):
+        '''
+        Refreshes the catalog for the actual business and save it in self.__catalog
+        If any error occurs return false, otherwise return true
+        Catalog Structure:
+        {
+            "product_id1": {
+                "image_url":"(opt)",
+                "product_title":"...",
+                "product_description":"...",
+                "product_price":"...",
+            },
+            "product_id2": {
+                ...
+            },
+        }
+        '''
         catalog = get_refreshed_catalog(self.__page)
         if catalog is not None:
             self.__catalog = catalog
@@ -385,22 +463,25 @@ class Order_Screen(Column):
         return False
         
     # Refreshes the week catalog for the actual business and save it in self.__current_week_catalog
-    # If any error occurs return false, otherwise return true
-    # Week Catalog Structure:  (product_scarcity can be 5, 1, 0 or null, the null is in case there are more then 5)
-    #   {
-    #       "Mon": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}],
-    #       "Tue": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}],
-    #       "Wed": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}],
-    #       "Thu": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}],
-    #       "Fri": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}],
-    #       "Sat": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}],
-    #       "Sun": [{"product_id":"...", "product_scarcity": ...}, {"product_id":"...", "product_scarcity": ...}]
-    #   }
-    #
     def __refresh_week_catalog(
         self,
         monday_date:str
     ):
+        '''
+        Refreshes the week catalog for the actual business and save it in self.__current_week_catalog
+        If any error occurs return false, otherwise return true
+        Week Catalog Structure:  (product_scarcity can be 5, 1, 0 or null, the null is in case there are more then 5)
+        {
+            "Mon": {"product_idX": product_scarcity, "product_idX": product_scarcity, ...},
+            "Tue": {"product_idX": product_scarcity, "product_idX": product_scarcity, ...},
+            "Wed": {"product_idX": product_scarcity, "product_idX": product_scarcity, ...},
+            "Thu": {"product_idX": product_scarcity, "product_idX": product_scarcity, ...},
+            "Fri": {"product_idX": product_scarcity, "product_idX": product_scarcity, ...},
+            "Sat": {"product_idX": product_scarcity, "product_idX": product_scarcity, ...},
+            "Sun": {"product_idX": product_scarcity, "product_idX": product_scarcity, ...}
+        }
+        '''
+        
         ###############################
         # Setting up all requirements for the request
         headers = {
@@ -471,8 +552,7 @@ class Order_Screen(Column):
         ###########################################################################
         #        ------- REMOVE THIS IF CASE FOR REAL TEST !!!!!!! -------        #
         ###########################################################################
-        testing = True
-        if testing:
+        if TESTING:
             if self.__current_week_day == "Wed" and self.__current_date == "04/12/2024":
                 num = 20
                 product_scarcity = None
@@ -494,25 +574,29 @@ class Order_Screen(Column):
             else:
                 num = 0
             for i in range(num):
-                product_row = self.__create_new_product_row(f"Este é um Pao disto assim {i}", self.__current_order["products"][f"Este é um Pao disto assim {i}"]["cost"], product_scarcity)
+                if user_ids["is_admin"]:
+                    product_row = self.__create_new_product_row_manager(f"Este é um Pao disto assim {i}", self.__current_order["products"][f"Este é um Pao disto assim {i}"]["cost"])
+                else:
+                    product_row = self.__create_new_product_row_client("1", f"Este é um Pao disto assim {i}", self.__current_order["products"][f"Este é um Pao disto assim {i}"]["cost"], product_scarcity)
                 self.__products_column.controls.append(product_row)
             return
         
         ###############################
         # Adding products rows according to the products in the catalog day
-        for product in self.__current_week_catalog[self.__current_week_day]:
-            product_id = product["product_id"]
-            product_scarcity = product["product_scarcity"]
-            product_row = self.__create_new_product_row(self.__catalog[product_id]["product_title"], self.__catalog[product_id]["product_price"], product_scarcity)
+        for product_id in self.__current_week_catalog[self.__current_week_day].keys():
+            if user_ids["is_admin"]:
+                product_row = self.__create_new_product_row_manager(self.__catalog[product_id]["product_title"], self.__catalog[product_id]["product_price"])
+            else:
+                product_scarcity = self.__current_week_catalog[self.__current_week_day][product_id]
+                product_row = self.__create_new_product_row_client(product_id, self.__catalog[product_id]["product_title"], self.__catalog[product_id]["product_price"], product_scarcity)
+            
             self.__products_column.controls.append(product_row)
         
     
     #############################################
     #          Data Management Methods          #
     #############################################
-    {
-        
-    }
+
     # Changes the current week
     def __change_current_week(self, e):
         '''
@@ -571,34 +655,37 @@ class Order_Screen(Column):
         Changes the product amount in the current order list.
         '''
         
+        operation = e.control.data[0]
+        product_name = e.control.data[1]
+        product_id = e.control.data[2]
+        
         ###############################
         # Checking if the pressed button was the '+' or '-'
         # and changing quantities according to that
-        if e.control.data[0] == "+":
+        if operation == "+":
             testing = True
             if testing:
                 product_scarcity = None
             else:
-                product_scarcity = self.__current_week_catalog[self.__current_week_day]["product_scarcity"]
+                product_scarcity = self.__current_week_catalog[self.__current_week_day][product_id]
             
             increment = True
             if product_scarcity is not None:
-                if self.__current_order["products"][e.control.data[1]]["quantity"] >= product_scarcity:
+                if self.__current_order["products"][product_name]["quantity"] >= product_scarcity:
                     increment = False
             if increment:
-                self.__current_order["products"][e.control.data[1]]["quantity"] += 1
+                self.__current_order["products"][product_name]["quantity"] += 1
                 self.__total_amount += 1
                 if self.__total_amount > 0:
                     self.__order_button.disabled = False
-                
-        elif e.control.data[0] == "-":
-            if self.__current_order["products"][e.control.data[1]]["quantity"] > 0:
-                self.__current_order["products"][e.control.data[1]]["quantity"] -= 1
+        elif operation == "-":
+            if self.__current_order["products"][product_name]["quantity"] > 0:
+                self.__current_order["products"][product_name]["quantity"] -= 1
                 self.__total_amount -= 1
                 if self.__total_amount <= 0:
                     self.__order_button.disabled = True
                     
-        self.__current_order["products"][e.control.data[1]]["quantity_text"].value = f"{self.__current_order["products"][e.control.data[1]]["quantity"]}"
+        self.__current_order["products"][product_name]["quantity_text"].value = f"{self.__current_order["products"][product_name]["quantity"]}"
         self.__page.update()
     
     # Edits the product state by removing or adding it to the current week catalog
@@ -607,15 +694,10 @@ class Order_Screen(Column):
         Edits the product state by removing or adding it to the current week catalog
         '''
         
-        is_checked = e.control.value
+        state = e.control.value
         product_id = e.control.data
-        
-        if is_checked:
-            self.__current_week_catalog[self.__current_week_day].append({"product_id": product_id, "quantity": 0})
-        else:
-            for product in self.__current_week_catalog[self.__current_week_day]:
-                if product["product_id"] == product_id:
-                    self.__current_week_catalog[self.__current_week_day].remove(product)
+        self.__current_date_catalog_edit[product_id]["state"] = state
+        self.__page.update()
         
     # Edits the current week catalog with the new defined product quantity
     def __edit_product_amount(self, e):
@@ -624,12 +706,10 @@ class Order_Screen(Column):
         '''
         
         product_id = e.control.data
-        for product in self.__current_week_catalog[self.__current_week_day]:
-            if product["product_id"] == product_id:
-                if e.control.value == "":
-                    product["quantity"] = 0
-                else:
-                    product["quantity"] = int(e.control.value)
+        if e.control.value == "":
+            self.__current_date_catalog_edit[product_id]["quantity"] = 0
+        else:
+            self.__current_date_catalog_edit[product_id]["quantity"] = int(e.control.value)
     
     # Handles the close of the dialog alert
     def __handle_close_dialog(self, e):
@@ -709,11 +789,12 @@ class Order_Screen(Column):
         )
     
     # Creates and returns a row with the information about the product and two buttons ('+' and '-')
-    def __create_new_product_row(
+    def __create_new_product_row_client(
         self,
+        product_id: str,
         product_name: str,
-        product_cost: Optional[str],
-        product_scarcity: Optional[int] = None
+        product_cost: str,
+        product_scarcity: int = None
     ):
         '''
         Creates and returns a row with the information about the product and two buttons ('+' and '-').
@@ -762,7 +843,7 @@ class Order_Screen(Column):
                                         padding=padding.all(0)
                                     ),
                                     on_click=self.__change_product_amount,
-                                    data=("-", product_name)
+                                    data=("-", product_name, product_id)
                                 ),
                                 width=40,
                                 height=40
@@ -777,7 +858,7 @@ class Order_Screen(Column):
                                         padding=padding.all(0)
                                     ),
                                     on_click=self.__change_product_amount,
-                                    data=("+", product_name)
+                                    data=("+", product_name, product_id)
                                 ),
                                 padding=padding.only(right=10),
                                 width=50,
@@ -792,13 +873,55 @@ class Order_Screen(Column):
             ]
         )
     
+    # Creates and returns a row with the information about the product
+    def __create_new_product_row_manager(
+        self,
+        product_name: str,
+        product_cost: str,
+    ):
+        '''
+        Creates and returns a row with the information about the product
+        '''
+        
+        return Row(
+            controls=[
+                Container(
+                    content=Row(
+                        controls=[
+                            Container(
+                                content=Text(
+                                    value = f"{product_name}"
+                                ),
+                                padding=padding.only(left=10, right=20),
+                                expand=True
+                            ),
+                            Container(
+                                content=Text(
+                                    value = product_cost
+                                ),
+                                padding=padding.only(left=20, right=10),
+                            )
+                        ],
+                        alignment=MainAxisAlignment.SPACE_AROUND
+                    ),
+                    height=60,
+                    expand=True
+                )
+            ]
+        )  
+    
+    # Creates and returns a container with the product name, a checkbox and a text field for edition
     def __create_new_product_container(
         self,
         product_name: str,
         product_id: str,
         current_state: bool
     ):
-        Container(
+        '''
+        Creates and returns a container with the product name, a checkbox and a text field for edition
+        '''
+        
+        return Container(
             content=Column(
                 controls=[
                     Text(
@@ -812,30 +935,39 @@ class Order_Screen(Column):
                                 data=product_id,
                                 on_change=self.__edit_product_state
                             ),
-                            Smart_TextField(
-                                page=self.__page,
-                                label="",
-                                hint_text="",
-                                numeric=True,
-                                data=product_id,
-                                on_blur=self.__edit_product_amount
+                            Container(
+                                content=Smart_TextField(
+                                    page=self.__page,
+                                    label=self.EDIT_TEXTFIELD_TEXT,
+                                    hint_text=self.EDIT_TEXTFIELD_HINT_TEXT,
+                                    numeric=True,
+                                    data=product_id,
+                                    on_blur=self.__edit_product_amount,
+                                    expand=True,
+                                    label_style=TextStyle(size=10),
+                                    hint_style=TextStyle(size=10)
+                                ),
+                                width=100,
+                                height=30,
+                                alignment=alignment.center
                             )
                         ],
-                        alignment=MainAxisAlignment.CENTER
+                        alignment=MainAxisAlignment.CENTER,
+                        spacing=3
                     )
                 ],
-                alignment=MainAxisAlignment.SPACE_AROUND
+                alignment=MainAxisAlignment.SPACE_AROUND,
+                horizontal_alignment=CrossAxisAlignment.CENTER
             ),
-            alignment=alignment.center,
-            expand=True
+            alignment=alignment.center
         )
-        
-    
+          
     # Resets the current order
     def reset_current_order(self):
         '''
         Resets the current order and actualize its date
         '''
+        
         for product in self.__current_order["products"]:
             self.__current_order["products"][product]["quantity"] = 0
             self.__current_order["products"][product]["quantity_text"].value = "0"
@@ -845,6 +977,10 @@ class Order_Screen(Column):
     
     # Updates the controls according to if the user is in edit mode or not
     def __update_controls(self):
+        '''
+        Updates the controls according to if the user is in edit mode or not and updates the page
+        '''
+        
         if self.__editing:
             self.controls = [
                 Column(
@@ -854,7 +990,7 @@ class Order_Screen(Column):
                                 controls=[
                                     self.__business_title,
                                     Text(
-                                        value=f"{EDITING_SUBTITLE_TEXT}{self.__current_date}"
+                                        value=f"{self.EDITING_SUBTITLE_TEXT}{self.__current_date}"
                                     )
                                 ],
                                 alignment=MainAxisAlignment.CENTER,
@@ -869,8 +1005,13 @@ class Order_Screen(Column):
                     alignment=MainAxisAlignment.START,
                     expand=True
                 ),
-                self.__main_button_row
+                Container(
+                    content=self.__main_button_row,
+                    padding=padding.symmetric(20, 0),
+                    alignment=alignment.center
+                )
             ]
+            self.__products_column.spacing = 15
             
         else:
             ###############################
@@ -921,4 +1062,7 @@ class Order_Screen(Column):
                 ),
                 main_button_row_and_pages_menu_row
             ]
+            self.__products_column.spacing = 10
+    
+        self.__page.update()
             

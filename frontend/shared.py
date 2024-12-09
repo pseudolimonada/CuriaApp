@@ -2,7 +2,6 @@ user_ids = {
     "user_id": str,
     "manager_business_ids": list,
     "is_admin": bool
-    ""
 }
 
 shared_vars = {
@@ -29,3 +28,5 @@ UNF_COLOR = '#818181'
 MAIN_BG_COLOR = ''
 MAIN_TEXT_COLOR = ''
 MAIN_DISABLED_COLOR = ''
+
+TESTING = True
