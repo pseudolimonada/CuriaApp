@@ -1,32 +1,47 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+# Versao 2
+import redis
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Depends
+import json
 
-router = APIRouter()
+app = FastAPI
+redis_client = redis.StrictRedis(host='localhost', port=6379,db=0)
+active_connections = {}  # Local cache for in-memory connections (for this instance)
 
-connections = {}
-
-async def notify_new_order(business_id: str, order_data: dict):
+async def notify_new_order(business_id: str, notification:dict):
     """
-    Notify all active WebSocket connections for the given business_id.
+    Notify WebSocket connections for a specific business.
     """
-    if business_id in connections:
-        for connection in connections[business_id]:
-            await connection.send_json(order_data)
-        
-@router.websocket("/businesses/<int:business_id>/notifications_for_new_orders")
+    redis_key = f"business:{business_id}:connections"
+    connections = redis_client.smembers(redis_key)
+    
+    for con_id in connections:
+        try:
+            websocket = active_connections[con_id.decode()]
+            await websocket.send_json(notification)
+        except Exception:
+            # Remove invalid connections
+            redis_client.srem(redis_key,con_id)
+            active_connections.pop(con_id.decode(),None)
+            
+@app.websocket("/businesses/<int:business_id>/notifications_for_new_orders")
 async def websocket_new_orders(websocket: WebSocket, business_id: str):
     """
-    WebSocket endpoint to handle real time notifications for new orders
+    WebSocket endpoint for real-time order notification
     """
+    conn_id = str(id(websocket)) # Unique ID for a connection
+    redis_key = f"business:{business_id}.connections"
     await websocket.accept()
-    
-    if business_id not in connections:
-        connections[business_id] = []
-    connections[business_id].append(websocket)
-    
+    redis_client.sadd(redis_key, conn_id)
+    active_connections[conn_id] = websocket
     try:
         while True:
             await websocket.receive_text()
     except WebSocketDisconnect:
-        connections[business_id].remove(websocket)
-        if not connections[business_id]:
-            del connections[business_id]
+        print(f"Client disconnected: {conn_id}")
+    except Exception as e:
+        print(f"Error with connection {conn_id}: {str(e)}")
+    finally:
+        redis_client.srem(redis_key, conn_id)
+        active_connections.pop(conn_id, None)
+
+        
