@@ -1,7 +1,63 @@
-from flet import Page, SnackBar, Text, TextThemeStyle
+from flet import Page, SnackBar, Text, TextThemeStyle, TextField, TextStyle
 from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls
 from string import Template
+from typing import Optional, Callable, Any
 import requests
+
+# Generic textfield that can storage last value and have just numeric mode.
+class Smart_TextField(TextField):
+    '''
+    Generic textfield that can storage last value and have just numeric mode.
+    '''
+    
+    __page: Page
+    __last_value: str = ""
+    __is_numeric: bool = False
+    __callback: Callable = None
+    
+    def __init__(
+        self,
+        page: Page,
+        label: str = "Label",
+        hint_text: str = "Hint Text",
+        disabled: Optional[bool] = False,
+        numeric: Optional[bool] = False,
+        expand: Optional[bool] = False,
+        max_length: Optional[int] = None,
+        on_blur: Optional[Callable] = None,
+        label_style: Optional[TextStyle] = None,
+        hint_style: Optional[TextStyle] = None,
+        data: Any = None
+    ):
+        self.__page = page
+        super().__init__(
+            adaptive = True,
+            label=label,
+            hint_text=hint_text,
+            on_change=self.change_value,
+            data=data,
+            disabled=disabled,
+            max_length=max_length,
+            expand=expand,
+            label_style=label_style,
+            hint_style=hint_style
+        )
+        self.__is_numeric = numeric
+        if on_blur:
+            self.on_blur = on_blur
+    
+    def change_value(self, e):
+        '''
+        Changes the current value and stores the last value.
+        '''
+        
+        if self.__is_numeric and not e.control.value.isdigit():
+            e.control.value = ''.join(filter(str.isdigit, e.control.value))
+            self.__page.update()
+            
+        else:
+            self.__last_value = self.value
+            self.value = e.control.value
 
 # Presents a snack bark in the page object.
 def present_snack_bar(
