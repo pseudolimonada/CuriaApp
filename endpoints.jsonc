@@ -15,32 +15,15 @@
 // response: (auth token in jwt)
 ,{"user_id":"...", "manager_business_ids":["...", "..."]}
 
-
-// POST /businesses/{business_id}/orders
-// header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
-// payload
-,{
-	"user_id": "", 
-	"order_date": "",
-  	"order_data" : [
-		{"product_id":"...", "product_quantity":"..."},
-		{"product_id":"...", "product_quantity":"..."},
-		{"product_id":"...", "product_quantity":"..."}
-	]
-}
-// response
-,{ "200": "Order submitted successfully" }
-,{ "400": "Error submitting order" }
-
 // GET /businesses/{business_id}/products
 // header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
 // response
 ,{
   "catalog": [
-	{"product_id":"", "image_url":"(opt)", "product_title":"", "product_description":"", "product_price":"", "product_scarcity": 5 /* or 1 or null*/},
-	{"product_id":"", "image_url":"(opt)", "product_title":"", "product_description":"", "product_price":"", "product_quantity": 5 /* or 1 or null*/},
-	{"product_id":"", "image_url":"(opt)", "product_title":"", "product_description":"", "product_price":"", "product_quantity": 5 /* or 1 or null*/},
-	{"product_id":"", "image_url":"(opt)", "product_title":"", "product_description":"", "product_price":"", "product_quantity": 5 /* or 1 or null*/}
+	{"product_id":"", "image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""},
+	{"product_id":"", "image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""},
+	{"product_id":"", "image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""},
+	{"product_id":"", "image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""}
   ]
 }
 
@@ -90,6 +73,16 @@
 	"catalog_products": ["product_id", "product_id", "product_id", "..."]
 }
 
+// PUT /businesses/{business_id}/catalogs
+// header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
+// payload
+,{
+	"catalog_date": "...",
+	"product_id": "...",
+	"product_quantity": "..."
+}
+// logic: if product id exists in catalog updates quantity, else does nothing
+
 // GET /businesses/{business_id}/orders
 // header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
 //query params: monday_date
@@ -102,17 +95,40 @@
 			"order_id": "",
 			"user_name": "",
 			"order_date": "",
-			"order_data": [{"product_id":"...", "quantity":"..."}],
+			"order_data": [{"product_id":"...", "product_quantity":"..."}, {"product_id":"...", "product_quantity":"..."}],
 			"order_state": "waiting_validation" // or "waiting_delivery" or "delivered"
 		},
 		{
 			"order_id": "",
 			"user_name": "",
 			"order_date": "",
-			"order_data": [{"product_id":"...", "quantity":"..."}],
+			"order_data": [{"product_id":"...", "product_quantity":"..."}, {"product_id":"...", "product_quantity":"..."}],
 			"order_state": "waiting_validation"// or "waiting_delivery" or "delivered"
 		}
 	]
+}
+
+// POST /businesses/{business_id}/orders
+// header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
+// payload
+,{
+	"user_id": "", 
+	"order_date": "",
+  	"order_data" : [
+		{"product_id":"...", "product_quantity":"..."},
+		{"product_id":"...", "product_quantity":"..."},
+		{"product_id":"...", "product_quantity":"..."}
+	]
+}
+// response
+,{ "200": "Order submitted successfully" }
+,{ "400": "Error submitting order" }
+
+// PUT /businesses/{business_id}/orders/{order_id}
+// header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
+// payload
+,{
+	"order_state": "waiting_delivery" // or "delivered"
 }
 
 // /notification_for_new_orders
