@@ -1,4 +1,5 @@
-from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, BorderSide
+from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, BorderSide, VisualDensity
+
 from shared import shared_vars, user_ids, endpoints_urls
 import requests
 
@@ -17,7 +18,7 @@ class Check_Orders_Screen(Column):
 
     __days_row: Row = Row(alignment = MainAxisAlignment.START, scroll = ScrollMode.ADAPTIVE)
 
-    __filters_row: Row = Row(alignment = MainAxisAlignment.CENTER, scroll = ScrollMode.ADAPTIVE)
+    __filters_row: Row = Row(alignment = MainAxisAlignment.CENTER)
 
     __orders_column: Column = Column(alignment = MainAxisAlignment.START, scroll = ScrollMode.ADAPTIVE, expand = True)
 
@@ -37,7 +38,6 @@ class Check_Orders_Screen(Column):
         
         self.refresh_data()
 
-        self.__fill_days_row()
         self.__create_filters_row()
 
         # Creating a column that joins order, filters and pages menu rows
@@ -60,8 +60,7 @@ class Check_Orders_Screen(Column):
         self.controls = [
             Column(
                 controls=[
-                    self.__days_row,
-                    Divider(),
+                    Container(height=10),
                     self.__filters_row,
                     Divider(),
                     self.__orders_column,
@@ -69,7 +68,8 @@ class Check_Orders_Screen(Column):
                 alignment=MainAxisAlignment.START,
                 expand=True
             ),
-            order_row_and_pages_menu_row
+            order_row_and_pages_menu_row,
+            Divider()
         ]
         
     def refresh_data(self):
@@ -87,13 +87,17 @@ class Check_Orders_Screen(Column):
         '''
         Creates row with filter buttons
         ''' 
+        self.__filters_row.controls.clear()
         for i in self.FILTER_BUTTON_TEXT.keys():
             self.__filters_row.controls.append(
                 ElevatedButton(
                     text = self.FILTER_BUTTON_TEXT.get(i),
                     adaptive = True,
                     on_click = self.__change_filter_orders_list,
-                    data = i
+                    data = i,
+                    style= ButtonStyle(
+                        padding = padding.all(20),
+                    ),
                 )
             )
 
@@ -128,13 +132,13 @@ class Check_Orders_Screen(Column):
 
         #get all orders given the day selected
         if self.__current_filter == "All":
-            orders_to_show = [order for order in self.__orders if order.get("order_date") == self.__current_date]
+            orders_to_show = self.__orders
         
 
         else:
             orders_to_show = [
                 order for order in self.__orders
-                if (order.get("order_date") == self.__current_date and order.get("order_state") == self.__current_filter)
+                if (order.get("order_state") == self.__current_filter)
             ]
 
         
