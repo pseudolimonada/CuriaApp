@@ -4,7 +4,7 @@ from utils import present_snack_bar
 import requests
 from Order_Screen.order_screen import Order_Screen
 from Full_Order_Screen.full_order_screen import Full_Order_Screen
-from Check_Orders_Screen.check_orders_page import Check_Orders_Page
+from Check_Orders_Screen.check_orders_screen import Check_Orders_Screen
 
 class Login_Screen(Column):
     '''
@@ -160,7 +160,7 @@ class Login_Screen(Column):
         
         order_screen = Order_Screen(self.__page)
         full_order_screen = Full_Order_Screen(self.__page)
-        check_orders_screen = Check_Orders_Page(self.__page)
+        check_orders_screen = Check_Orders_Screen(self.__page)
         
         shared_vars["main_container"].add_screen_to_list(order_screen, "order_screen")
         shared_vars["main_container"].add_screen_to_list(full_order_screen, "full_order_screen")
