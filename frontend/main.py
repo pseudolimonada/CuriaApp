@@ -31,11 +31,15 @@ from flet import (
     dropdown,
     ScrollMode,
     PagePlatform,
+    IconTheme
 )
 from main_container import Main_Container
 from Login_Screen.login_screen import Login_Screen
+from Order_Screen.order_screen import Order_Screen
+from Full_Order_Screen.full_order_screen import Full_Order_Screen
+from Check_Orders_Screen.check_orders_screen import Check_Orders_Screen
 from bottom_menu import Bottom_Menu
-from shared import shared_vars, PRIM_COLOR, SEC_COLOR
+from shared import MAIN_TEXT_COLOR, shared_vars
 
 # Program Function
 def main(page: Page):
@@ -48,7 +52,9 @@ def main(page: Page):
     shared_vars["main_container"] = Main_Container(page)
     shared_vars["bottom_menu"] = Bottom_Menu()
     login_screen = Login_Screen(page)
-    
+    order_screen = Order_Screen(page)
+    full_order_screen = Full_Order_Screen(page)
+    check_orders_screen = Check_Orders_Screen(page)
     
     shared_vars["main_container"].add_screen_to_list(login_screen, "login_screen")
     shared_vars["main_container"].change_screen("login_screen")
@@ -76,9 +82,9 @@ def main(page: Page):
             #surface="",
             ###on_surface="",       # Disabled Button Color
             #surface_variant="",
-            ###on_surface_variant="",   # Textbox Text Color
+            on_surface_variant=MAIN_TEXT_COLOR,   # Textbox Text Color
             #outline="",
-            ###outline_variant="",        # Dividers Color
+            ###outline_variant="#606060",        # Dividers Color
             #shadow="",
             #scrim="",
             #inverse_surface="",

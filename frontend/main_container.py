@@ -1,6 +1,9 @@
-from flet import Container, Page, Theme, ColorScheme 
+from flet import (
+    Container, Page, Theme, ColorScheme, colors, alignment, 
+    LinearGradient, BorderRadius, Offset, BoxShadow
+                  )
 from utils import present_snack_bar
-from shared import PRIM_COLOR, user_ids
+from shared import BG_TOP_COLOR, BG_BOTTOM_COLOR, user_ids
 
 class Main_Container(Container):
     '''
@@ -21,8 +24,15 @@ class Main_Container(Container):
     ):
         super().__init__(
             expand=True,
-            # bgcolor=PRIM_COLOR,   # Main Background Color
-            border_radius=10
+            gradient=LinearGradient(
+                begin=alignment.top_center,
+                end=alignment.bottom_center,
+                colors=[
+                    BG_TOP_COLOR,
+                    BG_BOTTOM_COLOR
+                ],
+            ),
+            alignment=alignment.center
         )
         self.__page = page
     

@@ -2,6 +2,8 @@ user_ids = {
     "user_id": str,
     "manager_business_ids": list,
     "is_admin": bool
+    "manager_business_ids": list,
+    "is_admin": bool
 }
 
 shared_vars = {
@@ -15,18 +17,16 @@ endpoints_urls = {
     "LOGIN": "/login",
     "REGISTER": "/register",
     "GET_CATALOG": "/businesses/$business_id/products",
-    "POST_ORDER": "/businesses/$business_id/orders"
+    "POST_ORDER": "/businesses/$business_id/orders",
+    "GET_ORDERS": "businesses/$business_id/orders"
 }
 
 STATUS_CODES = {"SUCCESS": 200, "INVALID_CREDENTIALS": 401, "INTERNAL_ERROR": 500, "BAD_REQUEST": 400}
 
-PRIM_COLOR = '#f0cf7d'
-SEC_COLOR = '#4c4c4c'
-THIRD_COLOR = '#89f4dc'
-UNF_COLOR = '#818181'
+BG_TOP_COLOR = "#e6be7a"
+BG_BOTTOM_COLOR = "#f4ac75"
+MAIN_TEXT_COLOR = "#606060"
 
-MAIN_BG_COLOR = ''
-MAIN_TEXT_COLOR = ''
-MAIN_DISABLED_COLOR = ''
+
 
 TESTING = True

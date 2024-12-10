@@ -1,8 +1,10 @@
-from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, BorderSide
-from shared import shared_vars, user_ids, endpoints_urls
+from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, BorderSide, VisualDensity
+from utils import get_refreshed_catalog, present_snack_bar
+from shared import shared_vars, user_ids, endpoints_urls, STATUS_CODES
 import requests
+from string import Template
 
-class Check_Orders_Page(Column):
+class Check_Orders_Screen(Column):
     '''
     Column that displays all the orders a user has made
     '''
@@ -15,9 +17,11 @@ class Check_Orders_Page(Column):
 
     FILTER_BUTTON_TEXT: dict = {"waiting_validation":"Por aprovar", "waiting_delivery":"Por entregar", "delivered":"Entregue"} 
 
+    NETWORK_ERROR_TEXT: str = "Please verify your internet connection and try again..."
+
     __days_row: Row = Row(alignment = MainAxisAlignment.START, scroll = ScrollMode.ADAPTIVE)
 
-    __filters_row: Row = Row(alignment = MainAxisAlignment.CENTER, scroll = ScrollMode.ADAPTIVE)
+    __filters_row: Row = Row(alignment = MainAxisAlignment.CENTER)
 
     __orders_column: Column = Column(alignment = MainAxisAlignment.START, scroll = ScrollMode.ADAPTIVE, expand = True)
 
@@ -37,8 +41,8 @@ class Check_Orders_Page(Column):
         
         self.refresh_data()
 
-        self.__fill_days_row()
         self.__create_filters_row()
+        self.__fill_orders_column()
 
         # Creating a column that joins order, filters and pages menu rows
         order_row_and_pages_menu_row = Column(
@@ -60,8 +64,7 @@ class Check_Orders_Page(Column):
         self.controls = [
             Column(
                 controls=[
-                    self.__days_row,
-                    Divider(),
+                    Container(height=10),
                     self.__filters_row,
                     Divider(),
                     self.__orders_column,
@@ -69,31 +72,56 @@ class Check_Orders_Page(Column):
                 alignment=MainAxisAlignment.START,
                 expand=True
             ),
-            order_row_and_pages_menu_row
+            order_row_and_pages_menu_row,
+            Divider()
         ]
         
     def refresh_data(self):
         '''
         Requests data about the orders the user has placed and saves it
         '''
+        #get products
+        self.__catalog = get_refreshed_catalog(self.__page)
+
+        #get orders
+
         header = {
             "user_id": user_ids["user_id"],
             "manager_business_ids": user_ids["manager_business_ids"]
         }
-        #self.__catalog = requests.get(endpoints_urls["PRODUCTS"],headers=header)
-        #self.__orders = requests.get(endpoints_urls["ORDERS"],headers=header)
-    
+
+        url_template = Template(endpoints_urls["GET_ORDERS"])
+        get_orders_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"])
+
+        try:
+            response = requests.get(get_orders_url,headers =header)
+
+            if response.status_code == STATUS_CODES["SUCCESS"]:
+                self.__orders = response["orders"]
+
+            elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
+                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
+            else:
+                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
+                
+        except requests.exceptions.RequestException as e:
+            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
+
     def __create_filters_row(self):
         '''
         Creates row with filter buttons
         ''' 
+        self.__filters_row.controls.clear()
         for i in self.FILTER_BUTTON_TEXT.keys():
             self.__filters_row.controls.append(
                 ElevatedButton(
                     text = self.FILTER_BUTTON_TEXT.get(i),
                     adaptive = True,
                     on_click = self.__change_filter_orders_list,
-                    data = i
+                    data = i,
+                    style= ButtonStyle(
+                        padding = padding.all(20),
+                    ),
                 )
             )
 
@@ -120,7 +148,9 @@ class Check_Orders_Page(Column):
         Clears orders column and fills it with the orders according to __current_date and __current_filter
         '''
         #test order
-        self.__orders=[{"order_id":"1","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"Croissant","quantity":2}], "order_state":"waiting_delivery"},{"order_id":"1","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"Pao","quantity":2}],"order_state":"waiting_validation"}] #product_id as a name for test, change it later
+        
+        self.__orders=[{"order_id":"1","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"01","quantity":2},{"product_id":"02","quantity":3}], "order_state":"waiting_delivery"},{"order_id":"3","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"04","quantity":2}],"order_state":"waiting_validation"}] #product_id as a name for test, change it later
+        self.__catalog={"01":{"product_title":"Pao"},"02":{"product_title":"Broa"},"03":{"product_title":"Uma cena"},"04":{"product_title":"Bolo"}}
         if not self.__orders:
             return
          
@@ -128,16 +158,21 @@ class Check_Orders_Page(Column):
 
         #get all orders given the day selected
         if self.__current_filter == "All":
-            orders_to_show = [order for order in self.__orders if order.get("order_date") == self.__current_date]
+            orders_to_show = self.__orders
         
 
         else:
             orders_to_show = [
                 order for order in self.__orders
-                if (order.get("order_date") == self.__current_date and order.get("order_state") == self.__current_filter)
+                if (order.get("order_state") == self.__current_filter)
             ]
 
-        
+        print(orders_to_show)
+        for order in orders_to_show:
+            #row
+            pass
+
+
         for order in orders_to_show:
             row =self.__create_new_order_row(order)
             self.__orders_column.controls.append(row)
@@ -154,7 +189,7 @@ class Check_Orders_Page(Column):
         for product in data:
             product_id = product.get("product_id")
             #print(product_id)
-            order_string += product_id + " x" +str(product.get("quantity"))+", "
+            order_string += self.__catalog[product_id]["product_title"] + " x" +str(product.get("quantity"))+", "
             
 
         #print(order_string)
