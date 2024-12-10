@@ -15,7 +15,7 @@ class Check_Orders_Screen(Column):
     __page = Page
     __data = dict
 
-    FILTER_BUTTON_TEXT: dict = {"waiting_validation":"Por aprovar", "waiting_delivery":"Por entregar", "delivered":"Entregue"} 
+    FILTER_BUTTON_TEXT: dict = {"waiting_validation":"Por aprovar", "waiting_delivery":"Por entregar", "delivered":"Entregue","rejected":"Rejeitado"} 
 
     NETWORK_ERROR_TEXT: str = "Please verify your internet connection and try again..."
 
@@ -150,7 +150,7 @@ class Check_Orders_Screen(Column):
         #test order
         
         self.__orders=[{"order_id":"1","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"01","quantity":2},{"product_id":"02","quantity":3}], "order_state":"waiting_delivery"},{"order_id":"3","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"04","quantity":2}],"order_state":"waiting_validation"}] #product_id as a name for test, change it later
-        self.__catalog={"01":{"product_title":"Pao"},"02":{"product_title":"Broa"},"03":{"product_title":"Uma cena"},"04":{"product_title":"Bolo"}}
+        self.__catalog={"01":{"product_title":"Pao","product_price":"2.0€"},"02":{"product_title":"Broa","product_price":"2.50€"},"03":{"product_title":"Uma cena","product_price":"4.0€"},"04":{"product_title":"Bolo","product_price":"5.00€"}}
         if not self.__orders:
             return
          
@@ -204,7 +204,9 @@ class Check_Orders_Screen(Column):
                                 expand=True
                             ),
                             ElevatedButton(
-                                content = Text("View")
+                                content = Text("View"),
+                                data = {"order_date":order["order_date"], "order_state":order["order_state"], "products":order["order_data"]},
+                                on_click = self.__go_full_order_screen
                             )
                         ],
                         alignment = MainAxisAlignment.SPACE_AROUND
@@ -218,6 +220,31 @@ class Check_Orders_Screen(Column):
                 )
             ]
         )
+
+    def __go_full_order_screen(self, e):
+        '''
+        shared_vars["current_order"]
+        {
+        ["date] : "DD/MM/YYYY"
+        ["state] : str
+        ["products_title"] : [{"quantity":int, "product_id":, "cost": "1,50€", "quantity_text":},{},...]
+        }
+        '''
+        #print(e.control.data["products"])
+        
+        products_dict={}
+
+        for product in e.control.data["products"]:
+            products_dict[self.__catalog[product["product_id"]]["product_title"]] = {
+                "quantity": int(product["quantity"]),
+                "quantity_text": product["quantity"],
+                "cost" : self.__catalog[product["product_id"]]["product_price"]
+                }
+
+        shared_vars["current_order"] = {"products":products_dict, "date":e.control.data["order_date"], "state":e.control.data["order_state"]}
+        
+        shared_vars["main_container"].change_screen("full_order_screen")
+
 
 
     def __create_date_button(self, date: str):
