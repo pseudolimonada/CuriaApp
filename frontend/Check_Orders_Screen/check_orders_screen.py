@@ -1,7 +1,8 @@
 from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, BorderSide, VisualDensity
-
-from shared import shared_vars, user_ids, endpoints_urls
+from utils import get_refreshed_catalog, present_snack_bar
+from shared import shared_vars, user_ids, endpoints_urls, STATUS_CODES
 import requests
+from string import Template
 
 class Check_Orders_Screen(Column):
     '''
@@ -15,6 +16,8 @@ class Check_Orders_Screen(Column):
     __data = dict
 
     FILTER_BUTTON_TEXT: dict = {"waiting_validation":"Por aprovar", "waiting_delivery":"Por entregar", "delivered":"Entregue"} 
+
+    NETWORK_ERROR_TEXT: str = "Please verify your internet connection and try again..."
 
     __days_row: Row = Row(alignment = MainAxisAlignment.START, scroll = ScrollMode.ADAPTIVE)
 
@@ -39,6 +42,7 @@ class Check_Orders_Screen(Column):
         self.refresh_data()
 
         self.__create_filters_row()
+        self.__fill_orders_column()
 
         # Creating a column that joins order, filters and pages menu rows
         order_row_and_pages_menu_row = Column(
@@ -76,13 +80,33 @@ class Check_Orders_Screen(Column):
         '''
         Requests data about the orders the user has placed and saves it
         '''
+        #get products
+        self.__catalog = get_refreshed_catalog(self.__page)
+
+        #get orders
+
         header = {
             "user_id": user_ids["user_id"],
             "manager_business_ids": user_ids["manager_business_ids"]
         }
-        #self.__catalog = requests.get(endpoints_urls["PRODUCTS"],headers=header)
-        #self.__orders = requests.get(endpoints_urls["ORDERS"],headers=header)
-    
+
+        url_template = Template(endpoints_urls["GET_ORDERS"])
+        get_orders_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"])
+
+        try:
+            response = requests.get(get_orders_url,headers =header)
+
+            if response.status_code == STATUS_CODES["SUCCESS"]:
+                self.__orders = response["orders"]
+
+            elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
+                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
+            else:
+                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
+                
+        except requests.exceptions.RequestException as e:
+            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
+
     def __create_filters_row(self):
         '''
         Creates row with filter buttons
