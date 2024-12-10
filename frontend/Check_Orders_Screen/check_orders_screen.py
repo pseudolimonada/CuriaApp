@@ -148,7 +148,9 @@ class Check_Orders_Screen(Column):
         Clears orders column and fills it with the orders according to __current_date and __current_filter
         '''
         #test order
-        self.__orders=[{"order_id":"1","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"Croissant","quantity":2}], "order_state":"waiting_delivery"},{"order_id":"1","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"Pao","quantity":2}],"order_state":"waiting_validation"}] #product_id as a name for test, change it later
+        
+        self.__orders=[{"order_id":"1","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"01","quantity":2},{"product_id":"02","quantity":3}], "order_state":"waiting_delivery"},{"order_id":"3","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"04","quantity":2}],"order_state":"waiting_validation"}] #product_id as a name for test, change it later
+        self.__catalog={"01":{"product_title":"Pao"},"02":{"product_title":"Broa"},"03":{"product_title":"Uma cena"},"04":{"product_title":"Bolo"}}
         if not self.__orders:
             return
          
@@ -165,7 +167,12 @@ class Check_Orders_Screen(Column):
                 if (order.get("order_state") == self.__current_filter)
             ]
 
-        
+        print(orders_to_show)
+        for order in orders_to_show:
+            #row
+            pass
+
+
         for order in orders_to_show:
             row =self.__create_new_order_row(order)
             self.__orders_column.controls.append(row)
@@ -182,7 +189,7 @@ class Check_Orders_Screen(Column):
         for product in data:
             product_id = product.get("product_id")
             #print(product_id)
-            order_string += product_id + " x" +str(product.get("quantity"))+", "
+            order_string += self.__catalog[product_id]["product_title"] + " x" +str(product.get("quantity"))+", "
             
 
         #print(order_string)
