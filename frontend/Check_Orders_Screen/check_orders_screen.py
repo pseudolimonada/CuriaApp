@@ -167,7 +167,7 @@ class Check_Orders_Screen(Column):
                 if (order.get("order_state") == self.__current_filter)
             ]
 
-        print(orders_to_show)
+        #print(orders_to_show)
         for order in orders_to_show:
             #row
             pass
@@ -185,7 +185,7 @@ class Check_Orders_Screen(Column):
         '''
         order_string = ""
         data = order.get("order_data")
-        print(data)
+        #print(data)
         for product in data:
             product_id = product.get("product_id")
             #print(product_id)
@@ -202,6 +202,9 @@ class Check_Orders_Screen(Column):
                                 content = Text(order_string),
                                 padding=padding.only(left=10, right=20),
                                 expand=True
+                            ),
+                            ElevatedButton(
+                                content = Text("View")
                             )
                         ],
                         alignment = MainAxisAlignment.SPACE_AROUND
@@ -211,6 +214,7 @@ class Check_Orders_Screen(Column):
                 ),
                 Container(
                     content=Text(self.FILTER_BUTTON_TEXT.get(order.get("order_state"))),
+                    padding = padding.only(right=10)
                 )
             ]
         )
@@ -253,4 +257,4 @@ class Check_Orders_Screen(Column):
             self.__current_filter = e.control.data
             self.__fill_orders_column()
             self.__page.update() 
-        print(self.__current_filter)
+        #print(self.__current_filter)
