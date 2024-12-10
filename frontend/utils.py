@@ -1,5 +1,5 @@
-from flet import Page, Container, ElevatedButton, ButtonStyle, LinearGradient, alignment, SnackBar, Text, TextThemeStyle, TextField, TextStyle
-from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls
+from flet import CircleBorder, padding, Page, Container, ElevatedButton, ButtonStyle, LinearGradient, alignment, SnackBar, Text, TextThemeStyle, TextField, TextStyle
+from shared import SELECTED_GRADIENT_COLOR_1, SELECTED_GRADIENT_COLOR_2, STATUS_CODES, PRIM_GRADIENT_COLOR_1, PRIM_GRADIENT_COLOR_2, SEC_GRADIENT_COLOR_1, SEC_GRADIENT_COLOR_2, THIRD_GRADIENT_COLOR_1, THIRD_GRADIENT_COLOR_2, BUTTON_OVERLAY_COLOR, user_ids, shared_vars, endpoints_urls
 from string import Template
 from typing import Optional, Callable, Any
 import requests
@@ -99,7 +99,7 @@ class Main_ElevatedButton_Container(Container):
                 color="#606060",
                 style=ButtonStyle(
                     elevation=0,
-                    overlay_color="#fff791"
+                    overlay_color=BUTTON_OVERLAY_COLOR
                 )
             ),
             gradient = Primary_Gradient(),
@@ -108,6 +108,41 @@ class Main_ElevatedButton_Container(Container):
             alignment=alignment.center
         )
 
+class Secondary_ElevatedButton_Container(Container):
+    def __init__(
+        self,
+        text: Optional[str] = "Text",
+        scale: Optional[float] = 1.0,
+        width: Optional[int] = None,
+        height: Optional[int] = None,
+        on_click: Optional[Callable] = None,
+        container_padding: Any = None,
+        data: Any = None
+    ):
+        super().__init__(
+            content=ElevatedButton(
+                adaptive=True,
+                text=text,
+                scale=scale,
+                on_click=on_click,
+                data=data,
+                bgcolor="transparent",
+                color="#606060",
+                style=ButtonStyle(
+                    elevation=0,
+                    overlay_color=BUTTON_OVERLAY_COLOR,
+                    shape=CircleBorder(),
+                    padding=padding.all(0)
+                )
+            ),
+            gradient = Third_Gradient(),
+            border_radius=20,
+            scale=scale,
+            alignment=alignment.center,
+            width=width,
+            height=height,
+            padding=container_padding
+        )
 
 class Primary_Gradient(LinearGradient):
     def __init__(self):
@@ -115,14 +150,43 @@ class Primary_Gradient(LinearGradient):
             begin=alignment.top_center,
             end=alignment.bottom_center,
             colors=[
-                "#ffd791",
-                "#ffc396"
+                PRIM_GRADIENT_COLOR_1,
+                PRIM_GRADIENT_COLOR_2
             ],
         )
 
+class Secondary_Gradient(LinearGradient):
+    def __init__(self):
+        super().__init__(
+            begin=alignment.center_left,
+            end=alignment.center_right,
+            colors=[
+                SEC_GRADIENT_COLOR_1,
+                SEC_GRADIENT_COLOR_2
+            ],
+        )
 
+class Third_Gradient(LinearGradient):
+    def __init__(self):
+        super().__init__(
+            begin=alignment.top_right,
+            end=alignment.bottom_left,
+            colors=[
+                THIRD_GRADIENT_COLOR_1,
+                THIRD_GRADIENT_COLOR_2
+            ],
+        )
 
-
+class Selected_Gradient(LinearGradient):
+    def __init__(self):
+        super().__init__(
+            begin=alignment.top_center,
+            end=alignment.bottom_center,
+            colors=[
+                SELECTED_GRADIENT_COLOR_1,
+                SELECTED_GRADIENT_COLOR_2
+            ],
+        )
 
 # Presents a snack bark in the page object.
 def present_snack_bar(

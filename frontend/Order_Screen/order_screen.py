@@ -1,6 +1,6 @@
-from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight, IconButton, icons, CrossAxisAlignment, VisualDensity, Checkbox, ResponsiveRow
-from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls, TESTING
-from utils import Smart_TextField, present_snack_bar, get_refreshed_catalog
+from flet import Animation, AnimationCurve, Column, MainAxisAlignment, TextDecoration, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight, IconButton, icons, CrossAxisAlignment, VisualDensity, Checkbox, ResponsiveRow
+from shared import BUTTON_OVERLAY_COLOR, STATUS_CODES, MAIN_TEXT_COLOR, user_ids, shared_vars, endpoints_urls, TESTING
+from utils import Selected_Gradient, Secondary_ElevatedButton_Container, Smart_TextField, Primary_Gradient, Secondary_Gradient, Third_Gradient, present_snack_bar, get_refreshed_catalog
 from datetime import datetime, timedelta
 from string import Template
 from typing import Optional
@@ -59,7 +59,8 @@ class Order_Screen(Column):
     __current_week_day: str
     __current_week_text: Text = Text(
         size=15,
-        width=FontWeight.BOLD
+        width=FontWeight.BOLD,
+        color=MAIN_TEXT_COLOR
     )
     
     ###############################
@@ -67,7 +68,8 @@ class Order_Screen(Column):
     __business_title: Text = Text(
         size=25,
         text_align=TextAlign.CENTER,
-        width=FontWeight.BOLD
+        width=FontWeight.BOLD,
+        color=MAIN_TEXT_COLOR
     )
     
     ###############################
@@ -100,9 +102,29 @@ class Order_Screen(Column):
     __main_button_row: Row = Row(
         alignment=MainAxisAlignment.CENTER
     )
-    __order_button: ElevatedButton
-    __edit_day_button: ElevatedButton
-    __confirm_button: ElevatedButton
+    __order_button: Container = Container(
+        opacity=0.4,
+        alignment=alignment.center,
+        gradient=Primary_Gradient(),
+        border_radius=20,
+        scale=1.6,
+        animate_opacity=Animation(
+            duration=200,
+            curve=AnimationCurve.EASE_IN_OUT
+        )
+    )
+    __edit_day_button: Container = Container(
+        alignment=alignment.center,
+        gradient=Primary_Gradient(),
+        border_radius=20,
+        scale=1.2
+    )
+    __confirm_button: Container = Container(
+        alignment=alignment.center,
+        gradient=Primary_Gradient(),
+        border_radius=20,
+        scale=1.2
+    )
     
     ###############################
     # Initializing and setting up the alert dialog
@@ -143,6 +165,7 @@ class Order_Screen(Column):
         self.__pass_week_forward_button = IconButton(
             icon = icons.ARROW_FORWARD_IOS,
             icon_size = 12,
+            icon_color=MAIN_TEXT_COLOR,
             enable_feedback=False,
             adaptive=True,
             on_click=self.__change_current_week,
@@ -155,6 +178,7 @@ class Order_Screen(Column):
         self.__pass_week_backward_button = IconButton(
             icon = icons.ARROW_BACK_IOS,
             icon_size = 12,
+            icon_color=MAIN_TEXT_COLOR,
             enable_feedback=False,
             adaptive=True,
             on_click=self.__change_current_week,
@@ -203,35 +227,45 @@ class Order_Screen(Column):
         ###############################
         # Setting up the order / confirm & edit button
         if user_ids["is_admin"]:
-            self.__confirm_button = ElevatedButton(
+            self.__confirm_button.content = ElevatedButton(
                 text=self.CONFIRM_BUTTON_TEXT,
                 adaptive=True,
                 on_click=self.__update_current_day,
+                bgcolor="transparent",
+                color="#606060",
                 style=ButtonStyle(
-                    padding=padding.symmetric(10, 70)
-                ),
-                scale=1.2
+                    padding=padding.symmetric(10, 70),
+                    elevation=0,
+                    overlay_color=BUTTON_OVERLAY_COLOR
+                )
             )
-            self.__edit_day_button = ElevatedButton(
+            self.__edit_day_button.content = ElevatedButton(
                 text=self.EDIT_BUTTON_TEXT,
                 adaptive=True,
                 on_click=self.__edit_current_day,
+                bgcolor="transparent",
+                color="#606060",
                 style=ButtonStyle(
-                    padding=padding.symmetric(10, 70)
-                ),
-                scale=1.2
+                    padding=padding.symmetric(10, 70),
+                    elevation=0,
+                    overlay_color=BUTTON_OVERLAY_COLOR
+                )
             )
             self.__main_button_row.controls = [self.__edit_day_button]
         else:
-            self.__order_button = ElevatedButton(
+            self.__order_button.content = ElevatedButton(
+                opacity=0.4,
                 text=self.ORDER_BUTTON_TEXT,
                 adaptive=True,
                 disabled=True,
                 on_click=self.__realize_order,
+                bgcolor="transparent",
+                color="#606060",
                 style=ButtonStyle(
-                    padding=padding.symmetric(10, 70)
-                ),
-                scale=1.6
+                    padding=padding.symmetric(10, 70),
+                    elevation=0,
+                    overlay_color=BUTTON_OVERLAY_COLOR
+                )
             )
             self.__main_button_row.controls = [self.__order_button]
         
@@ -267,7 +301,7 @@ class Order_Screen(Column):
             for i in range(20):
                 self.__current_order["products"][f"Este é um Pao disto assim {i}"] = {
                     "product_id": f"{i}",
-                    "quantity_text": Text(value="0"),
+                    "quantity_text": Text(value="0", color=MAIN_TEXT_COLOR, weight=FontWeight.BOLD),
                     "quantity": 0,
                     "cost": "1.50€"
                 }
@@ -287,7 +321,7 @@ class Order_Screen(Column):
                 for product_id in self.__catalog.keys():
                     self.__current_order["products"][self.__catalog[product_id]["product_title"]] = {
                         "product_id": product_id,
-                        "quantity_text": Text(value="0"),
+                        "quantity_text": Text(value="0", color=MAIN_TEXT_COLOR, weight=FontWeight.BOLD),
                         "quantity": 0,
                         "cost": self.__catalog[product_id]["product_price"]
                     }
@@ -643,8 +677,17 @@ class Order_Screen(Column):
                 ]
                 self.__page.open(self.__alert)
             else:
+                current_date_datetime = datetime.strptime(self.__current_date, "%d/%m/%Y")
+                days_to_monday = current_date_datetime.weekday()
+                self.__days_row.controls[days_to_monday].gradient=Primary_Gradient()
+                
                 self.__current_date = e.control.data[1]
                 self.__current_week_day = e.control.data[0]
+                
+                new_current_date_datetime = datetime.strptime(self.__current_date, "%d/%m/%Y")
+                days_to_monday = new_current_date_datetime.weekday()
+                self.__days_row.controls[days_to_monday].gradient=Selected_Gradient()
+                
                 self.__current_order["date"] = self.__current_date
                 self.__fill_products_column()
                 self.__page.update()
@@ -677,13 +720,17 @@ class Order_Screen(Column):
                 self.__current_order["products"][product_name]["quantity"] += 1
                 self.__total_amount += 1
                 if self.__total_amount > 0:
-                    self.__order_button.disabled = False
+                    self.__order_button.content.disabled = False
+                    self.__order_button.content.opacity = 1
+                    self.__order_button.opacity = 1
         elif operation == "-":
             if self.__current_order["products"][product_name]["quantity"] > 0:
                 self.__current_order["products"][product_name]["quantity"] -= 1
                 self.__total_amount -= 1
                 if self.__total_amount <= 0:
-                    self.__order_button.disabled = True
+                    self.__order_button.content.disabled = True
+                    self.__order_button.content.opacity = 0.4
+                    self.__order_button.opacity = 0.4
                     
         self.__current_order["products"][product_name]["quantity_text"].value = f"{self.__current_order["products"][product_name]["quantity"]}"
         self.__page.update()
@@ -725,8 +772,9 @@ class Order_Screen(Column):
         # Verifying if the OK button got clicked and if it is about
         # to change just the day or the whole week
         if e.control.text == self.ALERT_DIALOG_OK_TEXT:
+            current_date_datetime = datetime.strptime(self.__current_date, "%d/%m/%Y")
+                
             if e.control.data in ["forward", "backward"]:
-                current_date_datetime = datetime.strptime(self.__current_date, "%d/%m/%Y")
                 if e.control.data == "forward":
                     current_date_datetime += timedelta(days=7)
                 elif e.control.data == "backward":
@@ -748,8 +796,15 @@ class Order_Screen(Column):
             else:
                 ###############################
                 # Updating the current date and week day
+                days_to_monday = current_date_datetime.weekday()
+                self.__days_row.controls[days_to_monday].gradient=Primary_Gradient()
+                
                 self.__current_date = e.control.data[1]
                 self.__current_week_day = e.control.data[0]
+                
+                new_current_date_datetime = datetime.strptime(self.__current_date, "%d/%m/%Y")
+                days_to_monday = new_current_date_datetime.weekday()
+                self.__days_row.controls[days_to_monday].gradient=Selected_Gradient()
                 
                 ###############################
                 # Resetting the current order and refilling the products column
@@ -773,18 +828,34 @@ class Order_Screen(Column):
         Creates and appends to the days list a button for a respective date.
         '''
         
+        if date == self.__current_date:
+            gradient = Selected_Gradient()
+        else:
+            gradient = Primary_Gradient()
+            
         self.__days_row.controls.append(
-            ElevatedButton(
-                text=week_day,
-                adaptive=True,
-                on_click=self.__change_date_product_list,
-                data=(week_day, date),
+            Container(
+                content=ElevatedButton(
+                    text=week_day,
+                    adaptive=True,
+                    bgcolor="transparent",
+                    color="#606060",
+                    on_click=self.__change_date_product_list,
+                    data=(week_day, date),
+                    width=60,
+                    height=30,
+                    style=ButtonStyle(
+                        elevation=0,
+                        overlay_color="#fff791",
+                        padding=Padding(left=2, top=1, right=2, bottom=1),
+                        text_style=TextStyle(size=14)
+                    )
+                ),
                 width=60,
                 height=30,
-                style=ButtonStyle(
-                    padding=Padding(left=2, top=1, right=2, bottom=1),
-                    text_style=TextStyle(size=14)
-                )
+                gradient=gradient,
+                border_radius=20,
+                alignment=alignment.center
             )
         )
     
@@ -812,65 +883,61 @@ class Order_Screen(Column):
             case 0:
                 product_scarcity_text = self.PRODUCT_SCARCITY_0_TEXT
         
-        return Row(
-            controls=[
-                Container(
-                    content=Row(
-                        controls=[
-                            Container(
-                                content=Text(
-                                    value= f"{product_name}{product_scarcity_text}"
-                                ),
-                                padding=padding.only(left=10, right=20),
-                                expand=True
-                            ),
-                            Text(product_cost),
-                        ],
-                        alignment=MainAxisAlignment.SPACE_AROUND
-                    ),
-                    height=80,
-                    expand=True
-                ),
-                Container(
-                    content=Row(
-                        controls=[
-                            Container(
-                                content=ElevatedButton(
-                                    text="-",
-                                    adaptive=True,
-                                    style=ButtonStyle(
-                                        shape=CircleBorder(),
-                                        padding=padding.all(0)
+        return Container (
+            content=Row(
+                controls=[
+                    Container(
+                        content=Row(
+                            controls=[
+                                Container(
+                                    content=Text(
+                                        value= f"{product_name}{product_scarcity_text}",
+                                        color=MAIN_TEXT_COLOR
                                     ),
-                                    on_click=self.__change_product_amount,
-                                    data=("-", product_name, product_id)
+                                    padding=padding.only(left=5, right=5),
+                                    expand=True
                                 ),
+                                Container(
+                                    content=Text(
+                                        value=product_cost,
+                                        color=MAIN_TEXT_COLOR
+                                    ),
+                                    padding=padding.only(left=5, right=5),
+                                )
+                            ],
+                            alignment=MainAxisAlignment.SPACE_AROUND
+                        ),
+                        height=80,
+                        expand=True,
+                        gradient = Third_Gradient(),
+                        border_radius=20,
+                        alignment=alignment.center
+                    ),
+                    Row(
+                        controls=[
+                            Secondary_ElevatedButton_Container(
+                                text="-",
+                                on_click=self.__change_product_amount,
+                                data=("-", product_name, product_id),
                                 width=40,
                                 height=40
                             ),
                             self.__current_order["products"][product_name]["quantity_text"],
-                            Container(
-                                content=ElevatedButton(
-                                    text="+",
-                                    adaptive=True,
-                                    style=ButtonStyle(
-                                        shape=CircleBorder(),
-                                        padding=padding.all(0)
-                                    ),
-                                    on_click=self.__change_product_amount,
-                                    data=("+", product_name, product_id)
-                                ),
-                                padding=padding.only(right=10),
-                                width=50,
+                            Secondary_ElevatedButton_Container(
+                                text="+",
+                                on_click=self.__change_product_amount,
+                                data=("+", product_name, product_id),
+                                width=40,
                                 height=40
-                            )
+                            ),
                         ],
                         alignment=MainAxisAlignment.START,
-                        spacing=10,
-                        expand=True
+                        spacing=10
                     )
-                )
-            ]
+                ]
+            ),
+            alignment=alignment.center,
+            padding=padding.only(left=10, right=10)
         )
     
     # Creates and returns a row with the information about the product
@@ -883,32 +950,42 @@ class Order_Screen(Column):
         Creates and returns a row with the information about the product
         '''
         
-        return Row(
-            controls=[
-                Container(
-                    content=Row(
-                        controls=[
-                            Container(
-                                content=Text(
-                                    value = f"{product_name}"
+        return Container(
+            content=Row(
+                controls=[
+                    Container(
+                        content=Row(
+                            controls=[
+                                Container(
+                                    content=Text(
+                                        value = f"{product_name}",
+                                        color = MAIN_TEXT_COLOR
+                                    ),
+                                    padding=padding.only(left=5, right=10),
+                                    expand=True
                                 ),
-                                padding=padding.only(left=10, right=20),
-                                expand=True
-                            ),
-                            Container(
-                                content=Text(
-                                    value = product_cost
-                                ),
-                                padding=padding.only(left=20, right=10),
-                            )
-                        ],
-                        alignment=MainAxisAlignment.SPACE_AROUND
-                    ),
-                    height=60,
-                    expand=True
-                )
-            ]
-        )  
+                                Container(
+                                    content=Text(
+                                        value = product_cost,
+                                        color = MAIN_TEXT_COLOR
+                                    ),
+                                    padding=padding.only(left=10, right=5),
+                                )
+                            ],
+                            alignment=MainAxisAlignment.SPACE_AROUND
+                        ),
+                        padding=padding.symmetric(0, 10),
+                        height=60,
+                        expand=True,
+                        gradient = Third_Gradient(),
+                        border_radius=15,
+                        alignment=alignment.center
+                    )
+                ],
+                alignment=MainAxisAlignment.CENTER,
+            ),
+            padding=padding.symmetric(2.5, 10),
+        )
     
     # Creates and returns a container with the product name, a checkbox and a text field for edition
     def __create_new_product_container(
@@ -972,7 +1049,9 @@ class Order_Screen(Column):
             self.__current_order["products"][product]["quantity"] = 0
             self.__current_order["products"][product]["quantity_text"].value = "0"
         self.__current_order["date"] = self.__current_date
-        self.__order_button.disabled = True
+        self.__order_button.content.disabled = True
+        self.__order_button.content.opacity = 0.4
+        self.__order_button.opacity = 0.4
         self.__total_amount = 0
     
     # Updates the controls according to if the user is in edit mode or not
@@ -1017,44 +1096,52 @@ class Order_Screen(Column):
             ###############################
             # Creating a column that makes the union between the main
             # button row and pages menu row
-            main_button_row_and_pages_menu_row = Column(
-                controls=[
-                    Divider(),
-                    self.__main_button_row,
-                    Column(
-                        controls=[
-                            Divider(),
-                            shared_vars["bottom_menu"],
-                            Divider()
-                        ],
-                        alignment=MainAxisAlignment.START,
-                        spacing=1
-                    )
-                ],
-                alignment=MainAxisAlignment.START,
-                spacing=20
+            main_button_row_and_pages_menu_row = Container(
+                content=Column(
+                    controls=[
+                        self.__main_button_row,
+                        shared_vars["bottom_menu"],
+                    ],
+                    alignment=MainAxisAlignment.CENTER,
+                    horizontal_alignment=CrossAxisAlignment.CENTER,
+                    spacing=20
+                ),
+                border_radius=12,
+                gradient=Secondary_Gradient(),
+                padding=padding.only(top=20, bottom=4),
+                alignment=alignment.center
             )
             
             self.controls = [
                 Column(
                     controls=[
                         Container(
-                            content = Row(
+                            content=Column(
                                 controls=[
-                                    self.__business_title,
-                                    self.__pass_week_section
+                                    Container(
+                                        content = Row(
+                                            controls=[
+                                                self.__business_title,
+                                                self.__pass_week_section
+                                            ],
+                                            alignment=MainAxisAlignment.SPACE_AROUND
+                                        ),
+                                        padding=Padding(left=1, top=5, right=1, bottom=2),
+                                        alignment=alignment.center
+                                    ),
+                                    Container(
+                                        content = self.__days_row,
+                                        padding=Padding(left=8, top=1, right=8, bottom=10),
+                                        alignment=alignment.center
+                                    )
                                 ],
-                                alignment=MainAxisAlignment.SPACE_AROUND
+                                alignment=MainAxisAlignment.CENTER,
+                                horizontal_alignment=CrossAxisAlignment.CENTER
                             ),
-                            padding=Padding(left=1, top=5, right=1, bottom=5),
-                            alignment=alignment.center
+                            alignment=alignment.center,
+                            gradient = Secondary_Gradient(),
+                            border_radius=12,
                         ),
-                        Container(
-                            content = self.__days_row,
-                            padding=Padding(left=8, top=2, right=8, bottom=2),
-                            alignment=alignment.center
-                        ),
-                        Divider(),
                         self.__products_column,
                     ],
                     alignment=MainAxisAlignment.START,

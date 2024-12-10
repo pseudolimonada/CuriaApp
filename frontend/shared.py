@@ -2,8 +2,6 @@ user_ids = {
     "user_id": str,
     "manager_business_ids": list,
     "is_admin": bool
-    "manager_business_ids": list,
-    "is_admin": bool
 }
 
 shared_vars = {
@@ -25,8 +23,16 @@ STATUS_CODES = {"SUCCESS": 200, "INVALID_CREDENTIALS": 401, "INTERNAL_ERROR": 50
 
 BG_TOP_COLOR = "#e6be7a"
 BG_BOTTOM_COLOR = "#f4ac75"
+PRIM_GRADIENT_COLOR_1 = "#ffd791"
+PRIM_GRADIENT_COLOR_2 = "#ffc396"
+SEC_GRADIENT_COLOR_1 = "#ffc270"
+SEC_GRADIENT_COLOR_2 = "#ed9f60"
+THIRD_GRADIENT_COLOR_1 = "#ffeee2"
+THIRD_GRADIENT_COLOR_2 = "#fae6c1"
+BUTTON_OVERLAY_COLOR = "#fff791"  # CHANGE
+SELECTED_GRADIENT_COLOR_1 = SEC_GRADIENT_COLOR_1
+SELECTED_GRADIENT_COLOR_2 = SEC_GRADIENT_COLOR_2
+
 MAIN_TEXT_COLOR = "#606060"
-
-
 
 TESTING = True

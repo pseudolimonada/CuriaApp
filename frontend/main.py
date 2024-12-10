@@ -35,26 +35,20 @@ from flet import (
 )
 from main_container import Main_Container
 from Login_Screen.login_screen import Login_Screen
-from Order_Screen.order_screen import Order_Screen
-from Full_Order_Screen.full_order_screen import Full_Order_Screen
-from Check_Orders_Screen.check_orders_screen import Check_Orders_Screen
 from bottom_menu import Bottom_Menu
-from shared import MAIN_TEXT_COLOR, shared_vars
+from shared import MAIN_TEXT_COLOR, shared_vars, user_ids
 
 # Program Function
 def main(page: Page):
     """
     Program Function
     """
-
+    user_ids["is_admin"] = False
     shared_vars["current_business"]["name"] = "Farinha e Afeto"
     shared_vars["current_business"]["id"] = "1"
     shared_vars["main_container"] = Main_Container(page)
     shared_vars["bottom_menu"] = Bottom_Menu()
     login_screen = Login_Screen(page)
-    order_screen = Order_Screen(page)
-    full_order_screen = Full_Order_Screen(page)
-    check_orders_screen = Check_Orders_Screen(page)
     
     shared_vars["main_container"].add_screen_to_list(login_screen, "login_screen")
     shared_vars["main_container"].change_screen("login_screen")
