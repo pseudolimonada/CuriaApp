@@ -3,7 +3,7 @@ from flet import (
     LinearGradient, BorderRadius, Offset, BoxShadow
                   )
 from utils import present_snack_bar
-from shared import BG_TOP_COLOR, BG_BOTTOM_COLOR, user_ids
+from shared import THIRD_GRADIENT_COLOR_1, MAIN_TEXT_COLOR, BG_TOP_COLOR, BG_BOTTOM_COLOR, user_ids, shared_vars
 
 class Main_Container(Container):
     '''
@@ -71,9 +71,16 @@ class Main_Container(Container):
                 else:
                     present_snack_bar(self.__page, self.CURRENT_SCREEN_NOT_RECOGNIZED, "Red")
                     return
-            elif not user_ids["is_admin"] and screen_name == "order_screen" and self.selected_screen_name == "full_order_screen":
-                self.__screens_dict[screen_name].reset_current_order()
-                self.__screens_dict[screen_name].refresh_data(False)
+            elif screen_name == "order_screen":
+                if not user_ids["is_admin"] and self.selected_screen_name == "full_order_screen":
+                    self.__screens_dict[screen_name].reset_current_order()
+                    self.__screens_dict[screen_name].refresh_data(False)
+                
+                shared_vars["bottom_menu"].controls[0].icon_color = THIRD_GRADIENT_COLOR_1
+                shared_vars["bottom_menu"].controls[1].icon_color = MAIN_TEXT_COLOR
+            elif screen_name == "check_orders_screen":
+                shared_vars["bottom_menu"].controls[0].icon_color = MAIN_TEXT_COLOR
+                shared_vars["bottom_menu"].controls[1].icon_color = THIRD_GRADIENT_COLOR_1
             
             self.selected_screen_name = screen_name
             self.content = self.__screens_dict[screen_name]
