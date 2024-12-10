@@ -1,4 +1,4 @@
-from flet import Page, SnackBar, Text, TextThemeStyle, TextField, TextStyle
+from flet import Page, Container, ElevatedButton, ButtonStyle, LinearGradient, alignment, SnackBar, Text, TextThemeStyle, TextField, TextStyle
 from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls
 from string import Template
 from typing import Optional, Callable, Any
@@ -13,7 +13,6 @@ class Smart_TextField(TextField):
     __page: Page
     __last_value: str = ""
     __is_numeric: bool = False
-    __callback: Callable = None
     
     def __init__(
         self,
@@ -58,6 +57,72 @@ class Smart_TextField(TextField):
         else:
             self.__last_value = self.value
             self.value = e.control.value
+
+class Main_TextField_Container(Container):
+    def __init__(
+        self,
+        label: Optional[str] = "Label",
+        hint_text: Optional[str] = "Hint Text",
+        password: Optional[bool] = False,
+        can_reveal_password: Optional[bool] = False
+    ):
+        super().__init__(
+            content=TextField(
+                adaptive=True,
+                label=label,
+                hint_text=hint_text,
+                password=password,
+                can_reveal_password=can_reveal_password,
+                border_radius=12,
+                border_color="transparent",
+                cursor_color="#606060",
+                color="#606060",
+                label_style=TextStyle(color="#606060"),
+                hint_style=TextStyle(color="#606060")
+            ),
+            gradient = Primary_Gradient(),
+            border_radius=10,
+            alignment=alignment.center
+        )
+
+class Main_ElevatedButton_Container(Container):
+    def __init__(
+        self,
+        text: Optional[str] = "Text",
+        scale: Optional[float] = 1.0
+    ):
+        super().__init__(
+            content=ElevatedButton(
+                adaptive=True,
+                text=text,
+                bgcolor="transparent",
+                color="#606060",
+                style=ButtonStyle(
+                    elevation=0,
+                    overlay_color="#fff791"
+                )
+            ),
+            gradient = Primary_Gradient(),
+            border_radius=20,
+            scale=scale,
+            alignment=alignment.center
+        )
+
+
+class Primary_Gradient(LinearGradient):
+    def __init__(self):
+        super().__init__(
+            begin=alignment.top_center,
+            end=alignment.bottom_center,
+            colors=[
+                "#ffd791",
+                "#ffc396"
+            ],
+        )
+
+
+
+
 
 # Presents a snack bark in the page object.
 def present_snack_bar(
