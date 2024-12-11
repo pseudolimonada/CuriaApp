@@ -22,7 +22,6 @@ endpoints_urls = {
 
 STATUS_CODES = {"SUCCESS": 200, "INVALID_CREDENTIALS": 401, "INTERNAL_ERROR": 500, "BAD_REQUEST": 400}
 
-FILTER_BUTTON_TEXT: dict = {"waiting_validation":"Waiting validation", "waiting_delivery":"Waiting delivery", "delivered":"Delivered","rejected":"Rejected"} 
 
 BG_TOP_COLOR = "#e6be7a"
 BG_BOTTOM_COLOR = "#f4ac75"
@@ -35,7 +34,10 @@ THIRD_GRADIENT_COLOR_2 = "#fae6c1"
 BUTTON_OVERLAY_COLOR = "#fff791"  # CHANGE
 SELECTED_GRADIENT_COLOR_1 = SEC_GRADIENT_COLOR_1
 SELECTED_GRADIENT_COLOR_2 = SEC_GRADIENT_COLOR_2
+DIALOG_BG_COLOR = BG_TOP_COLOR
 
 MAIN_TEXT_COLOR = "#606060"
+
+FILTER_BUTTON_TEXT: dict = {"waiting_validation":"Waiting validation", "waiting_delivery":"Waiting delivery", "delivered":"Delivered","rejected":"Rejected"} 
 
 TESTING = True

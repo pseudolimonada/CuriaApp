@@ -107,11 +107,11 @@ class Check_Orders_Screen(Column):
 
 
 
-
     def __create_filters_row(self):
         '''
         Creates row with filter buttons
         ''' 
+
         #Appending a button in row for each filter in FILTER_BUTTON_TEXT
         self.__filters_row.controls.clear()
         for i in FILTER_BUTTON_TEXT.keys():
@@ -168,18 +168,17 @@ class Check_Orders_Screen(Column):
                 if (order.get("order_state") == self.__current_filter)
             ]
 
-        #print(orders_to_show)
+
         for order in orders_to_show:
             #row
             pass
+
 
 
         for order in orders_to_show:
             row =self.__create_new_order_row(order)
             self.__orders_column.controls.append(row)
         
-
-
     def __create_new_order_row(self, order: dict):
         '''
         Creates order row
@@ -192,7 +191,6 @@ class Check_Orders_Screen(Column):
             #print(product_id)
             order_string += self.__catalog[product_id]["product_title"] + " x" +str(product.get("quantity"))+", "
             
-
         #print(order_string)
         return Row(
             controls=[
@@ -269,7 +267,6 @@ class Check_Orders_Screen(Column):
             self.__current_date = e.control.data
             self.__fill_orders_column()
             self.__page.update()
-
 
     def __change_filter_orders_list(self, e):
         '''
