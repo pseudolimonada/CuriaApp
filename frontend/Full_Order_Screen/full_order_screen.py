@@ -1,5 +1,5 @@
 from flet import Column, padding, CrossAxisAlignment, MainAxisAlignment, Page, ElevatedButton, ScrollMode, Text, icons, Divider, Row, Container, TextButton, AlertDialog, alignment, Icon, ButtonStyle
-from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls
+from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls,FILTER_BUTTON_TEXT
 from utils import present_snack_bar
 from string import Template
 import requests
@@ -30,6 +30,9 @@ class Full_Order_Screen(Column):
     INTERNAL_ERROR_TEXT: str = "An internal error occurred, please wait and try again..."
     UNRECOGNIZED_ERROR_TEXT: str = "An unexpected error occurred, please verify if your app is updated..."
     NETWORK_ERROR_TEXT: str = "Please verify your internet connection and try again..."
+    BAD_REQUEST_TEXT : str = "Bad request error"
+    REJECTED_ORDER_TEXT : str = "The order was rejected with sucess"
+    ACCEPTED_ORDER_TEXT : str = "The order was accepted with sucess"
 
     ###############################
     # Initializing the page object
@@ -69,6 +72,44 @@ class Full_Order_Screen(Column):
                     ALERT_DIALOG_CONTENT_TEXT,
                     size=16,
                 ),
+                Container(
+                    content=Icon(
+                        name=icons.CHECK_CIRCLE,
+                        size=100
+                    ),
+                    alignment=alignment.center
+                )
+            ],
+            alignment=MainAxisAlignment.CENTER,
+            spacing=20,
+        ),
+        actions_alignment=MainAxisAlignment.CENTER
+    )
+
+    __rejected_message = AlertDialog(
+        modal=True,
+        title=Text(REJECTED_ORDER_TEXT),
+        content=Column(
+            controls=[
+                Container(
+                    content=Icon(
+                        name=icons.CHECK_CIRCLE,
+                        size=100
+                    ),
+                    alignment=alignment.center
+                )
+            ],
+            alignment=MainAxisAlignment.CENTER,
+            spacing=20,
+        ),
+        actions_alignment=MainAxisAlignment.CENTER
+    )
+
+    __accepted_message = AlertDialog(
+        modal=True,
+        title=Text(ACCEPTED_ORDER_TEXT),
+        content=Column(
+            controls=[
                 Container(
                     content=Icon(
                         name=icons.CHECK_CIRCLE,
@@ -189,7 +230,7 @@ class Full_Order_Screen(Column):
         self.__title_column.controls=[
             Divider(),
             Text(value=f"{self.TITLE_TEXT}{shared_vars["current_order"]["date"]}"),
-            Text(value=f"{self.SUBTITLE_TEXT}{shared_vars["current_order"]["state"]}"),
+            Text(value=f"{self.SUBTITLE_TEXT}{FILTER_BUTTON_TEXT[shared_vars["current_order"]["state"]]}"),
             Divider()
         ]
         
@@ -203,7 +244,7 @@ class Full_Order_Screen(Column):
         self.__buttons_row.controls.append(self.__back_button)
         
         #Add accept and reject buttons if user is admin
-        if user_ids["is_admin"]:
+        if user_ids["is_admin"] and shared_vars["current_order"]["state"] == "waiting_validation":
             self.__buttons_row.controls.append(self.__reject_button)
             self.__buttons_row.controls.append(self.__accept_button)
         
@@ -353,14 +394,128 @@ class Full_Order_Screen(Column):
         '''
         Rejects order
         '''
-        print("Reject")
+        testing = True
+        if testing:
+            self.__rejected_message.actions=[
+                TextButton(
+                    text = "Ok",
+                    data = self.__rejected_message,
+                    on_click=self.__hande_close,
+                    style=ButtonStyle(
+                        enable_feedback=False
+                    )
+                ),
+            ]
+            self.__page.open(self.__rejected_message)
+
+            shared_vars["main_container"].change_screen("check_orders_screen")
+            return
+        
+
+
+
+        header = {
+            "user_id": user_ids["user_id"],
+            "manager_business_ids": user_ids["manager_business_ids"]
+        }
+        
+        payload = {
+            "order_state" : "rejected"
+        }
+        url_template = Template(endpoints_urls["PUT_STATE"])
+        put_state_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"], order_id = shared_vars["current_order"]["order_id"])
+        
+        try:
+            response = requests.put(put_state_url,headers=header,json=payload)
+
+            if response.status_code == STATUS_CODES["SUCCESS"]:
+                self.__rejected_message.actions=[
+                    TextButton(
+                        self.REJECTED_ORDER_TEXT,
+                        data = self.__rejected_message,
+                        on_click=self.__hande_close,
+                        style=ButtonStyle(
+                            enable_feedback=False
+                        )
+                    ),
+                ]
+                self.__page.open(self.__rejected_message)
+                shared_vars["main_container"].change_screen("order_screen")
+                return
+            
+            elif response.status_code == STATUS_CODES["BAD_REQUEST"]:
+                present_snack_bar(self.__page, self.BAD_REQUEST_TEXT,"Red")
+            
+            elif response.status_code == STATUS_CODES["INTERNAL_ERROR"]:
+                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
+            
+            else:
+                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
+        
+        except requests.exceptions.RequestException as e:
+            # Handle network-related errors
+            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
+
 
 
     def __accept_order(self,e):
         '''
         Accepts order
         '''
-        print("Accept")
+        testing = True
+        if testing:
+            self.__accepted_message.actions=[
+                TextButton(
+                    "Ok",
+                    data = self.__accepted_message,
+                    on_click=self.__hande_close,
+                    style=ButtonStyle(
+                        enable_feedback=False
+                    )
+                ),
+            ]
+            self.__page.open(self.__accepted_message)
+            shared_vars["main_container"].change_screen("check_orders_screen")
+            return
+        header = {
+            "user_id": user_ids["user_id"],
+            "manager_business_ids": user_ids["manager_business_ids"]
+        }
+        
+        payload = {
+            "order_state" : "waiting_delivery"
+        }
+        url_template = Template(endpoints_urls["PUT_STATE"])
+        put_state_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"], order_id = shared_vars["current_order"]["order_id"])
+        
+        try:
+            response = requests.put(put_state_url,headers=header,json=payload)
+
+            if response.status_code == STATUS_CODES["SUCCESS"]:
+                self.__accepted_message.actions=[
+                    TextButton(
+                        text = "Ok",
+                        data = self.__accepted_message,
+                        on_click=self.__hande_close,
+                        style=ButtonStyle(
+                            enable_feedback=False
+                        )
+                    ),
+                ]
+                self.__page.open(self.__accepted_message)
+            
+            elif response.status_code == STATUS_CODES["BAD_REQUEST"]:
+                present_snack_bar(self.__page, self.BAD_REQUEST_TEXT,"Red")
+            
+            elif response.status_code == STATUS_CODES["INTERNAL_ERROR"]:
+                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
+            
+            else:
+                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
+        
+        except requests.exceptions.RequestException as e:
+            # Handle network-related errors
+            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
 
 
     # Handles the close of the dialog alert
@@ -370,3 +525,7 @@ class Full_Order_Screen(Column):
         '''
         
         self.__page.close(self.__alert)
+
+
+    def __hande_close(self, e):
+        self.__page.close(e.control.data)

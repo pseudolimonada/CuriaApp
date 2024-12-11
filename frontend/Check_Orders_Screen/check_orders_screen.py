@@ -1,6 +1,6 @@
 from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, BorderSide, VisualDensity
 from utils import get_refreshed_catalog, present_snack_bar
-from shared import shared_vars, user_ids, endpoints_urls, STATUS_CODES
+from shared import shared_vars, user_ids, endpoints_urls, STATUS_CODES,FILTER_BUTTON_TEXT
 import requests
 from string import Template
 
@@ -15,7 +15,6 @@ class Check_Orders_Screen(Column):
     __page = Page
     __data = dict
 
-    FILTER_BUTTON_TEXT: dict = {"waiting_validation":"Por aprovar", "waiting_delivery":"Por entregar", "delivered":"Entregue","rejected":"Rejeitado"} 
 
     NETWORK_ERROR_TEXT: str = "Please verify your internet connection and try again..."
 
@@ -112,10 +111,10 @@ class Check_Orders_Screen(Column):
         Creates row with filter buttons
         ''' 
         self.__filters_row.controls.clear()
-        for i in self.FILTER_BUTTON_TEXT.keys():
+        for i in FILTER_BUTTON_TEXT.keys():
             self.__filters_row.controls.append(
                 ElevatedButton(
-                    text = self.FILTER_BUTTON_TEXT.get(i),
+                    text = FILTER_BUTTON_TEXT.get(i),
                     adaptive = True,
                     on_click = self.__change_filter_orders_list,
                     data = i,
@@ -203,11 +202,6 @@ class Check_Orders_Screen(Column):
                                 padding=padding.only(left=10, right=20),
                                 expand=True
                             ),
-                            ElevatedButton(
-                                content = Text("View"),
-                                data = {"order_date":order["order_date"], "order_state":order["order_state"], "products":order["order_data"]},
-                                on_click = self.__go_full_order_screen
-                            )
                         ],
                         alignment = MainAxisAlignment.SPACE_AROUND
                     ),
@@ -215,9 +209,14 @@ class Check_Orders_Screen(Column):
                     expand=True
                 ),
                 Container(
-                    content=Text(self.FILTER_BUTTON_TEXT.get(order.get("order_state"))),
+                    content=Text(FILTER_BUTTON_TEXT.get(order.get("order_state"))),
                     padding = padding.only(right=10)
-                )
+                ),
+                ElevatedButton(
+                                content = Text("View"),
+                                data = {"order_date":order["order_date"], "order_state":order["order_state"], "products":order["order_data"],"order_id":order["order_id"]},
+                                on_click = self.__go_full_order_screen
+                            )
             ]
         )
 
@@ -241,8 +240,8 @@ class Check_Orders_Screen(Column):
                 "cost" : self.__catalog[product["product_id"]]["product_price"]
                 }
 
-        shared_vars["current_order"] = {"products":products_dict, "date":e.control.data["order_date"], "state":e.control.data["order_state"]}
-        
+        shared_vars["current_order"] = {"products":products_dict, "date":e.control.data["order_date"], "state":e.control.data["order_state"],"order_id":e.control.data["order_id"]}
+        user_ids["is_admin"] = True #remove later
         shared_vars["main_container"].change_screen("full_order_screen")
 
 
