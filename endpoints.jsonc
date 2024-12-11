@@ -143,8 +143,51 @@
 	"INTERNAL_ERROR": 500
 }
 
+<<<<<<< HEAD
 // notification_for_new_orders
 // WEBSOCKET/business/{business_id}/notifications_for_new_orders
+=======
+// POST /businesses/{business_id}/orders
+// header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
+// payload
+,{
+	"user_id": "", 
+	"order_date": "",
+	"order_data" : [
+		{"product_id":"...", "product_quantity":"..."},
+		{"product_id":"...", "product_quantity":"..."},
+		{"product_id":"...", "product_quantity":"..."}
+	]
+}
+// response
+,{ "200": "Order submitted successfully" }
+,{ "400": "Error submitting order" }
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+	"SUCCESS": 200,
+	"INTERNAL_ERROR": 500,
+	"BAD_REQUEST": 400
+}
+
+// PUT /businesses/{business_id}/orders/{order_id}
+// header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
+// payload
+,{
+	"order_state": "waiting_delivery" // or "delivered"
+}
+// response
+,{ "200": "Order submitted successfully" }
+,{ "400": "Error submitting order" }
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+	"SUCCESS": 200,
+	"INTERNAL_ERROR": 500,
+	"BAD_REQUEST": 400
+}
+
+
+// /notification_for_new_orders
+>>>>>>> 5febf9e (Added notification code)
 // header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
 // description: Establish a Websocket connection to receive real-time notifications for new orders.
 // payload: None (It doens't need to, serves notifications as they occur)
