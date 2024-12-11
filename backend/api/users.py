@@ -3,7 +3,7 @@ from db_models import User, Business, BusinessUser
 from extensions import db
 from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import UniqueViolation
-from constants import hash_password
+from constants import hash_password, jwt_token
 
 users_blueprint = Blueprint("users", __name__)
 register_blueprint = Blueprint("register", __name__)
@@ -19,28 +19,16 @@ def get_users():
         user_list.append(
             {"user_id": user_dict["user_id"], "user_name": user_dict["user_name"]}
         )
-    # breakpoint()
     return jsonify(user_list), 200
 
 
 @register_blueprint.route("/", methods=["POST"])
 def register():
-    assert request.json is not None, "Request Json is None"
-
     user_data = {
         "user_name": request.json.get("user_name"),
         "password": request.json.get("password"),
     }
-
-    user = User.query.filter_by(user_name=user_data["user_name"]).first()
-    # verify if user already exists
-
-    if user:  # verify if this actually works
-        # TODO: é preciso enviar o jwt
-        return (
-            jsonify({"error": "user already exists"}),
-            200,
-        )
+    token = jwt_token(user_data)
 
     business_id = request.json.get("business_id", None)
     if business_id:
@@ -61,7 +49,15 @@ def register():
                 db.session.add(business_user)
 
             db.session.commit()
-        return jsonify({"user_id": user.user_id}), 201
+        return (
+            jsonify(
+                {
+                    "token": jwt_token(user_data),
+                    "is_admin": is_admin(),
+                }
+            ),
+            201,
+        )
     except IntegrityError as e:
         db.session.rollback()
         if isinstance(e.orig, UniqueViolation):

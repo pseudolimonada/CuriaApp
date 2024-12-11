@@ -1,7 +1,11 @@
 from enum import Enum
 from hashlib import sha256
 from config import SECRET_KEY
+import jwt
+import datetime
 import logging
+from functools import wraps
+from flask import request, jsonify
 
 DB_MAX_ID_SIZE = 20
 DB_MAX_EMAIL_SIZE = 320
@@ -31,6 +35,7 @@ class UserType(Enum):
 class OrderStateType(Enum):
     TO_BE_VALIDATED = "to_be_validated"
     TO_BE_DELIVERED = "to_be_delivered"
+    REFUSED = "rejected"
     DELIVERED = "delivered"
 
 
@@ -62,5 +67,54 @@ def setup_logger() -> logging.Logger:
 LOGGER = setup_logger()
 
 
-def jwt_token(data_to_encode: dict) -> str:
-    pass
+def jwt_token(data_to_encode: dict, expires_in: int = 360000) -> str:
+    """
+    Generates a JWT token from a dictionary.
+
+    :param data_to_encode: Dictionary to encode in the JWT.
+    :param expires_in: Expiration time in minutes.
+    :return: Encoded JWT token as a string.
+    """
+    payload = data_to_encode.copy()
+    payload["exp"] = datetime.datetime.now(
+        tz=datetime.timezone.utc
+    ) + datetime.timedelta(minutes=expires_in)
+
+    token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+    return token
+
+
+def decode_jwt(token: str) -> dict:
+    """
+    Decodes a JWT token.
+
+    :param token: JWT token to decode.
+    :return: Decoded data as a dictionary.
+    """
+    try:
+        decoded_data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        return decoded_data
+    except jwt.ExpiredSignatureError:
+        LOGGER.error("Token has expired")
+        raise
+    except jwt.InvalidTokenError:
+        LOGGER.error("Invalid token")
+        raise
+
+
+def jwt_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = request.headers.get("Authorization")
+        if not token:
+            return jsonify({"error": "Token is missing"}), 401
+        try:
+            decoded_data = decode_jwt(token)
+            request.user_data = decoded_data
+        except jwt.ExpiredSignatureError:
+            return jsonify({"error": "Token has expired"}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({"error": "Invalid token"}), 401
+        return f(*args, **kwargs)
+
+    return decorated_function

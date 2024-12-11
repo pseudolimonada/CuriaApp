@@ -2,12 +2,14 @@ from flask import Blueprint, request, jsonify
 from db_models import Order
 from extensions import db
 
-orders_blueprint = Blueprint('orders', __name__)
+orders_blueprint = Blueprint("orders", __name__)
+
 
 @orders_blueprint.route("/", methods=["GET"])
 def get_orders(business_id):
     orders = Order.query.filter_by(business_id=business_id).all()
     return jsonify([order.__dict__ for order in orders]), 200
+
 
 @orders_blueprint.route("/", methods=["POST"])
 def submit_order(business_id):
