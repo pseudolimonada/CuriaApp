@@ -52,6 +52,11 @@
 	"SUCCESS": 200,
 	"INTERNAL_ERROR": 500
 }
+// Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
+,{
+    "SUCCESS": 200,
+    "INTERNAL_ERROR": 500
+}
 
 // POST /businesses/{business_id}/products
 // header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}

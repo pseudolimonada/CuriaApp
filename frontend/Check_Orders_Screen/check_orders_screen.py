@@ -1,6 +1,6 @@
 from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, BorderSide, VisualDensity
 from utils import get_refreshed_catalog, present_snack_bar
-from shared import shared_vars, user_ids, endpoints_urls, STATUS_CODES,FILTER_BUTTON_TEXT, TESTING
+from shared import shared_vars, user_data, endpoints_urls, STATUS_CODES,FILTER_BUTTON_TEXT, TESTING
 import requests
 from string import Template
 
@@ -84,8 +84,8 @@ class Check_Orders_Screen(Column):
 
             #get orders
             header = {
-                "user_id": user_ids["user_id"],
-                "manager_business_ids": user_ids["manager_business_ids"]
+                "user_id": user_data["user_id"],
+                "manager_business_ids": user_data["manager_business_ids"]
             }
 
             url_template = Template(endpoints_urls["GET_ORDERS"])
