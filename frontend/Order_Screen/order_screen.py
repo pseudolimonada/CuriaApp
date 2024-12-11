@@ -11,12 +11,14 @@ class Order_Screen(Column):
     Column that represents a screen for the order realization
     '''
     
+    
     #############################################
     #              Initializations              #
     #############################################
     
     ###############################
     # Initializing the texts strings
+
     ORDER_BUTTON_TEXT: str = "Order"
     CONFIRM_BUTTON_TEXT: str = "Confirm"
     EDIT_BUTTON_TEXT: str = "Edit"

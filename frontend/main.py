@@ -35,9 +35,6 @@ from flet import (
 )
 from main_container import Main_Container
 from Login_Screen.login_screen import Login_Screen
-from Order_Screen.order_screen import Order_Screen
-from Full_Order_Screen.full_order_screen import Full_Order_Screen
-from Check_Orders_Screen.check_orders_screen import Check_Orders_Screen
 from bottom_menu import Bottom_Menu
 from shared import MAIN_TEXT_COLOR, shared_vars, user_ids
 
