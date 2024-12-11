@@ -53,7 +53,7 @@ class Login_Screen(Column):
         scale=1.5
     )
     register_button: Main_ElevatedButton_Container = Main_ElevatedButton_Container(
-        text=LOGIN_BUTTON_TEXT
+        text=REGISTER_BUTTON_TEXT
     )
     login_register_column: Column
     

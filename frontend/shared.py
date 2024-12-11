@@ -16,7 +16,8 @@ endpoints_urls = {
     "REGISTER": "/register",
     "GET_CATALOG": "/businesses/$business_id/products",
     "POST_ORDER": "/businesses/$business_id/orders",
-    "GET_ORDERS": "businesses/$business_id/orders"
+    "GET_ORDERS": "businesses/$business_id/orders",
+    "PUT_STATE" : "businesses/$business_id/orders/$order_id"
 }
 
 STATUS_CODES = {"SUCCESS": 200, "INVALID_CREDENTIALS": 401, "INTERNAL_ERROR": 500, "BAD_REQUEST": 400}
@@ -35,5 +36,7 @@ SELECTED_GRADIENT_COLOR_2 = SEC_GRADIENT_COLOR_2
 DIALOG_BG_COLOR = BG_TOP_COLOR
 
 MAIN_TEXT_COLOR = "#606060"
+
+FILTER_BUTTON_TEXT: dict = {"waiting_validation":"Waiting validation", "waiting_delivery":"Waiting delivery", "delivered":"Delivered","rejected":"Rejected"} 
 
 TESTING = True

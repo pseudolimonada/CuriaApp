@@ -1,6 +1,6 @@
 from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, BorderSide, VisualDensity
 from utils import get_refreshed_catalog, present_snack_bar
-from shared import shared_vars, user_ids, endpoints_urls, STATUS_CODES
+from shared import shared_vars, user_ids, endpoints_urls, STATUS_CODES,FILTER_BUTTON_TEXT
 import requests
 from string import Template
 
@@ -11,11 +11,10 @@ class Check_Orders_Screen(Column):
 
 
 
-    #Button texts
+    #Initializing useful variables
     __page = Page
-    __data = dict
 
-    FILTER_BUTTON_TEXT: dict = {"waiting_validation":"Por aprovar", "waiting_delivery":"Por entregar", "delivered":"Entregue"} 
+    NETWORK_ERROR_TEXT: str = "Please verify your internet connection and try again..."
 
     NETWORK_ERROR_TEXT: str = "Please verify your internet connection and try again..."
 
@@ -33,6 +32,7 @@ class Check_Orders_Screen(Column):
 
     __catalog: dict
     
+
     #Constructor
     def __init__(self, page: Page):
         super().__init__(alignment = MainAxisAlignment.SPACE_BETWEEN, expand = True)
@@ -80,11 +80,11 @@ class Check_Orders_Screen(Column):
         '''
         Requests data about the orders the user has placed and saves it
         '''
+
         #get products
         self.__catalog = get_refreshed_catalog(self.__page)
 
         #get orders
-
         header = {
             "user_id": user_ids["user_id"],
             "manager_business_ids": user_ids["manager_business_ids"]
@@ -111,11 +111,13 @@ class Check_Orders_Screen(Column):
         '''
         Creates row with filter buttons
         ''' 
+        
+        #Appending a button in row for each filter in FILTER_BUTTON_TEXT
         self.__filters_row.controls.clear()
-        for i in self.FILTER_BUTTON_TEXT.keys():
+        for i in FILTER_BUTTON_TEXT.keys():
             self.__filters_row.controls.append(
                 ElevatedButton(
-                    text = self.FILTER_BUTTON_TEXT.get(i),
+                    text = FILTER_BUTTON_TEXT.get(i),
                     adaptive = True,
                     on_click = self.__change_filter_orders_list,
                     data = i,
@@ -124,9 +126,7 @@ class Check_Orders_Screen(Column):
                     ),
                 )
             )
-
-
-
+    
     def __fill_days_row(self):
         '''
         Clears the days row and refill it with new data from DB.
@@ -140,8 +140,6 @@ class Check_Orders_Screen(Column):
         self.__create_date_button("15/11")
 
         self.__current_date = "11/11"
-        # Add the new days buttons to controls according to data from DB
-
 
     def __fill_orders_column(self):
         '''
@@ -150,7 +148,7 @@ class Check_Orders_Screen(Column):
         #test order
         
         self.__orders=[{"order_id":"1","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"01","quantity":2},{"product_id":"02","quantity":3}], "order_state":"waiting_delivery"},{"order_id":"3","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"04","quantity":2}],"order_state":"waiting_validation"}] #product_id as a name for test, change it later
-        self.__catalog={"01":{"product_title":"Pao"},"02":{"product_title":"Broa"},"03":{"product_title":"Uma cena"},"04":{"product_title":"Bolo"}}
+        self.__catalog={"01":{"product_title":"Pao","product_price":"2.0€"},"02":{"product_title":"Broa","product_price":"2.50€"},"03":{"product_title":"Uma cena","product_price":"4.0€"},"04":{"product_title":"Bolo","product_price":"5.00€"}}
         if not self.__orders:
             return
          
@@ -167,31 +165,26 @@ class Check_Orders_Screen(Column):
                 if (order.get("order_state") == self.__current_filter)
             ]
 
-        print(orders_to_show)
         for order in orders_to_show:
             #row
             pass
-
 
         for order in orders_to_show:
             row =self.__create_new_order_row(order)
             self.__orders_column.controls.append(row)
         
-
-
     def __create_new_order_row(self, order: dict):
         '''
         Creates order row
         '''
         order_string = ""
         data = order.get("order_data")
-        print(data)
+        #print(data)
         for product in data:
             product_id = product.get("product_id")
             #print(product_id)
             order_string += self.__catalog[product_id]["product_title"] + " x" +str(product.get("quantity"))+", "
             
-
         #print(order_string)
         return Row(
             controls=[
@@ -202,7 +195,7 @@ class Check_Orders_Screen(Column):
                                 content = Text(order_string),
                                 padding=padding.only(left=10, right=20),
                                 expand=True
-                            )
+                            ),
                         ],
                         alignment = MainAxisAlignment.SPACE_AROUND
                     ),
@@ -210,11 +203,40 @@ class Check_Orders_Screen(Column):
                     expand=True
                 ),
                 Container(
-                    content=Text(self.FILTER_BUTTON_TEXT.get(order.get("order_state"))),
-                )
+                    content=Text(FILTER_BUTTON_TEXT.get(order.get("order_state"))),
+                    padding = padding.only(right=10)
+                ),
+                ElevatedButton(
+                                content = Text("View"),
+                                data = {"order_date":order["order_date"], "order_state":order["order_state"], "products":order["order_data"],"order_id":order["order_id"]},
+                                on_click = self.__go_full_order_screen
+                            )
             ]
         )
 
+    def __go_full_order_screen(self, e):
+        '''
+        shared_vars["current_order"]
+        {
+        ["date] : "DD/MM/YYYY"
+        ["state] : str
+        ["products_title"] : [{"quantity":int, "product_id":, "cost": "1,50€", "quantity_text":},{},...]
+        }
+        '''
+        #print(e.control.data["products"])
+        
+        products_dict={}
+
+        for product in e.control.data["products"]:
+            products_dict[self.__catalog[product["product_id"]]["product_title"]] = {
+                "quantity": int(product["quantity"]),
+                "quantity_text": product["quantity"],
+                "cost" : self.__catalog[product["product_id"]]["product_price"]
+                }
+
+        shared_vars["current_order"] = {"products":products_dict, "date":e.control.data["order_date"], "state":e.control.data["order_state"],"order_id":e.control.data["order_id"]}
+        user_ids["is_admin"] = True #remove later
+        shared_vars["main_container"].change_screen("full_order_screen")
 
     def __create_date_button(self, date: str):
         '''
@@ -238,7 +260,6 @@ class Check_Orders_Screen(Column):
             self.__fill_orders_column()
             self.__page.update()
 
-
     def __change_filter_orders_list(self, e):
         '''
         Change shown orders according to order status
@@ -253,4 +274,4 @@ class Check_Orders_Screen(Column):
             self.__current_filter = e.control.data
             self.__fill_orders_column()
             self.__page.update() 
-        print(self.__current_filter)
+        #print(self.__current_filter)
