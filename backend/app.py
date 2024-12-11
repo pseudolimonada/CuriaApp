@@ -14,15 +14,20 @@ app.config.from_object(Config)
 db.init_app(app)
 
 # Register blueprints
-app.register_blueprint(users_blueprint, url_prefix='/users')
-app.register_blueprint(businesses_blueprint, url_prefix='/businesses')
-app.register_blueprint(products_blueprint, url_prefix='/businesses/<int:business_id>/products')
-app.register_blueprint(orders_blueprint, url_prefix='/businesses/<int:business_id>/orders')
+app.register_blueprint(users_blueprint, url_prefix="/users")
+app.register_blueprint(businesses_blueprint, url_prefix="/businesses")
+app.register_blueprint(
+    products_blueprint, url_prefix="/businesses/<int:business_id>/products"
+)
+app.register_blueprint(
+    orders_blueprint, url_prefix="/businesses/<int:business_id>/orders"
+)
 
 
 @app.route("/", methods=["GET"])
 def hello_world():
     return jsonify({"message": "Hello, World!"}), 200
+
 
 if __name__ == "__main__":
     with app.app_context():
