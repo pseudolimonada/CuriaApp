@@ -1,6 +1,6 @@
-from flet import Column, padding, CrossAxisAlignment, MainAxisAlignment, Page, ElevatedButton, ScrollMode, Text, icons, Divider, Row, Container, TextButton, AlertDialog, alignment, Icon, ButtonStyle
-from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls
-from utils import present_snack_bar
+from flet import TextAlign, FontWeight, Column, padding, CrossAxisAlignment, MainAxisAlignment, Page, ElevatedButton, ScrollMode, Text, icons, Divider, Row, Container, TextButton, AlertDialog, alignment, Icon, ButtonStyle
+from shared import MAIN_TEXT_COLOR, DIALOG_BG_COLOR, BUTTON_OVERLAY_COLOR, STATUS_CODES, user_ids, shared_vars, endpoints_urls
+from utils import Primary_Gradient, Secondary_Gradient, Third_Gradient, present_snack_bar
 from string import Template
 import requests
 
@@ -37,9 +37,16 @@ class Full_Order_Screen(Column):
     
     ###############################
     # Initializing and setting up the title and product columns
-    __title_column: Column = Column(
-        alignment=MainAxisAlignment.CENTER,
-        horizontal_alignment=CrossAxisAlignment.CENTER
+    __title_column: Container = Container(
+        content=Column(
+            alignment=MainAxisAlignment.CENTER,
+            horizontal_alignment=CrossAxisAlignment.CENTER,
+            spacing=5
+        ),
+        alignment=alignment.center,
+        gradient=Secondary_Gradient(),
+        padding=padding.only(top=10, bottom=15),
+        border_radius=12,
     )
     __products_column: Column = Column(
         alignment=MainAxisAlignment.START,
@@ -50,39 +57,63 @@ class Full_Order_Screen(Column):
     
     ###############################
     # Initializing the buttons row and the actual buttons
-    __buttons_row: Row = Row(
-        alignment=MainAxisAlignment.CENTER,
-        vertical_alignment=CrossAxisAlignment.CENTER
+    __buttons_row: Container = Container(
+        content=Row(
+            alignment=MainAxisAlignment.CENTER,
+            vertical_alignment=CrossAxisAlignment.CENTER
+        ),
+        border_radius=12,
+        gradient=Secondary_Gradient(),
+        padding=padding.only(top=20, bottom=25),
+        alignment=alignment.center
     )
-    __confirm_order_button: ElevatedButton
-    __cancel_button: ElevatedButton
-    __back_button: ElevatedButton
-    __approve_order_button: ElevatedButton
-    __deny_order_button: ElevatedButton
+    __confirm_order_button: Container = Container(
+        alignment=alignment.center,
+        gradient=Primary_Gradient(),
+        border_radius=20,
+    )
+    __cancel_button: Container = Container(
+        alignment=alignment.center,
+        gradient=Primary_Gradient(),
+        border_radius=20,
+    )
+    __back_button: Container = Container(
+        alignment=alignment.center,
+        gradient=Primary_Gradient(),
+        border_radius=20,
+    )
+    __approve_order_button: Container = Container(
+        alignment=alignment.center,
+        gradient=Primary_Gradient(),
+        border_radius=20,
+    )
+    __deny_order_button: Container = Container(
+        alignment=alignment.center,
+        gradient=Primary_Gradient(),
+        border_radius=20,
+    )
     
     ###############################
     # Initializing and setting up the alert dialog
     __alert = AlertDialog(
         modal=True,
-        title=Text(ALERT_DIALOG_TITLE_TEXT),
-        content=Column(
-            controls=[
-                Text(
-                    ALERT_DIALOG_CONTENT_TEXT,
-                    size=16,
-                ),
-                Container(
-                    content=Icon(
-                        name=icons.CHECK_CIRCLE,
-                        size=100
-                    ),
-                    alignment=alignment.center
-                )
-            ],
-            alignment=MainAxisAlignment.CENTER,
-            spacing=20,
+        adaptive=True,
+        bgcolor=DIALOG_BG_COLOR,
+        icon=Icon(
+            name=icons.CHECK_CIRCLE,
+            color="#34c862",
+            size=100
         ),
-        actions_alignment=MainAxisAlignment.CENTER
+        title=Text(
+            value=ALERT_DIALOG_TITLE_TEXT,
+            color=MAIN_TEXT_COLOR
+        ),
+        content=Text(
+            ALERT_DIALOG_CONTENT_TEXT,
+            color=MAIN_TEXT_COLOR,
+            size=16,
+        ),
+        actions_alignment=MainAxisAlignment.END
     )
 
 
@@ -99,16 +130,15 @@ class Full_Order_Screen(Column):
         # Setting the main column with all objects
         super().__init__(
             controls=[
-                self.__title_column,
-                self.__products_column,
                 Column(
                     controls=[
-                        Divider(),
-                        self.__buttons_row,
-                        Divider(),
+                        self.__title_column,
+                        self.__products_column,
                     ],
-                    alignment=MainAxisAlignment.CENTER
+                    alignment=MainAxisAlignment.START,
+                    expand=True
                 ),
+                self.__buttons_row
             ],
             alignment=MainAxisAlignment.SPACE_BETWEEN,
             expand=True
@@ -120,41 +150,97 @@ class Full_Order_Screen(Column):
         
         ###############################
         # Setting up the buttons
-        self.__back_button = ElevatedButton(
+        self.__back_button.content = ElevatedButton(
             text=self.CANCEL_BUTTON_TEXT,
             icon=icons.KEYBOARD_RETURN,
+            icon_color="#606060",
             adaptive=True,
             on_click=self.__turn_back,
+            bgcolor="transparent",
+            color="#606060",
+            style=ButtonStyle(
+                padding=padding.symmetric(10, 70),
+                elevation=0,
+                overlay_color=BUTTON_OVERLAY_COLOR
+            )
         )
         
         if user_ids["is_admin"]:
             self.__back_button.scale=0.8
-            self.__approve_order_button = ElevatedButton(
+            self.__back_button.content.scale=0.8
+            self.__approve_order_button.content = ElevatedButton(
                 text=self.APPROVE_BUTTON_TEXT,
                 icon=icons.CHECK,
+                icon_color="#606060",
                 adaptive=True,
                 on_click=self.__approve_order,
+                bgcolor="transparent",
+                color="#606060",
+                style=ButtonStyle(
+                    elevation=0,
+                    overlay_color=BUTTON_OVERLAY_COLOR
+                )
             )
-            self.__deny_order_button = ElevatedButton(
+            self.__deny_order_button.content = ElevatedButton(
                 text=self.DENY_BUTTON_TEXT,
                 icon=icons.CANCEL,
+                icon_color="#606060",
                 adaptive=True,
                 on_click=self.__deny_order,
+                bgcolor="transparent",
+                color="#606060",
+                style=ButtonStyle(
+                    elevation=0,
+                    overlay_color=BUTTON_OVERLAY_COLOR
+                )
             )
         else:
             self.__back_button.scale=1.5
-            self.__confirm_order_button = ElevatedButton(
+            self.__back_button.content.scale=1.5
+            self.__confirm_order_button.content = ElevatedButton(
                 text=self.CONFIRM_BUTTON_TEXT,
                 icon=icons.CHECK,
+                icon_color="#606060",
                 adaptive=True,
                 on_click=self.__confirm_order,
+                bgcolor="transparent",
+                color="#606060",
+                style=ButtonStyle(
+                    elevation=0,
+                    overlay_color=BUTTON_OVERLAY_COLOR
+                )
             )
-            self.__cancel_button = ElevatedButton(
+            self.__cancel_button.content = ElevatedButton(
                 text=self.CANCEL_BUTTON_TEXT,
                 icon=icons.CANCEL,
+                icon_color="#606060",
                 adaptive=True,
                 on_click=self.__cancel_order,
+                bgcolor="transparent",
+                color="#606060",
+                style=ButtonStyle(
+                    elevation=0,
+                    overlay_color=BUTTON_OVERLAY_COLOR
+                )
             )
+        
+        self.__alert.actions=[
+            Container(
+                content = ElevatedButton(
+                    text=self.ALERT_DIALOG_OK_TEXT,
+                    adaptive=True,
+                    on_click=self.__handle_close_dialog,
+                    bgcolor="transparent",
+                    color="#606060",
+                    style=ButtonStyle(
+                        elevation=0,
+                        overlay_color=BUTTON_OVERLAY_COLOR
+                    )
+                ),
+                gradient=Primary_Gradient(),
+                border_radius=20
+            )
+        ]
     
     
     #############################################
@@ -165,13 +251,22 @@ class Full_Order_Screen(Column):
     def set_confirm_order_layout(self):
         # Resetting controls from before
         self.__products_column.controls.clear()
-        self.__buttons_row.controls.clear()
+        self.__buttons_row.content.controls.clear()
         
         # Setting the title column
-        self.__title_column.controls=[
-            Divider(),
-            Text(value=f"{self.TITLE_TEXT}{shared_vars["current_order"]["date"]}"),
-            Divider()
+        self.__title_column.content.controls=[
+            Text(
+                value=f"{shared_vars["current_business"]["name"]}",
+                size=25,
+                text_align=TextAlign.CENTER,
+                width=FontWeight.BOLD,
+                color=MAIN_TEXT_COLOR
+            ),
+            Text(
+                value=f"{self.TITLE_TEXT}{shared_vars["current_order"]["date"]}",
+                text_align=TextAlign.CENTER,
+                color=MAIN_TEXT_COLOR
+            )
         ]
         
         # Setting the products of the order
@@ -181,21 +276,34 @@ class Full_Order_Screen(Column):
                 self.__products_column.controls.append(self.__create_new_product_row(product, products_dict[product]["quantity"], products_dict[product]["cost"]))
         
         # Adding the cancel and confirm buttons
-        self.__buttons_row.controls.append(self.__cancel_button)
-        self.__buttons_row.controls.append(self.__confirm_order_button)
+        self.__buttons_row.content.controls.append(self.__cancel_button)
+        self.__buttons_row.content.controls.append(self.__confirm_order_button)
         
     # Sets up the order details layout
     def set_order_details_layout(self):
         # Resetting controls from before
         self.__products_column.controls.clear()
-        self.__buttons_row.controls.clear()
+        self.__buttons_row.content.controls.clear()
         
         # Setting the title column
-        self.__title_column.controls=[
-            Divider(),
-            Text(value=f"{self.TITLE_TEXT}{shared_vars["current_order"]["date"]}"),
-            Text(value=f"{self.SUBTITLE_TEXT}{shared_vars["current_order"]["state"]}"),
-            Divider()
+        self.__title_column.content.controls=[
+            Text(
+                value=f"{shared_vars["current_business"]["name"]}",
+                size=25,
+                text_align=TextAlign.CENTER,
+                width=FontWeight.BOLD,
+                color=MAIN_TEXT_COLOR
+            ),
+            Text(
+                value=f"{self.TITLE_TEXT}{shared_vars["current_order"]["date"]}",
+                text_align=TextAlign.CENTER,
+                color=MAIN_TEXT_COLOR
+            ),
+            Text(
+                value=f"{self.SUBTITLE_TEXT}{shared_vars["current_order"]["state"]}",
+                text_align=TextAlign.CENTER,
+                color=MAIN_TEXT_COLOR
+            )
         ]
         
         # Setting the products of the order
@@ -205,7 +313,7 @@ class Full_Order_Screen(Column):
                 self.__products_column.controls.append(self.__create_new_product_row(product, products_dict[product]["quantity"], products_dict[product]["cost"]))
         
         if user_ids["is_admin"]:
-            self.__buttons_row.controls.append(
+            self.__buttons_row.content.controls.append(
                 Container(
                     content=Column(
                         controls=[
@@ -227,7 +335,7 @@ class Full_Order_Screen(Column):
             )
         else:
             # Adding the back button
-            self.__buttons_row.controls.append(self.__back_button)
+            self.__buttons_row.content.controls.append(self.__back_button)
     
     
     #############################################
@@ -245,28 +353,40 @@ class Full_Order_Screen(Column):
         Creates a new product row with the ordered products and their cost.
         '''
         
-        return Row(
-            controls=[
-                Container(
-                    content=Row(
-                        controls=[
-                            Container(
-                                content=Text(value=f"{product_name}\nx{product_quantity}"),
-                                padding=padding.only(left=10, right=20),
-                                expand=True
-                            ),
-                            Container(
-                                content=Text(f"{product_quantity*float(product_cost[:-1]):.2f}€"),
-                                padding=padding.only(right=10)
-                            ),
-                        ],
-                        alignment=MainAxisAlignment.SPACE_AROUND
-                    ),
-                    height=80,
-                    expand=True
-                )
-            ],
-            alignment=MainAxisAlignment.SPACE_AROUND,
+        return Container(
+            content=Row(
+                controls=[
+                    Container(
+                        content=Row(
+                            controls=[
+                                Container(
+                                    content=Text(
+                                        value=f"{product_name}\nx{product_quantity}",
+                                        color = MAIN_TEXT_COLOR
+                                    ),
+                                    padding=padding.only(left=5, right=15),
+                                    expand=True
+                                ),
+                                Container(
+                                    content=Text(
+                                        value=f"{product_quantity*float(product_cost[:-1]):.2f}€",
+                                        color = MAIN_TEXT_COLOR
+                                    ),
+                                    padding=padding.only(right=5)
+                                ),
+                            ],
+                            alignment=MainAxisAlignment.SPACE_AROUND
+                        ),
+                        height=60,
+                        expand=True,
+                        gradient = Third_Gradient(),
+                        border_radius=15,
+                        alignment=alignment.center
+                    )
+                ],
+                alignment=MainAxisAlignment.CENTER
+            ),
+            padding=padding.symmetric(2.5, 10),
         )
     
     
@@ -285,15 +405,6 @@ class Full_Order_Screen(Column):
         ###########################################################################
         testing = True
         if testing:
-            self.__alert.actions=[
-                TextButton(
-                    self.ALERT_DIALOG_OK_TEXT,
-                    on_click=self.__handle_close_dialog,
-                    style=ButtonStyle(
-                        enable_feedback=False
-                    )
-                ),
-            ]
             self.__page.open(self.__alert)
 
             shared_vars["main_container"].change_screen("order_screen")
@@ -332,15 +443,6 @@ class Full_Order_Screen(Column):
             
             # Check the response
             if response.status_code == STATUS_CODES["SUCCESS"]:
-                self.__alert.actions=[
-                    TextButton(
-                        self.ALERT_DIALOG_OK_TEXT,
-                        on_click=self.__handle_close_dialog,
-                        style=ButtonStyle(
-                            enable_feedback=False
-                        )
-                    ),
-                ]
                 self.__page.open(self.__alert)
                 
             elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:

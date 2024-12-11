@@ -130,6 +130,7 @@ class Order_Screen(Column):
     # Initializing and setting up the alert dialog
     __alert = AlertDialog(
         modal=True,
+        adaptive=True,
         title=Text(ALERT_DIALOG_TITLE_TEXT),
         content=Text(ALERT_DIALOG_CONTENT_TEXT),
         actions_alignment=MainAxisAlignment.END
