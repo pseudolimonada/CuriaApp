@@ -11,10 +11,8 @@ class Check_Orders_Screen(Column):
 
 
 
-    #Button texts
+    #Initializing useful variables
     __page = Page
-    __data = dict
-
 
     NETWORK_ERROR_TEXT: str = "Please verify your internet connection and try again..."
 
@@ -32,6 +30,7 @@ class Check_Orders_Screen(Column):
 
     __catalog: dict
     
+
     #Constructor
     def __init__(self, page: Page):
         super().__init__(alignment = MainAxisAlignment.SPACE_BETWEEN, expand = True)
@@ -79,11 +78,11 @@ class Check_Orders_Screen(Column):
         '''
         Requests data about the orders the user has placed and saves it
         '''
+
         #get products
         self.__catalog = get_refreshed_catalog(self.__page)
 
         #get orders
-
         header = {
             "user_id": user_ids["user_id"],
             "manager_business_ids": user_ids["manager_business_ids"]
@@ -106,10 +105,14 @@ class Check_Orders_Screen(Column):
         except requests.exceptions.RequestException as e:
             present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
 
+
+
+
     def __create_filters_row(self):
         '''
         Creates row with filter buttons
         ''' 
+        #Appending a button in row for each filter in FILTER_BUTTON_TEXT
         self.__filters_row.controls.clear()
         for i in FILTER_BUTTON_TEXT.keys():
             self.__filters_row.controls.append(
@@ -125,7 +128,7 @@ class Check_Orders_Screen(Column):
             )
 
 
-
+    
     def __fill_days_row(self):
         '''
         Clears the days row and refill it with new data from DB.
@@ -139,7 +142,6 @@ class Check_Orders_Screen(Column):
         self.__create_date_button("15/11")
 
         self.__current_date = "11/11"
-        # Add the new days buttons to controls according to data from DB
 
 
     def __fill_orders_column(self):

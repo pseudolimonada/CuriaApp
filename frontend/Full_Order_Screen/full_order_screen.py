@@ -394,6 +394,8 @@ class Full_Order_Screen(Column):
         '''
         Rejects order
         '''
+
+        #Beginning of test
         testing = True
         if testing:
             self.__rejected_message.actions=[
@@ -410,7 +412,7 @@ class Full_Order_Screen(Column):
 
             shared_vars["main_container"].change_screen("check_orders_screen")
             return
-        
+        #End of test
 
 
 
@@ -425,6 +427,8 @@ class Full_Order_Screen(Column):
         url_template = Template(endpoints_urls["PUT_STATE"])
         put_state_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"], order_id = shared_vars["current_order"]["order_id"])
         
+
+        #Request attempt to set state in DB
         try:
             response = requests.put(put_state_url,headers=header,json=payload)
 
@@ -462,6 +466,8 @@ class Full_Order_Screen(Column):
         '''
         Accepts order
         '''
+
+        #Beginning of test
         testing = True
         if testing:
             self.__accepted_message.actions=[
@@ -477,6 +483,9 @@ class Full_Order_Screen(Column):
             self.__page.open(self.__accepted_message)
             shared_vars["main_container"].change_screen("check_orders_screen")
             return
+        #End of test
+
+
         header = {
             "user_id": user_ids["user_id"],
             "manager_business_ids": user_ids["manager_business_ids"]
@@ -526,6 +535,6 @@ class Full_Order_Screen(Column):
         
         self.__page.close(self.__alert)
 
-
+    #Handles the close of __rejected_messsage / __accepted_message
     def __hande_close(self, e):
         self.__page.close(e.control.data)
