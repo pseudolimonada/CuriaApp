@@ -19,6 +19,7 @@ class Full_Order_Screen(Column):
     TITLE_TEXT: str = "Order Day: "
     SUBTITLE_TEXT: str = "State: "
     SUB_TITLE: str = "Order State: "
+    TOTAL_COST_TEXT: str = "Total Cost: "
     CONFIRM_BUTTON_TEXT: str = "Confirm!"
     CANCEL_BUTTON_TEXT: str = "Cancel"
     BACK_BUTTON_TEXT: str = "Back"
@@ -34,6 +35,10 @@ class Full_Order_Screen(Column):
     ###############################
     # Initializing the page object
     __page: Page
+    
+    ###############################
+    # Initializing total cost track variable
+    __current_total_cost: float = 0
     
     ###############################
     # Initializing and setting up the title and product columns
@@ -252,6 +257,13 @@ class Full_Order_Screen(Column):
         # Resetting controls from before
         self.__products_column.controls.clear()
         self.__buttons_row.content.controls.clear()
+        self.__current_total_cost = 0
+        
+        # Setting the products of the order
+        products_dict: dict = shared_vars["current_order"]["products"]
+        for product in products_dict:
+            if products_dict[product]["quantity"] > 0:
+                self.__products_column.controls.append(self.__create_new_product_row(product, products_dict[product]["quantity"], products_dict[product]["cost"]))
         
         # Setting the title column
         self.__title_column.content.controls=[
@@ -266,14 +278,14 @@ class Full_Order_Screen(Column):
                 value=f"{self.TITLE_TEXT}{shared_vars["current_order"]["date"]}",
                 text_align=TextAlign.CENTER,
                 color=MAIN_TEXT_COLOR
+            ),
+            Text(
+                value=f"{self.TOTAL_COST_TEXT}{self.__current_total_cost}€",
+                text_align=TextAlign.CENTER,
+                width=FontWeight.BOLD,
+                color=MAIN_TEXT_COLOR
             )
         ]
-        
-        # Setting the products of the order
-        products_dict: dict = shared_vars["current_order"]["products"]
-        for product in products_dict:
-            if products_dict[product]["quantity"] > 0:
-                self.__products_column.controls.append(self.__create_new_product_row(product, products_dict[product]["quantity"], products_dict[product]["cost"]))
         
         # Adding the cancel and confirm buttons
         self.__buttons_row.content.controls.append(self.__cancel_button)
@@ -284,6 +296,13 @@ class Full_Order_Screen(Column):
         # Resetting controls from before
         self.__products_column.controls.clear()
         self.__buttons_row.content.controls.clear()
+        self.__current_total_cost = 0
+        
+        # Setting the products of the order
+        products_dict: dict = shared_vars["current_order"]["products"]
+        for product in products_dict:
+            if products_dict[product]["quantity"] > 0:
+                self.__products_column.controls.append(self.__create_new_product_row(product, products_dict[product]["quantity"], products_dict[product]["cost"]))
         
         # Setting the title column
         self.__title_column.content.controls=[
@@ -303,14 +322,14 @@ class Full_Order_Screen(Column):
                 value=f"{self.SUBTITLE_TEXT}{shared_vars["current_order"]["state"]}",
                 text_align=TextAlign.CENTER,
                 color=MAIN_TEXT_COLOR
+            ),
+            Text(
+                value=f"{self.TOTAL_COST_TEXT}{self.__current_total_cost}€",
+                text_align=TextAlign.CENTER,
+                width=FontWeight.BOLD,
+                color=MAIN_TEXT_COLOR
             )
         ]
-        
-        # Setting the products of the order
-        products_dict: dict = shared_vars["current_order"]["products"]
-        for product in products_dict:
-            if products_dict[product]["quantity"] > 0:
-                self.__products_column.controls.append(self.__create_new_product_row(product, products_dict[product]["quantity"], products_dict[product]["cost"]))
         
         if user_ids["is_admin"]:
             self.__buttons_row.content.controls.append(
@@ -353,6 +372,9 @@ class Full_Order_Screen(Column):
         Creates a new product row with the ordered products and their cost.
         '''
         
+        total_cost = float(product_quantity*float(product_cost[:-1]))
+        self.__current_total_cost += total_cost
+        
         return Container(
             content=Row(
                 controls=[
@@ -369,7 +391,7 @@ class Full_Order_Screen(Column):
                                 ),
                                 Container(
                                     content=Text(
-                                        value=f"{product_quantity*float(product_cost[:-1]):.2f}€",
+                                        value=f"{total_cost:.2f}€",
                                         color = MAIN_TEXT_COLOR
                                     ),
                                     padding=padding.only(right=5)
