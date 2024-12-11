@@ -18,7 +18,7 @@ class Check_Orders_Screen(Column):
 
     __days_row: Row = Row(alignment = MainAxisAlignment.START, scroll = ScrollMode.ADAPTIVE)
 
-    __filters_row: Column = Column(alignment = MainAxisAlignment.CENTER)
+    __filters_row: Row = Row(alignment = MainAxisAlignment.CENTER)
 
     __orders_column: Column = Column(alignment = MainAxisAlignment.START, scroll = ScrollMode.ADAPTIVE, expand = True)
 
@@ -63,7 +63,7 @@ class Check_Orders_Screen(Column):
                 controls=[
                     Container(
                         content=self.__filters_row,
-                        padding = Padding(left=10,right=10,top=10,bottom=5),
+                        padding = Padding(left=10,right=10,top=10,bottom=10),
                         border_radius=12,
                         gradient=Secondary_Gradient(),
                         alignment=alignment.center
@@ -116,6 +116,7 @@ class Check_Orders_Screen(Column):
                 bgcolor= "transparent",
                 color="#606060",
                 adaptive = True,
+                width= 160,
                 on_click = self.__change_filter_orders_list,
                 data = state,
                 style= ButtonStyle(
@@ -137,23 +138,26 @@ class Check_Orders_Screen(Column):
 
         self.__filters_row.controls.clear()
         self.__filters_row.controls.append(
-            Row(
+            Column(
                 controls=[
                     self.__create_filter_button("waiting_validation"),
-                    self.__create_filter_button("waiting_delivery")
+                    self.__create_filter_button("delivered")
                 ],
-                alignment=MainAxisAlignment.CENTER
-            )
+                alignment=MainAxisAlignment.END,
+                spacing = 20
+            ),
         )
         self.__filters_row.controls.append(
-            Row(
+            Column(
                 controls=[
-                    self.__create_filter_button("delivered"),
-                    self.__create_filter_button("rejected")
+                    self.__create_filter_button("waiting_delivery"),
+                    self.__create_filter_button("rejected"),
                 ],
-                alignment=MainAxisAlignment.CENTER
+                alignment=MainAxisAlignment.START,
+                spacing = 20
             )
         )
+        self.__filters_row.padding =padding.only(bottom = 100)
 
             
         
