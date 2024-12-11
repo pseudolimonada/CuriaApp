@@ -101,13 +101,13 @@
 }
 // response for admin:
 ,{
-	"Mon": [{"product_id":"...", "product_quantity_sellable": 5, "product_quantity_sold": 5}, {"product_id":"...", "product_quantity_sellable": 5, "product_quantity_sold": 5}],
-	"Tue": [{"product_id":"...", "product_quantity_sellable": 5, "product_quantity_sold": 5}, {"product_id":"...", "product_quantity_sellable": 5, "product_quantity_sold": 5}],
-	"Wed": [{"product_id":"...", "product_quantity_sellable": 5, "product_quantity_sold": 5}, {"product_id":"...", "product_quantity_sellable": 5, "product_quantity_sold": 5}],
-	"Thu": [{"product_id":"...", "product_quantity_sellable": 5, "product_quantity_sold": 5}, {"product_id":"...", "product_quantity_sellable": 5, "product_quantity_sold": 5}],
-	"Fri": [{"product_id":"...", "product_quantity_sellable": 5, "product_quantity_sold": 5}, {"product_id":"...", "product_quantity_sellable": 5, "product_quantity_sold": 5}],
-	"Sat": [{"product_id":"...", "product_quantity_sellable": 5, "product_quantity_sold": 5}, {"product_id":"...", "product_quantity_sellable": 5, "product_quantity_sold": 5}],
-	"Sun": [{"product_id":"...", "product_quantity_sellable": 5, "product_quantity_sold": 5}, {"product_id":"...", "product_quantity_sellable": 5, "product_quantity_sold": 5}]
+	"Mon": [{"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5}, {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5}],
+	"Tue": [{"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5}, {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5}],
+	"Wed": [{"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5}, {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5}],
+	"Thu": [{"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5}, {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5}],
+	"Fri": [{"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5}, {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5}],
+	"Sat": [{"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5}, {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5}],
+	"Sun": [{"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5}, {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5}]
 }
 
 // Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
