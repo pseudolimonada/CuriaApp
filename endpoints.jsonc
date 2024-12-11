@@ -143,9 +143,6 @@
 	"INTERNAL_ERROR": 500
 }
 
-// notification_for_new_orders
-// WEBSOCKET/business/{business_id}/notifications_for_new_orders
-
 // POST /businesses/{business_id}/orders
 // header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
 // payload
