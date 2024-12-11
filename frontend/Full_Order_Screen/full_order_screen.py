@@ -22,6 +22,8 @@ class Full_Order_Screen(Column):
     CONFIRM_BUTTON_TEXT: str = "Confirm!"
     CANCEL_BUTTON_TEXT: str = "Cancel"
     BACK_BUTTON_TEXT: str = "Back"
+    ACCEPT_BUTTON_TEXT : str = "Accept"
+    REJECT_BUTTON_TEXT : str = "Reject"
     ALERT_DIALOG_TITLE_TEXT: str = "Your Order Is Done"
     ALERT_DIALOG_CONTENT_TEXT: str = "You can check order details in orders details menu."
     ALERT_DIALOG_OK_TEXT: str = "OK"
@@ -134,8 +136,19 @@ class Full_Order_Screen(Column):
             text=self.CANCEL_BUTTON_TEXT,
             icon=icons.KEYBOARD_RETURN,
             adaptive=True,
-            on_click=self.__turn_back,
-            scale=1.5
+            on_click=self.__turn_back
+        )
+
+        self.__accept_button = ElevatedButton(
+            text = self.ACCEPT_BUTTON_TEXT,
+            adaptive = True,
+            on_click = self.__accept_order
+        )
+
+        self.__reject_button = ElevatedButton(
+            text = self.REJECT_BUTTON_TEXT,
+            adaptive = True,
+            on_click = self.__reject_order
         )
     
     
@@ -188,6 +201,12 @@ class Full_Order_Screen(Column):
         
         # Adding the back button
         self.__buttons_row.controls.append(self.__back_button)
+        
+        #Add accept and reject buttons if user is admin
+        if user_ids["is_admin"]:
+            self.__buttons_row.controls.append(self.__reject_button)
+            self.__buttons_row.controls.append(self.__accept_button)
+        
     
     
     #############################################
@@ -330,6 +349,20 @@ class Full_Order_Screen(Column):
         
         shared_vars["main_container"].change_screen("check_orders_screen")
     
+    def __reject_order(self, e):
+        '''
+        Rejects order
+        '''
+        print("Reject")
+
+
+    def __accept_order(self,e):
+        '''
+        Accepts order
+        '''
+        print("Accept")
+
+
     # Handles the close of the dialog alert
     def __handle_close_dialog(self, e):
         '''
