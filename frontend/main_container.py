@@ -1,7 +1,4 @@
-from flet import (
-    Container, Page, Theme, ColorScheme, colors, alignment, 
-    LinearGradient, BorderRadius, Offset, BoxShadow
-                  )
+from flet import Container, Page, alignment, LinearGradient
 from utils import present_snack_bar
 from shared import THIRD_GRADIENT_COLOR_1, MAIN_TEXT_COLOR, BG_TOP_COLOR, BG_BOTTOM_COLOR, user_ids, shared_vars
 
