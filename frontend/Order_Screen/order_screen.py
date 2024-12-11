@@ -1,4 +1,4 @@
-from flet import Animation, AnimationCurve, Column, MainAxisAlignment, TextDecoration, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight, IconButton, icons, CrossAxisAlignment, VisualDensity, Checkbox, ResponsiveRow
+from flet import Animation, AnimationCurve, Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight, IconButton, icons, CrossAxisAlignment, VisualDensity, Checkbox
 from shared import DIALOG_BG_COLOR, BUTTON_OVERLAY_COLOR, STATUS_CODES, MAIN_TEXT_COLOR, user_ids, shared_vars, endpoints_urls, TESTING
 from utils import Selected_Gradient, Secondary_ElevatedButton_Container, Smart_TextField, Primary_Gradient, Secondary_Gradient, Third_Gradient, present_snack_bar, get_refreshed_catalog
 from datetime import datetime, timedelta
