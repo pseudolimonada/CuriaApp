@@ -1,6 +1,6 @@
 from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, BorderSide, VisualDensity, TextStyle, Padding, alignment
 from utils import get_refreshed_catalog, present_snack_bar, Selected_Gradient, Secondary_ElevatedButton_Container, Smart_TextField, Primary_Gradient, Secondary_Gradient, Third_Gradient
-from shared import shared_vars, user_ids, endpoints_urls, STATUS_CODES,FILTER_BUTTON_TEXT, TESTING, MAIN_TEXT_COLOR
+from shared import shared_vars, user_ids, endpoints_urls, STATUS_CODES,FILTER_BUTTON_TEXT, TESTING, MAIN_TEXT_COLOR, BUTTON_OVERLAY_COLOR
 import requests
 from string import Template
 
@@ -18,7 +18,7 @@ class Check_Orders_Screen(Column):
 
     __days_row: Row = Row(alignment = MainAxisAlignment.START, scroll = ScrollMode.ADAPTIVE)
 
-    __filters_row: Row = Row(alignment = MainAxisAlignment.CENTER)
+    __filters_row: Column = Column(alignment = MainAxisAlignment.CENTER)
 
     __orders_column: Column = Column(alignment = MainAxisAlignment.START, scroll = ScrollMode.ADAPTIVE, expand = True)
 
@@ -43,35 +43,37 @@ class Check_Orders_Screen(Column):
         self.__fill_orders_column()
 
         # Creating a column that joins order, filters and pages menu rows
-        order_row_and_pages_menu_row = Column(
-            controls=[
-                Column(
-                    controls=[
-                        Divider(),
-                        shared_vars["bottom_menu"]
-                    ],
-                    alignment=MainAxisAlignment.START,
-                    spacing=4
-                )
-            ],
-            alignment=MainAxisAlignment.START,
-            spacing=40
+        order_row_and_pages_menu_row = Container(
+            content= Column(
+                controls=[
+                    shared_vars["bottom_menu"]
+                ],
+                alignment=MainAxisAlignment.CENTER,
+                spacing=20,
+            ),       
+            padding = Padding(left=10,right=10,top=10,bottom=5),
+            border_radius=12,
+            gradient=Secondary_Gradient(),
+            alignment=alignment.center,
         )
 
         # Updating controls of the screen
         self.controls = [
             Column(
                 controls=[
-                    Container(height=10),
-                    self.__filters_row,
-                    Divider(),
+                    Container(
+                        content=self.__filters_row,
+                        padding = Padding(left=10,right=10,top=10,bottom=5),
+                        border_radius=12,
+                        gradient=Secondary_Gradient(),
+                        alignment=alignment.center
+                    ),
                     self.__orders_column,
                 ],
                 alignment=MainAxisAlignment.START,
                 expand=True
             ),
-            order_row_and_pages_menu_row,
-            Divider()
+            order_row_and_pages_menu_row,        
         ]
         
     def refresh_data(self):
@@ -106,13 +108,58 @@ class Check_Orders_Screen(Column):
                 present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
 
 
+    def __create_filter_button(self,state):
+        button = Container(
+            ElevatedButton(
+                opacity = 0.9,
+                content = Text(FILTER_BUTTON_TEXT.get(state), color = MAIN_TEXT_COLOR ),
+                bgcolor= "transparent",
+                color="#606060",
+                adaptive = True,
+                on_click = self.__change_filter_orders_list,
+                data = state,
+                style= ButtonStyle(
+                    padding = padding.all(20),
+                    overlay_color = BUTTON_OVERLAY_COLOR,
+                    elevation = 0,
+                    visual_density=VisualDensity.COMPACT
+                ),
+            ),
+            gradient = Primary_Gradient(),
+            border_radius=20
+        )
+        return button
 
     def __create_filters_row(self):
         '''
         Creates row with filter buttons
         ''' 
 
+        self.__filters_row.controls.clear()
+        self.__filters_row.controls.append(
+            Row(
+                controls=[
+                    self.__create_filter_button("waiting_validation"),
+                    self.__create_filter_button("waiting_delivery")
+                ],
+                alignment=MainAxisAlignment.CENTER
+            )
+        )
+        self.__filters_row.controls.append(
+            Row(
+                controls=[
+                    self.__create_filter_button("delivered"),
+                    self.__create_filter_button("rejected")
+                ],
+                alignment=MainAxisAlignment.CENTER
+            )
+        )
+
+            
+        
+
         #Appending a button in row for each filter in FILTER_BUTTON_TEXT
+        '''
         self.__filters_row.controls.clear()
         for i in FILTER_BUTTON_TEXT.keys():
             self.__filters_row.controls.append(
@@ -123,10 +170,11 @@ class Check_Orders_Screen(Column):
                     data = i,
                     style= ButtonStyle(
                         padding = padding.all(20),
+                        visual_density=VisualDensity.COMPACT
                     ),
                 )
             )
-
+        '''
 
     
     def __fill_days_row(self):
