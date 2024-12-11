@@ -191,7 +191,6 @@
 // payload: None (It doens't need to, serves notifications as they occur)
 // example message received from websocket:
 ,{
-	"order_id": "",
 	"order_date": "",
 	"order_data": [{"product_id":"...", "quantity":"..."}],
 	"user_name": "",
