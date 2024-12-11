@@ -1,6 +1,6 @@
 
 from flet import TextAlign, FontWeight, Column, padding, CrossAxisAlignment, MainAxisAlignment, Page, ElevatedButton, ScrollMode, Text, icons, Divider, Row, Container, TextButton, AlertDialog, alignment, Icon, ButtonStyle
-from shared import MAIN_TEXT_COLOR, DIALOG_BG_COLOR, BUTTON_OVERLAY_COLOR, STATUS_CODES, user_ids, shared_vars, endpoints_urls, TESTING
+from shared import MAIN_TEXT_COLOR, DIALOG_BG_COLOR, BUTTON_OVERLAY_COLOR, STATUS_CODES, user_ids, shared_vars, endpoints_urls, TESTING, FILTER_BUTTON_TEXT
 from utils import Primary_Gradient, Secondary_Gradient, Third_Gradient, present_snack_bar
 
 from string import Template
@@ -422,7 +422,7 @@ class Full_Order_Screen(Column):
                 color=MAIN_TEXT_COLOR
             ),
             Text(
-                value=f"{self.SUBTITLE_TEXT}{shared_vars["current_order"]["state"]}",
+                value=f"{self.SUBTITLE_TEXT}{FILTER_BUTTON_TEXT[shared_vars["current_order"]["state"]]}",
                 text_align=TextAlign.CENTER,
                 color=MAIN_TEXT_COLOR
             ),
@@ -435,7 +435,8 @@ class Full_Order_Screen(Column):
         ]
         
         # TODO: need to change the logic because if it is an adm and already accepted or denied, should not appear this buttons
-        if user_ids["is_admin"]:
+        user_ids["is_admin"] == True
+        if user_ids["is_admin"] and shared_vars["current_order"]["state"] == "waiting_validation":
             self.__buttons_row.content.controls.append(
                 Container(
                     content=Column(

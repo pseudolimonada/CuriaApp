@@ -168,13 +168,6 @@ class Check_Orders_Screen(Column):
                 if (order.get("order_state") == self.__current_filter)
             ]
 
-
-        for order in orders_to_show:
-            #row
-            pass
-
-
-
         for order in orders_to_show:
             row =self.__create_new_order_row(order)
             self.__orders_column.controls.append(row)
@@ -186,11 +179,12 @@ class Check_Orders_Screen(Column):
         order_string = ""
         data = order.get("order_data")
         #print(data)
+        '''
         for product in data:
             product_id = product.get("product_id")
             #print(product_id)
             order_string += self.__catalog[product_id]["product_title"] + " x" +str(product.get("quantity"))+", "
-            
+        ''' 
         #print(order_string)
         return Row(
             controls=[
@@ -198,7 +192,7 @@ class Check_Orders_Screen(Column):
                     content=Row(
                         controls=[
                             Container(
-                                content = Text(order_string),
+                                content = Text(order["order_date"]),
                                 padding=padding.only(left=10, right=20),
                                 expand=True
                             ),
