@@ -1,6 +1,5 @@
-user_ids = {
-    "user_id": str,
-    "manager_business_ids": list,
+user_data = {
+    "token": str,
     "is_admin": bool
 }
 
