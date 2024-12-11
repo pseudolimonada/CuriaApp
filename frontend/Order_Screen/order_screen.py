@@ -1,5 +1,5 @@
 from flet import Animation, AnimationCurve, Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight, IconButton, icons, CrossAxisAlignment, VisualDensity, Checkbox
-from shared import DIALOG_BG_COLOR, BUTTON_OVERLAY_COLOR, STATUS_CODES, MAIN_TEXT_COLOR, user_ids, shared_vars, endpoints_urls, TESTING
+from shared import DIALOG_BG_COLOR, BUTTON_OVERLAY_COLOR, STATUS_CODES, MAIN_TEXT_COLOR, user_data, shared_vars, endpoints_urls, TESTING
 from utils import Selected_Gradient, Secondary_ElevatedButton_Container, Smart_TextField, Primary_Gradient, Secondary_Gradient, Third_Gradient, present_snack_bar, get_refreshed_catalog
 from datetime import datetime, timedelta
 from string import Template
@@ -29,6 +29,7 @@ class Order_Screen(Column):
     ALERT_DIALOG_CONTENT_TEXT: str = "By changing the day your current order will be cleared. If you still want to continue, press 'OK', otherwise press CANCEL."
     ALERT_DIALOG_OK_TEXT: str = "OK"
     ALERT_DIALOG_CANCEL_TEXT: str = "CANCEL"
+    DATE_CATALOG_EDIT_SUCCESS_TEXT: str = "Current day edited successfully!"
     INTERNAL_ERROR_TEXT: str = "An internal error occurred, please wait and try again..."
     UNRECOGNIZED_ERROR_TEXT: str = "An unexpected error occurred, please verify if your app is updated..."
     NETWORK_ERROR_TEXT: str = "Please verify your internet connection and try again..."
@@ -236,7 +237,7 @@ class Order_Screen(Column):
         
         ###############################
         # Setting up the order / confirm & edit button
-        if user_ids["is_admin"]:
+        if user_data["is_admin"]:
             self.__confirm_button.content = ElevatedButton(
                 text=self.CONFIRM_BUTTON_TEXT,
                 adaptive=True,
@@ -346,7 +347,7 @@ class Order_Screen(Column):
                     "product_id": f"{i}",
                     "quantity_text": Text(value="0", color=MAIN_TEXT_COLOR, weight=FontWeight.BOLD),
                     "quantity": 0,
-                    "cost": "1.50€"
+                    "cost": 1.50
                 }
             self.__current_order["date"] = self.__current_date
             if update_days_row:
@@ -425,7 +426,7 @@ class Order_Screen(Column):
 
             state = False
             for i in range(num):
-                new_container = self.__create_new_product_container(f"Este é um Pao disto assim {i}", i, state)
+                new_container = self.__create_new_product_container(f"Este é um Pao disto assim {i}", i, str(i+20), state)
                 self.__products_column.controls.append(new_container)
             
             self.__update_controls()
@@ -434,17 +435,19 @@ class Order_Screen(Column):
         ###############################
         # Creating and adding products containers according to the products in the catalog
         for product_id in self.__catalog.keys():
+            quantity = 0
+            state = False
+            
             if product_id in self.__current_week_catalog[self.__current_week_day].keys():
+                quantity = self.__current_week_catalog[self.__current_week_day][product_id]["quantity"]
                 state = True
-            else:
-                state = False
                 
             self.__current_date_catalog_edit[product_id] = {
-                "quantity": None, #TODO
+                "quantity": quantity,
                 "state": state
             }
             
-            new_container = self.__create_new_product_container(self.__catalog[product_id]["product_title"], product_id, state)
+            new_container = self.__create_new_product_container(self.__catalog[product_id]["product_title"], product_id, str(quantity), state)
             self.__products_column.controls.append(new_container)
         
         ###############################
@@ -469,26 +472,28 @@ class Order_Screen(Column):
         
         ###############################
         # Setting up all requirements for the request
-        new_date_catalog = {}
+        new_date_catalog = {
+            "catalog_date": self.__current_date,
+            "catalog_products": []
+        }
         for product_id in self.__current_date_catalog_edit.keys():
             if self.__current_date_catalog_edit[product_id]["state"]:
-                new_date_catalog[product_id] = self.__current_date_catalog_edit[product_id]["quantity"]
+                new_date_catalog["catalog_products"].append({"product_id": product_id,
+                                                             "product_quantity_total": self.__current_date_catalog_edit[product_id]["quantity"]}
+                                                            )
         
         headers = {
-            "user_id": user_ids["user_id"],
-            "manager_business_ids": user_ids["manager_business_ids"]
+            "Authorization": f"{user_data["token"]}"
         }
-        payload = {
-            "new_date_catalog": new_date_catalog,
-        }
-        url_template = Template(endpoints_urls[""])
+
+        url_template = Template(endpoints_urls["EDIT_CURRENT_DAY"])
         get_catalog_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"])
         
         ###############################
         # Making and processing the request
         try:
             # Sending request and getting response
-            response = requests.post(get_catalog_url, headers=headers, json=payload)
+            response = requests.post(get_catalog_url, headers=headers, json=new_date_catalog)
             
             # Check the response
             if response.status_code == STATUS_CODES["SUCCESS"]:
@@ -548,6 +553,7 @@ class Order_Screen(Column):
         Refreshes the week catalog for the actual business and save it in self.__current_week_catalog
         If any error occurs return false, otherwise return true
         Week Catalog Structure:  (product_scarcity can be 5, 1, 0 or null, the null is in case there are more then 5)
+        FOR CLIENT:
         {
             "Mon": {"product_idX": product_scarcity, "product_idX": product_scarcity, ...},
             "Tue": {"product_idX": product_scarcity, "product_idX": product_scarcity, ...},
@@ -557,13 +563,22 @@ class Order_Screen(Column):
             "Sat": {"product_idX": product_scarcity, "product_idX": product_scarcity, ...},
             "Sun": {"product_idX": product_scarcity, "product_idX": product_scarcity, ...}
         }
+        FOR ADMIN:
+        {
+            "Mon": {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5},
+            "Tue": {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5},
+            "Wed": {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5},
+            "Thu": {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5},
+            "Fri": {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5},
+            "Sat": {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5},
+            "Sun": {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5}
+        }
         '''
         
         ###############################
         # Setting up all requirements for the request
         headers = {
-            "user_id": user_ids["user_id"],
-            "manager_business_ids": user_ids["manager_business_ids"]
+            "Authorization": f"{user_data["token"]}"
         }
         params = {
             "monday_date": monday_date,
@@ -580,13 +595,14 @@ class Order_Screen(Column):
             # Check the response
             if response.status_code == STATUS_CODES["SUCCESS"]:
                 # Saving the catalog for each day
-                self.__current_week_catalog["Mon"] = response["Mon"]
-                self.__current_week_catalog["Tue"] = response["Tue"]
-                self.__current_week_catalog["Wed"] = response["Wed"]
-                self.__current_week_catalog["Thu"] = response["Thu"]
-                self.__current_week_catalog["Fri"] = response["Fri"]
-                self.__current_week_catalog["Sat"] = response["Sat"]
-                self.__current_week_catalog["Sun"] = response["Sun"]
+                response_data = response.json()
+                self.__current_week_catalog["Mon"] = response_data.get("Mon", [])
+                self.__current_week_catalog["Tue"] = response_data.get("Tue", [])
+                self.__current_week_catalog["Wed"] = response_data.get("Wed", [])
+                self.__current_week_catalog["Thu"] = response_data.get("Thu", [])
+                self.__current_week_catalog["Fri"] = response_data.get("Fri", [])
+                self.__current_week_catalog["Sat"] = response_data.get("Sat", [])
+                self.__current_week_catalog["Sun"] = response_data.get("Sun", [])
                 return True
                 
             elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
@@ -651,8 +667,8 @@ class Order_Screen(Column):
             else:
                 num = 0
             for i in range(num):
-                if user_ids["is_admin"]:
-                    product_row = self.__create_new_product_row_manager(f"Este é um Pao disto assim {i}", self.__current_order["products"][f"Este é um Pao disto assim {i}"]["cost"])
+                if user_data["is_admin"]:
+                    product_row = self.__create_new_product_row_manager(f"Este é um Pao disto assim {i}", self.__current_order["products"][f"Este é um Pao disto assim {i}"]["cost"], i+10, i+20)
                 else:
                     product_row = self.__create_new_product_row_client("1", f"Este é um Pao disto assim {i}", self.__current_order["products"][f"Este é um Pao disto assim {i}"]["cost"], product_scarcity)
                 self.__products_column.controls.append(product_row)
@@ -661,8 +677,10 @@ class Order_Screen(Column):
         ###############################
         # Adding products rows according to the products in the catalog day
         for product_id in self.__current_week_catalog[self.__current_week_day].keys():
-            if user_ids["is_admin"]:
-                product_row = self.__create_new_product_row_manager(self.__catalog[product_id]["product_title"], self.__catalog[product_id]["product_price"])
+            if user_data["is_admin"]:
+                product_quantity_sold = self.__current_week_catalog[self.__current_week_day][product_id]["product_quantity_sold"]
+                product_quantity_total = self.__current_week_catalog[self.__current_week_day][product_id]["product_quantity_total"]
+                product_row = self.__create_new_product_row_manager(self.__catalog[product_id]["product_title"], self.__catalog[product_id]["product_price"], product_quantity_sold, product_quantity_total)
             else:
                 product_scarcity = self.__current_week_catalog[self.__current_week_day][product_id]
                 product_row = self.__create_new_product_row_client(product_id, self.__catalog[product_id]["product_title"], self.__catalog[product_id]["product_price"], product_scarcity)
@@ -901,7 +919,7 @@ class Order_Screen(Column):
         self,
         product_id: str,
         product_name: str,
-        product_cost: str,
+        product_cost: float,
         product_scarcity: int = None
     ):
         '''
@@ -936,7 +954,7 @@ class Order_Screen(Column):
                                 ),
                                 Container(
                                     content=Text(
-                                        value=product_cost,
+                                        value=f"{product_cost:.2f}€",
                                         color=MAIN_TEXT_COLOR
                                     ),
                                     padding=padding.only(left=5, right=5),
@@ -981,7 +999,9 @@ class Order_Screen(Column):
     def __create_new_product_row_manager(
         self,
         product_name: str,
-        product_cost: str,
+        product_cost: float,
+        product_quantity_sold: int,
+        product_quantity_total: int
     ):
         '''
         Creates and returns a row with the information about the product
@@ -995,18 +1015,26 @@ class Order_Screen(Column):
                             controls=[
                                 Container(
                                     content=Text(
-                                        value = f"{product_name}",
+                                        value = f"{product_quantity_sold}/{product_quantity_total}",
                                         color = MAIN_TEXT_COLOR
                                     ),
-                                    padding=padding.only(left=5, right=10),
+                                    padding=padding.only(left=5, right=5),
                                     expand=True
                                 ),
                                 Container(
                                     content=Text(
-                                        value = product_cost,
+                                        value = f"{product_name}",
                                         color = MAIN_TEXT_COLOR
                                     ),
-                                    padding=padding.only(left=10, right=5),
+                                    padding=padding.only(left=5, right=5),
+                                    expand=True
+                                ),
+                                Container(
+                                    content=Text(
+                                        value = f"{product_cost:.2f}€",
+                                        color = MAIN_TEXT_COLOR
+                                    ),
+                                    padding=padding.only(left=5, right=5),
                                 )
                             ],
                             alignment=MainAxisAlignment.SPACE_AROUND
@@ -1029,6 +1057,7 @@ class Order_Screen(Column):
         self,
         product_name: str,
         product_id: str,
+        product_quantity: str,
         current_state: bool
     ):
         '''
@@ -1039,7 +1068,8 @@ class Order_Screen(Column):
             content=Column(
                 controls=[
                     Text(
-                        value= f"{product_name}"
+                        value= f"{product_name}",
+                        color=MAIN_TEXT_COLOR
                     ),
                     Row(
                         controls=[
@@ -1054,6 +1084,7 @@ class Order_Screen(Column):
                                     page=self.__page,
                                     label=self.EDIT_TEXTFIELD_TEXT,
                                     hint_text=self.EDIT_TEXTFIELD_HINT_TEXT,
+                                    init_value = product_quantity,
                                     numeric=True,
                                     data=product_id,
                                     on_blur=self.__edit_product_amount,

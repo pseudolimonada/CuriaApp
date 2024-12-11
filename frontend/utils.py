@@ -1,5 +1,5 @@
 from flet import CircleBorder, padding, Page, Container, ElevatedButton, ButtonStyle, LinearGradient, alignment, SnackBar, Text, TextThemeStyle, TextField, TextStyle
-from shared import SELECTED_GRADIENT_COLOR_1, SELECTED_GRADIENT_COLOR_2, STATUS_CODES, PRIM_GRADIENT_COLOR_1, PRIM_GRADIENT_COLOR_2, SEC_GRADIENT_COLOR_1, SEC_GRADIENT_COLOR_2, THIRD_GRADIENT_COLOR_1, THIRD_GRADIENT_COLOR_2, BUTTON_OVERLAY_COLOR, user_ids, shared_vars, endpoints_urls
+from shared import SELECTED_GRADIENT_COLOR_1, SELECTED_GRADIENT_COLOR_2, STATUS_CODES, PRIM_GRADIENT_COLOR_1, PRIM_GRADIENT_COLOR_2, SEC_GRADIENT_COLOR_1, SEC_GRADIENT_COLOR_2, THIRD_GRADIENT_COLOR_1, THIRD_GRADIENT_COLOR_2, BUTTON_OVERLAY_COLOR, user_data, shared_vars, endpoints_urls
 from string import Template
 from typing import Optional, Callable, Any
 import requests
@@ -19,6 +19,7 @@ class Smart_TextField(TextField):
         page: Page,
         label: str = "Label",
         hint_text: str = "Hint Text",
+        init_value: Optional[str] = "",
         disabled: Optional[bool] = False,
         numeric: Optional[bool] = False,
         expand: Optional[bool] = False,
@@ -33,6 +34,7 @@ class Smart_TextField(TextField):
             adaptive = True,
             label=label,
             hint_text=hint_text,
+            value=init_value,
             on_change=self.change_value,
             data=data,
             disabled=disabled,
@@ -232,8 +234,7 @@ def get_refreshed_catalog(page: Page):
     catalog = None
     
     headers = {
-        "user_id": user_ids["user_id"],
-        "manager_business_ids": user_ids["manager_business_ids"]
+        "Authorization": f"{user_data["token"]}"
     }
     url_template = Template(endpoints_urls["GET_CATALOG"])
     get_catalog_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"])
@@ -245,7 +246,8 @@ def get_refreshed_catalog(page: Page):
         # Check the response
         if response.status_code == STATUS_CODES["SUCCESS"]:
             # Save the refreshed catalog
-            catalog = response["catalog"]
+            response_data = response.json()
+            catalog = response_data.get("catalog", {})
 
         elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
             present_snack_bar(page, INTERNAL_ERROR_TEXT, "Red")

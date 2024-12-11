@@ -16,7 +16,8 @@ endpoints_urls = {
     "GET_CATALOG": "/businesses/$business_id/products",
     "POST_ORDER": "/businesses/$business_id/orders",
     "GET_ORDERS": "businesses/$business_id/orders",
-    "PUT_STATE" : "businesses/$business_id/orders/$order_id"
+    "PUT_STATE" : "businesses/$business_id/orders/$order_id",
+    "EDIT_CURRENT_DAY": "/businesses/$business_id/catalogs"
 }
 
 STATUS_CODES = {"SUCCESS": 200, "INVALID_CREDENTIALS": 401, "INTERNAL_ERROR": 500, "BAD_REQUEST": 400}
