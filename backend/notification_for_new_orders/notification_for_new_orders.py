@@ -44,8 +44,12 @@ async def websocket_new_orders(websocket: WebSocket, business_id: str):
         redis_client.srem(redis_key, conn_id)
         active_connections.pop(conn_id, None)
 <<<<<<< HEAD
+<<<<<<< HEAD
         
 =======
 
         
 >>>>>>> 7958eb9 (Added second version (almost completed) of notification_for_new_orders.py)
+=======
+        
+>>>>>>> e7beee3 (Some fixes before being updated with branch main)
