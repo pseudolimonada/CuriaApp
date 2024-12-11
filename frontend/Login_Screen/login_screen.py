@@ -1,5 +1,5 @@
-from flet import Container, Column, MainAxisAlignment, TextStyle, ButtonStyle, ElevatedButton, TextField, Row, Page, LinearGradient, alignment, colors
-from shared import STATUS_CODES, user_ids, shared_vars, endpoints_urls
+from flet import Column, MainAxisAlignment, Row, Page
+from shared import TESTING, STATUS_CODES, user_data, shared_vars, endpoints_urls
 from utils import Main_TextField_Container, Main_ElevatedButton_Container, present_snack_bar
 import requests
 from Order_Screen.order_screen import Order_Screen
@@ -104,7 +104,7 @@ class Login_Screen(Column):
         ###########################################################################
         #        ------- REMOVE THIS IF CASE FOR REAL TEST !!!!!!! -------        #
         ###########################################################################
-        if self.name_textfield.content.value == "" and self.password_textfield.content.value == "":
+        if TESTING:
             self.__init_client_mode()
             shared_vars["main_container"].change_screen("order_screen")
         else:
@@ -120,9 +120,10 @@ class Login_Screen(Column):
                 
                 # Check the response
                 if response.status_code == STATUS_CODES["SUCCESS"]:
-                    # Set user ids
-                    user_ids["user_id"] = response["user_id"]
-                    user_ids["manager_business_ids"] = response["manager_business_ids"]
+                    # Getting the user data
+                    response_data = response.json()
+                    user_data["token"] = response_data.get("token")
+                    user_data["is_admin"] = response_data.get("is_admin")
                     self.__init_client_mode()
                     
                     # Change screen
@@ -147,7 +148,7 @@ class Login_Screen(Column):
         ###########################################################################
         #        ------- REMOVE THIS IF CASE FOR REAL TEST !!!!!!! -------        #
         ###########################################################################
-        if self.name_textfield.content.value == "" and self.password_textfield.content.value == "":
+        if TESTING:
             self.__init_client_mode()
             shared_vars["main_container"].change_screen("order_screen")
         else:
@@ -164,13 +165,15 @@ class Login_Screen(Column):
                 
                 # Check the response
                 if response.status_code == STATUS_CODES["SUCCESS"]:
-                    # Set user ids
-                    user_ids["user_id"] = response["user_id"]
-                    user_ids["manager_business_ids"] = response["manager_business_ids"]
+                    # Getting the user data
+                    response_data = response.json()
+                    user_data["token"] = response_data.get("token")
+                    user_data["is_admin"] = response_data.get("is_admin")
                     self.__init_client_mode()
-                    
+        
                     # Change screen
                     shared_vars["main_container"].change_screen("order_screen")
+                    
                 elif response.status_code == STATUS_CODES["INVALID_CREDENTIALS"]:
                     present_snack_bar(self.__page, self.INVALID_LOGIN_ERROR_TEXT, "Red")
                 elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
