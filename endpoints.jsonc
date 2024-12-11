@@ -4,8 +4,12 @@
 	"user_name": "",
 	"user_password": ""
 }
-// response: (auth token in jwt)
-,{"user_id":"...", "manager_business_ids":["...", "..."]}
+// response: 
+,{
+  "token": "...",
+  "is_admin": "true/false"
+}
+//token format: JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
 // Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
 ,{
 	"SUCCESS": 200,
@@ -19,8 +23,11 @@
 	"user_name": "",
 	"user_password": ""
 }
-// response: (auth token in jwt)
-,{"user_id":"...", "manager_business_ids":["...", "..."]}
+// response: 
+,{
+	"token": "...",
+	"is_admin": "true/false"
+  }
 // Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
 ,{
 	"SUCCESS": 200,
