@@ -1,6 +1,6 @@
 from flet import Container, Page, alignment, LinearGradient
 from utils import present_snack_bar
-from shared import THIRD_GRADIENT_COLOR_1, MAIN_TEXT_COLOR, BG_TOP_COLOR, BG_BOTTOM_COLOR, user_ids, shared_vars
+from shared import THIRD_GRADIENT_COLOR_1, MAIN_TEXT_COLOR, BG_TOP_COLOR, BG_BOTTOM_COLOR, user_data, shared_vars
 
 class Main_Container(Container):
     '''
@@ -69,7 +69,7 @@ class Main_Container(Container):
                     present_snack_bar(self.__page, self.CURRENT_SCREEN_NOT_RECOGNIZED, "Red")
                     return
             elif screen_name == "order_screen":
-                if not user_ids["is_admin"] and self.selected_screen_name == "full_order_screen":
+                if not user_data["is_admin"] and self.selected_screen_name == "full_order_screen":
                     self.__screens_dict[screen_name].reset_current_order()
                     self.__screens_dict[screen_name].refresh_data(False)
                 

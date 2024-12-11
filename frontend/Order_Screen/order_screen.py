@@ -1,4 +1,4 @@
-from flet import Animation, AnimationCurve, Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight, IconButton, icons, CrossAxisAlignment, VisualDensity, Checkbox
+from flet import RoundedRectangleBorder, Animation, AnimationCurve, Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight, IconButton, icons, CrossAxisAlignment, VisualDensity, Checkbox
 from shared import DIALOG_BG_COLOR, BUTTON_OVERLAY_COLOR, STATUS_CODES, MAIN_TEXT_COLOR, user_data, shared_vars, endpoints_urls, TESTING
 from utils import Selected_Gradient, Secondary_ElevatedButton_Container, Smart_TextField, Primary_Gradient, Secondary_Gradient, Third_Gradient, present_snack_bar, get_refreshed_catalog
 from datetime import datetime, timedelta
@@ -1015,7 +1015,7 @@ class Order_Screen(Column):
                             controls=[
                                 Container(
                                     content=Text(
-                                        value = f"{product_quantity_sold}/{product_quantity_total}",
+                                        value = f"{product_name}",
                                         color = MAIN_TEXT_COLOR
                                     ),
                                     padding=padding.only(left=5, right=5),
@@ -1023,11 +1023,10 @@ class Order_Screen(Column):
                                 ),
                                 Container(
                                     content=Text(
-                                        value = f"{product_name}",
+                                        value = f"{product_quantity_sold}/{product_quantity_total}",
                                         color = MAIN_TEXT_COLOR
                                     ),
                                     padding=padding.only(left=5, right=5),
-                                    expand=True
                                 ),
                                 Container(
                                     content=Text(
@@ -1065,45 +1064,57 @@ class Order_Screen(Column):
         '''
         
         return Container(
-            content=Column(
-                controls=[
-                    Text(
-                        value= f"{product_name}",
-                        color=MAIN_TEXT_COLOR
-                    ),
-                    Row(
-                        controls=[
-                            Checkbox(
-                                adaptive=True,
-                                value=current_state,
-                                data=product_id,
-                                on_change=self.__edit_product_state
-                            ),
-                            Container(
-                                content=Smart_TextField(
-                                    page=self.__page,
-                                    label=self.EDIT_TEXTFIELD_TEXT,
-                                    hint_text=self.EDIT_TEXTFIELD_HINT_TEXT,
-                                    init_value = product_quantity,
-                                    numeric=True,
+            content=Container(
+                content=Column(
+                    controls=[
+                        Text(
+                            value= f"{product_name}",
+                            color=MAIN_TEXT_COLOR
+                        ),
+                        Row(
+                            controls=[
+                                Checkbox(
+                                    adaptive=True,
+                                    value=current_state,
                                     data=product_id,
-                                    on_blur=self.__edit_product_amount,
-                                    expand=True,
-                                    label_style=TextStyle(size=10),
-                                    hint_style=TextStyle(size=10)
+                                    on_change=self.__edit_product_state,
+                                    check_color="#606060",
+                                    fill_color="transparent",
+                                    overlay_color="#606060",
+                                    hover_color="#606060",
+                                    shape=RoundedRectangleBorder(radius=5)
                                 ),
-                                width=100,
-                                height=30,
-                                alignment=alignment.center
-                            )
-                        ],
-                        alignment=MainAxisAlignment.CENTER,
-                        spacing=3
-                    )
-                ],
-                alignment=MainAxisAlignment.SPACE_AROUND,
-                horizontal_alignment=CrossAxisAlignment.CENTER
+                                Container(
+                                    content=Smart_TextField(
+                                        page=self.__page,
+                                        label=self.EDIT_TEXTFIELD_TEXT,
+                                        hint_text=self.EDIT_TEXTFIELD_HINT_TEXT,
+                                        init_value = product_quantity,
+                                        numeric=True,
+                                        data=product_id,
+                                        on_blur=self.__edit_product_amount,
+                                        expand=True,
+                                        label_style=TextStyle(size=15, color="#606060", weight=FontWeight.BOLD),
+                                        hint_style=TextStyle(size=15, color="#606060")
+                                    ),
+                                    width=130,
+                                    height=40,
+                                    alignment=alignment.center
+                                )
+                            ],
+                            alignment=MainAxisAlignment.CENTER,
+                            spacing=3
+                        )
+                    ],
+                    alignment=MainAxisAlignment.SPACE_AROUND,
+                    horizontal_alignment=CrossAxisAlignment.CENTER
+                ),
+                height=80,
+                gradient=Third_Gradient(),
+                border_radius=12,
+                alignment=alignment.center
             ),
+            padding=padding.symmetric(2, 25),
             alignment=alignment.center
         )
           
@@ -1137,16 +1148,19 @@ class Order_Screen(Column):
                                 controls=[
                                     self.__business_title,
                                     Text(
-                                        value=f"{self.EDITING_SUBTITLE_TEXT}{self.__current_date}"
+                                        value=f"{self.EDITING_SUBTITLE_TEXT}{self.__current_date}",
+                                        color=MAIN_TEXT_COLOR
                                     )
                                 ],
+                                spacing=6,
                                 alignment=MainAxisAlignment.CENTER,
                                 horizontal_alignment=CrossAxisAlignment.CENTER
                             ),
-                            padding=Padding(left=1, top=5, right=1, bottom=5),
+                            border_radius=12,
+                            gradient=Secondary_Gradient(),
+                            padding=Padding(left=1, top=5, right=1, bottom=10),
                             alignment=alignment.center
                         ),
-                        Divider(),
                         self.__products_column,
                     ],
                     alignment=MainAxisAlignment.START,
@@ -1154,6 +1168,8 @@ class Order_Screen(Column):
                 ),
                 Container(
                     content=self.__main_button_row,
+                    border_radius=12,
+                    gradient=Secondary_Gradient(),
                     padding=padding.symmetric(20, 0),
                     alignment=alignment.center
                 )

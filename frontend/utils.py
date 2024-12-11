@@ -41,7 +41,10 @@ class Smart_TextField(TextField):
             max_length=max_length,
             expand=expand,
             label_style=label_style,
-            hint_style=hint_style
+            hint_style=hint_style,
+            border_color="#606060",
+            cursor_color="#606060",
+            color="#606060"
         )
         self.__is_numeric = numeric
         if on_blur:
