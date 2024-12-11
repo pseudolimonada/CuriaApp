@@ -1,5 +1,5 @@
 from flet import Animation, AnimationCurve, Column, MainAxisAlignment, TextDecoration, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight, IconButton, icons, CrossAxisAlignment, VisualDensity, Checkbox, ResponsiveRow
-from shared import BUTTON_OVERLAY_COLOR, STATUS_CODES, MAIN_TEXT_COLOR, user_ids, shared_vars, endpoints_urls, TESTING
+from shared import DIALOG_BG_COLOR, BUTTON_OVERLAY_COLOR, STATUS_CODES, MAIN_TEXT_COLOR, user_ids, shared_vars, endpoints_urls, TESTING
 from utils import Selected_Gradient, Secondary_ElevatedButton_Container, Smart_TextField, Primary_Gradient, Secondary_Gradient, Third_Gradient, present_snack_bar, get_refreshed_catalog
 from datetime import datetime, timedelta
 from string import Template
@@ -131,8 +131,15 @@ class Order_Screen(Column):
     __alert = AlertDialog(
         modal=True,
         adaptive=True,
-        title=Text(ALERT_DIALOG_TITLE_TEXT),
-        content=Text(ALERT_DIALOG_CONTENT_TEXT),
+        bgcolor=DIALOG_BG_COLOR,
+        title=Text(
+            value=ALERT_DIALOG_TITLE_TEXT,
+            color=MAIN_TEXT_COLOR
+        ),
+        content=Text(
+            value=ALERT_DIALOG_CONTENT_TEXT,
+            color=MAIN_TEXT_COLOR
+        ),
         actions_alignment=MainAxisAlignment.END
     )
     
@@ -269,6 +276,39 @@ class Order_Screen(Column):
                 )
             )
             self.__main_button_row.controls = [self.__order_button]
+        
+        self.__alert.actions=[
+            Container(
+                content = ElevatedButton(
+                    text=self.ALERT_DIALOG_OK_TEXT,
+                    adaptive=True,
+                    on_click=self.__handle_close_dialog,
+                    bgcolor="transparent",
+                    color="#606060",
+                    style=ButtonStyle(
+                        elevation=0,
+                        overlay_color=BUTTON_OVERLAY_COLOR
+                    )
+                ),
+                gradient=Primary_Gradient(),
+                border_radius=20
+            ),
+            Container(
+                content = ElevatedButton(
+                    text=self.ALERT_DIALOG_CANCEL_TEXT,
+                    adaptive=True,
+                    on_click=self.__handle_close_dialog,
+                    bgcolor="transparent",
+                    color="#606060",
+                    style=ButtonStyle(
+                        elevation=0,
+                        overlay_color=BUTTON_OVERLAY_COLOR
+                    )
+                ),
+                gradient=Primary_Gradient(),
+                border_radius=20
+            )
+        ]
         
         ###############################
         # Final setting up the main column controls with everything
@@ -642,10 +682,7 @@ class Order_Screen(Column):
         # Checking the current total amount and changing the week or 
         # popping up an alert dialog according to that
         if self.__total_amount > 0:
-            self.__alert.actions=[
-                TextButton(self.ALERT_DIALOG_OK_TEXT, on_click=self.__handle_close_dialog, data=e.control.data),
-                TextButton(self.ALERT_DIALOG_CANCEL_TEXT, on_click=self.__handle_close_dialog)
-            ]
+            self.__alert.actions[0].content.data=e.control.data
             self.__page.open(self.__alert)
         else:        
             current_date_datetime = datetime.strptime(self.__current_date, "%d/%m/%Y")
@@ -672,10 +709,7 @@ class Order_Screen(Column):
         
         if e.control.data[1] != self.__current_date:
             if self.__total_amount > 0:
-                self.__alert.actions=[
-                    TextButton(self.ALERT_DIALOG_OK_TEXT, on_click=self.__handle_close_dialog, data=e.control.data),
-                    TextButton(self.ALERT_DIALOG_CANCEL_TEXT, on_click=self.__handle_close_dialog)
-                ]
+                self.__alert.actions[0].content.data=e.control.data
                 self.__page.open(self.__alert)
             else:
                 current_date_datetime = datetime.strptime(self.__current_date, "%d/%m/%Y")
