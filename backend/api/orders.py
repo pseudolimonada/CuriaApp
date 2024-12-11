@@ -1,17 +1,20 @@
 from flask import Blueprint, request, jsonify
 from db_models import Order
 from extensions import db
+from constants import jwt_required
 
 orders_blueprint = Blueprint("orders", __name__)
 
 
-@orders_blueprint.route("/", methods=["GET"])
+@orders_blueprint.route("/<int:business_id>/orders", methods=["GET"])
+@jwt_required
 def get_orders(business_id):
     orders = Order.query.filter_by(business_id=business_id).all()
     return jsonify([order.__dict__ for order in orders]), 200
 
 
-@orders_blueprint.route("/", methods=["POST"])
+@orders_blueprint.route("/<int:business_id>/orders", methods=["POST"])
+@jwt_required
 def submit_order(business_id):
     assert request.json is not None, "Request Json is None"
 

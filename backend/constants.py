@@ -5,11 +5,20 @@ import jwt
 import datetime
 import logging
 from functools import wraps
-from flask import request, jsonify
+from flask import request, jsonify, g
+from db_models import BusinessUser
+from db_models import User
 
 DB_MAX_ID_SIZE = 20
 DB_MAX_EMAIL_SIZE = 320
 DB_MAX_PWD_SIZE = 50
+
+
+def validate_date(date: str) -> datetime.datetime:
+    try:
+        return datetime.datetime.strptime(date, "%d-%m-%Y")
+    except ValueError:
+        raise ValueError("Incorrect date format, should be dd-mm-yyyy")
 
 
 def hash_password(password: str) -> str:
@@ -102,6 +111,27 @@ def decode_jwt(token: str) -> dict:
         raise
 
 
+def build_token_data(user_id: int) -> dict:
+    """
+    Builds a list of businesses the user is associated with.
+
+    :param user_id: User ID to search for.
+    :return: List of businesses the user is associated with.
+    """
+    user = User.query.get(user_id)
+    if not user:
+        return None
+
+    businesses = BusinessUser.query.filter_by(
+        user_id=user_id, user_type=UserType.MANAGER
+    ).all()
+
+    return {
+        "user_id": user_id,
+        "manager_business_ids": [business.business_id for business in businesses],
+    }
+
+
 def jwt_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -110,7 +140,13 @@ def jwt_required(f):
             return jsonify({"error": "Token is missing"}), 401
         try:
             decoded_data = decode_jwt(token)
-            request.user_data = decoded_data
+            g.is_admin = False
+            g.user_id = decoded_data["user_id"]
+            if args:
+                business_id = args[0]
+                if business_id in decoded_data["manager_business_ids"]:
+                    g.is_admin = True
+
         except jwt.ExpiredSignatureError:
             return jsonify({"error": "Token has expired"}), 401
         except jwt.InvalidTokenError:

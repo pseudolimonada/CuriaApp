@@ -3,15 +3,21 @@ from db_models import Business
 from extensions import db
 from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import UniqueViolation
+from constants import jwt_required
 
-businesses_blueprint = Blueprint('businesses', __name__)
+businesses_blueprint = Blueprint("businesses", __name__)
+
 
 @businesses_blueprint.route("/", methods=["GET"])
+@jwt_required
 def get_businesses():
+
     businesses = Business.query.all()
     return jsonify([business.__dict__ for business in businesses]), 200
 
+
 @businesses_blueprint.route("/", methods=["POST"])
+@jwt_required
 def create_business():
     assert request.json is not None, "Request Json is None"
 

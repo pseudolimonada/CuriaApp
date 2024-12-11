@@ -1,5 +1,5 @@
 [
-// POST /login  (pls SSL when real users)
+// POST /users/login  (pls SSL when real users)
 {
 	"user_name": "",
 	"user_password": ""
@@ -18,7 +18,7 @@
 	"BAD_REQUEST": 400
 }
 
-// POST /register
+// POST /users/register
 ,{
 	"user_name": "",
 	"user_password": ""
@@ -35,16 +35,28 @@
 	"INTERNAL_ERROR": 500,
 	"BAD_REQUEST": 400
 }
+// GET /users/permissions/{business_id}
+// header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
+// response
+,{
+	"is_admin": true //or false
+}
+,{
+	"SUCCESS": 200,
+	"INVALID_CREDENTIALS": 401,
+	"INTERNAL_ERROR": 500,
+	"BAD_REQUEST": 400
+}
 
 // GET /businesses/{business_id}/products
 // header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
 // response  (the product_idX are basically the actual ids of the products)
 ,{
 	"catalog": {
-	"product_id1": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""},
-	"product_id2": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""},
-	"product_id3": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""},
-	"product_id4": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":""}
+	"product_id1": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":1.0},
+	"product_id2": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":1.0},
+	"product_id3": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":1.0},
+	"product_id4": {"image_url":"(opt)", "product_title":"", "product_description":"", "product_price":1.0}
 	}
 }
 // Possible Status Codes:  (for internal error, above of 500 will also be interpreted as it)
@@ -143,14 +155,14 @@
 			"order_id": "",
 			"user_name": "",
 			"order_date": "",
-			"order_data": [{"product_id":"...", "product_quantity":"..."}, {"product_id":"...", "product_quantity":"..."}],
+			"order_data": [{"product_id":"...", "product_quantity":5}, {"product_id":"...", "product_quantity":5}],
 			"order_state": "waiting_validation" // or "waiting_delivery" or "delivered" or "rejected"
 		},
 		{
 			"order_id": "",
 			"user_name": "",
 			"order_date": "",
-			"order_data": [{"product_id":"...", "product_quantity":"..."}, {"product_id":"...", "product_quantity":"..."}],
+			"order_data": [{"product_id":"...", "product_quantity":5}, {"product_id":"...", "product_quantity":5}],
 			"order_state": "waiting_validation"// or "waiting_delivery" or "delivered" or "rejected"
 		}
 	]
@@ -168,9 +180,9 @@
 	"user_id": "", 
 	"order_date": "",
 	"order_data" : [
-		{"product_id":"...", "product_quantity":"..."},
-		{"product_id":"...", "product_quantity":"..."},
-		{"product_id":"...", "product_quantity":"..."}
+		{"product_id":"...", "product_quantity":5},
+		{"product_id":"...", "product_quantity":5},
+		{"product_id":"...", "product_quantity":5}
 	]
 }
 // response

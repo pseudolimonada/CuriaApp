@@ -16,12 +16,8 @@ db.init_app(app)
 # Register blueprints
 app.register_blueprint(users_blueprint, url_prefix="/users")
 app.register_blueprint(businesses_blueprint, url_prefix="/businesses")
-app.register_blueprint(
-    products_blueprint, url_prefix="/businesses/<int:business_id>/products"
-)
-app.register_blueprint(
-    orders_blueprint, url_prefix="/businesses/<int:business_id>/orders"
-)
+app.register_blueprint(products_blueprint, url_prefix="/businesses")
+app.register_blueprint(orders_blueprint, url_prefix="/businesses")
 
 
 @app.route("/", methods=["GET"])
