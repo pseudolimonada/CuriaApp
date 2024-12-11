@@ -162,7 +162,7 @@
 // WEBSOCKET/business/{business_id}/notifications_for_new_orders
 // header TOKEN JWT, unpacked is {"user_id":"...", "manager_business_ids":["...", "..."]}
 // description: Establish a Websocket connection to receive real-time notifications for new orders.
-// payload: None (It doens't need to, serves notifications as they occur=
+// payload: None (It doens't need to, serves notifications as they occur)
 // response:
 ,{
 	"order_id": "",
@@ -171,7 +171,7 @@
 	"user_name": "",
 	"order_state": "waiting_validation" // or "waiting_delivery" or "delivered"
 }
-// Possible Status Codes: (sent as WebSocket messages when an error occurs)
+// Possible Status Codes: (for internal error, going to continue the same logic adpoted earlier)
 ,{
 	"SUCCESS": 200,
 	"INTERNAL_ERROR": 500,
