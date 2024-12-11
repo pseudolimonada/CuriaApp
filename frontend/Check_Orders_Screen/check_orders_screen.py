@@ -1,6 +1,6 @@
-from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, BorderSide, VisualDensity
-from utils import get_refreshed_catalog, present_snack_bar
-from shared import shared_vars, user_ids, endpoints_urls, STATUS_CODES,FILTER_BUTTON_TEXT, TESTING
+from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, BorderSide, VisualDensity, TextStyle, Padding, alignment
+from utils import get_refreshed_catalog, present_snack_bar, Selected_Gradient, Secondary_ElevatedButton_Container, Smart_TextField, Primary_Gradient, Secondary_Gradient, Third_Gradient
+from shared import shared_vars, user_ids, endpoints_urls, STATUS_CODES,FILTER_BUTTON_TEXT, TESTING, MAIN_TEXT_COLOR
 import requests
 from string import Template
 
@@ -186,32 +186,59 @@ class Check_Orders_Screen(Column):
             order_string += self.__catalog[product_id]["product_title"] + " x" +str(product.get("quantity"))+", "
         ''' 
         #print(order_string)
-        return Row(
-            controls=[
-                Container(
-                    content=Row(
-                        controls=[
-                            Container(
-                                content = Text(order["order_date"]),
-                                padding=padding.only(left=10, right=20),
-                                expand=True
-                            ),
-                        ],
-                        alignment = MainAxisAlignment.SPACE_AROUND
+        return Container(
+            Row(
+                controls=[
+                    Container(
+                        content=Row(
+                            controls=[
+                                Container(
+                                    content = Text(order["order_date"], color = MAIN_TEXT_COLOR),
+                                    padding=padding.only(left=10, right=20),
+                                    alignment= alignment.center_left
+                                ),
+                                Container(
+                                    content=Text(FILTER_BUTTON_TEXT.get(order.get("order_state")),color=MAIN_TEXT_COLOR),
+                                    padding = padding.only(right=10),
+                                    expand=True,
+                                    alignment = alignment.center_right
+                                )
+                            ],
+                            alignment=MainAxisAlignment.END
+                            
+                        ),
+                        height=60,
+                        expand=True,
+                        gradient = Third_Gradient(),
+                        border_radius=20,
+                        alignment=alignment.center
                     ),
-                    height=80,
-                    expand=True
-                ),
-                Container(
-                    content=Text(FILTER_BUTTON_TEXT.get(order.get("order_state"))),
-                    padding = padding.only(right=10)
-                ),
-                ElevatedButton(
-                                content = Text("View"),
-                                data = {"order_date":order["order_date"], "order_state":order["order_state"], "products":order["order_data"],"order_id":order["order_id"]},
-                                on_click = self.__go_full_order_screen
+                    Container(
+                        content = ElevatedButton(
+                            opacity = 0.9,
+                            content = Text("View", color = "MAIN_TEXT_COLOR"),
+                            adaptive =True,
+                            bgcolor="transparent",
+                            color="#606060",
+                            data = {"order_date":order["order_date"], "order_state":order["order_state"], "products":order["order_data"],"order_id":order["order_id"]},
+                            on_click = self.__go_full_order_screen,
+                            style = ButtonStyle(
+                                elevation=0,
+                                overlay_color="#fff791",
+                                padding=Padding(left=2, top=1, right=2, bottom=1),
+                                visual_density=VisualDensity.COMPACT
                             )
-            ]
+                        ),
+                        width=60,
+                        height=30,
+                        gradient=Third_Gradient(),
+                        border_radius=20,
+                    ),
+                ],
+                alignment=MainAxisAlignment.START    
+            ),
+            padding=padding.only(left=10,right=10),
+            expand=True
         )
 
     def __go_full_order_screen(self, e):

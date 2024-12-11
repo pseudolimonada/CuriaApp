@@ -435,7 +435,7 @@ class Full_Order_Screen(Column):
         ]
         
         # TODO: need to change the logic because if it is an adm and already accepted or denied, should not appear this buttons
-        user_ids["is_admin"] == True
+        user_ids["is_admin"] == True #remove when done testing
         if user_ids["is_admin"] and shared_vars["current_order"]["state"] == "waiting_validation":
             self.__buttons_row.content.controls.append(
                 Container(
