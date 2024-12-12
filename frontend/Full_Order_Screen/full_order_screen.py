@@ -1,5 +1,5 @@
 from flet import TextAlign, FontWeight, Column, padding, CrossAxisAlignment, MainAxisAlignment, Page, ElevatedButton, ScrollMode, Text, icons, Row, Container, TextButton, AlertDialog, alignment, Icon, ButtonStyle
-from shared import TESTING, MAIN_TEXT_COLOR, DIALOG_BG_COLOR, BUTTON_OVERLAY_COLOR, STATUS_CODES, user_data, shared_vars, endpoints_urls, configs
+from shared import TESTING, MAIN_TEXT_COLOR, DIALOG_BG_COLOR, BUTTON_OVERLAY_COLOR, STATUS_CODES, user_data, shared_vars, endpoints_urls, configs, FILTER_BUTTON_TEXT
 from utils import Primary_Gradient, Secondary_Gradient, Third_Gradient, present_snack_bar
 
 from string import Template
@@ -435,12 +435,12 @@ class Full_Order_Screen(Column):
                 color=MAIN_TEXT_COLOR
             ),
             Text(
-                value=f"{self.TITLE_TEXT}{shared_vars["current_order"]["date"]}",
+                value=f"{self.TITLE_TEXT[configs["LANGUAGE"]]}{shared_vars["current_order"]["date"]}",
                 text_align=TextAlign.CENTER,
                 color=MAIN_TEXT_COLOR
             ),
             Text(
-                value=f"{self.SUBTITLE_TEXT[configs["LANGUAGE"]]}{shared_vars["current_order"]["state"]}",
+                value=f"{self.SUBTITLE_TEXT[configs["LANGUAGE"]]}{FILTER_BUTTON_TEXT[configs["LANGUAGE"]][shared_vars["current_order"]["state"]]}",
                 text_align=TextAlign.CENTER,
                 color=MAIN_TEXT_COLOR
             ),
@@ -452,36 +452,9 @@ class Full_Order_Screen(Column):
             )
         ]
         
-
-        # Setting the title column
-        self.__title_column.content.controls=[
-            Text(
-                value=f"{shared_vars["current_business"]["name"]}",
-                size=25,
-                text_align=TextAlign.CENTER,
-                width=FontWeight.BOLD,
-                color=MAIN_TEXT_COLOR
-            ),
-            Text(
-                value=f"{self.TITLE_TEXT}{shared_vars["current_order"]["date"]}",
-                text_align=TextAlign.CENTER,
-                color=MAIN_TEXT_COLOR
-            ),
-            Text(
-                value=f"{self.SUBTITLE_TEXT[configs["LANGUAGE"]]}{shared_vars["current_order"]["state"]}",
-                text_align=TextAlign.CENTER,
-                color=MAIN_TEXT_COLOR
-            ),
-            Text(
-                value=f"{self.TOTAL_COST_TEXT[configs["LANGUAGE"]]}{self.__current_total_cost:.2f}€",
-                text_align=TextAlign.CENTER,
-                width=FontWeight.BOLD,
-                color=MAIN_TEXT_COLOR
-            )
-        ]
         
         # TODO: need to change the logic because if it is an adm and already accepted or denied, should not appear this buttons
-        if user_data["is_admin"]:
+        if user_data["is_admin"] and shared_vars["current_order"]["state"] == "waiting_validation":
             self.__buttons_row.content.controls.append(
                 Container(
                     content=Column(

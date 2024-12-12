@@ -46,7 +46,7 @@ def main(page: Page):
     
     configs["LANGUAGE"] = "English"
     #configs["LANGUAGE"] = "Portuguese"
-    user_data["is_admin"] = False
+    user_data["is_admin"] = True
     shared_vars["current_business"]["name"] = "Farinha e Afeto"
     shared_vars["current_business"]["id"] = "1"
     shared_vars["main_container"] = Main_Container(page)
