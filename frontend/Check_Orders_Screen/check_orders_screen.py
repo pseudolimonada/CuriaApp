@@ -38,6 +38,8 @@ class Check_Orders_Screen(Column):
     __orders : list = []
 
     __catalog: dict
+
+    __buttons_dict : dict ={}
     
 
     #Constructor
@@ -149,7 +151,8 @@ class Check_Orders_Screen(Column):
         '''
         Creates row with filter buttons
         ''' 
-
+        self.__buttons_dict["waiting_validation"] = self.__create_filter_button("waiting_validation")
+        
         self.__filters_row.controls.clear()
         self.__filters_row.controls.append(
             Column(
@@ -340,14 +343,25 @@ class Check_Orders_Screen(Column):
         '''
         Change shown orders according to order status
         '''
-        
+
         if e.control.data == self.__current_filter:
             self.__current_filter = "All"
             self.__fill_orders_column()
-            self.__page.update()
 
         elif e.control.data != self.__current_filter:
             self.__current_filter = e.control.data
             self.__fill_orders_column()
-            self.__page.update() 
-        #print(self.__current_filter)
+
+         
+        #Row->Column->Container->Button     
+        for column in self.__filters_row.controls:
+            if not isinstance(column, Column):
+                continue
+            for container in column.controls:
+                    if not isinstance(container, Container):
+                        continue
+                    if container.content.data != self.__current_filter:
+                        container.gradient = Primary_Gradient()
+                    else: 
+                        container.gradient = Selected_Gradient()
+        self.__page.update()
