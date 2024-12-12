@@ -31,7 +31,10 @@
 	      flutter
               pip
               venvShellHook
-            ]);
+            ]) ++ (with pkgs; [
+              pandoc
+	      texlive.combined.scheme-full
+	    ]);
 	  nativeBuildInputs = postgres.nativeBuildInputs;
         };
 
