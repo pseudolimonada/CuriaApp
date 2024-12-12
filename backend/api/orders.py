@@ -65,7 +65,7 @@ def submit_order(business_id):
 
         if not catalog:
             db.session.rollback()
-            return jsonify({"error": "Catalog not found"}), 404
+            return jsonify({"error": "Catalog not found"}), 400
 
         for product in request.json.get("order_data"):
             catalog_product = CatalogProduct.query.filter_by(
@@ -74,7 +74,7 @@ def submit_order(business_id):
 
             if not catalog_product:
                 db.session.rollback()
-                return jsonify({"error": "Product not found in catalog"}), 404
+                return jsonify({"error": "Product not found in catalog"}), 400
 
             if (
                 catalog_product.product_quantity_sold + product.get("product_quantity")
@@ -111,7 +111,7 @@ def change_order_state(business_id, order_id):
         order_state = OrderStateType(value=request.json.get("order_state"))
         order = Order.query.get(order_id)
         if not order or order.business_id != business_id:
-            return jsonify({"error": "Order not found"}), 404
+            return jsonify({"error": "Order not found"}), 400
 
         delete_from_catalog = False
 

@@ -60,7 +60,7 @@ def put_product(business_id, product_id):
 
     product = Product.query.get(product_id)
     if not product or product.business_id != business_id:
-        return jsonify({"error": "Product not found"}), 404
+        return jsonify({"error": "Product not found"}), 400
 
     if "image_url" in request.json:
         product.image_url = request.json["image_url"]
@@ -82,7 +82,7 @@ def put_product(business_id, product_id):
 def delete_product(business_id, product_id):
     product = Product.query.get(product_id)
     if not product or product.business_id != business_id:
-        return jsonify({"error": "Product not found"}), 404
+        return jsonify({"error": "Product not found"}), 400
 
     db.session.delete(product)
     db.session.commit()
