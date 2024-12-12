@@ -95,7 +95,7 @@ def submit_order(business_id):
             catalog_product.product_quantity_sold += product.get("product_quantity")
 
         db.session.commit()
-        return jsonify({"order_id": order.order_id}), 201
+        return jsonify({"order_id": order.order_id}), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 400

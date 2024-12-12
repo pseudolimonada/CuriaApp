@@ -41,7 +41,7 @@ def create_business():
         db.session.add(business)
         db.session.commit()
 
-        return jsonify({"business_id": business.business_id}), 201
+        return jsonify({"business_id": business.business_id}), 200
     except IntegrityError as e:
         db.session.rollback()
         if isinstance(e.orig, UniqueViolation):
