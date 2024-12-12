@@ -105,6 +105,8 @@ class Login_Screen(Column):
         #        ------- REMOVE THIS IF CASE FOR REAL TEST !!!!!!! -------        #
         ###########################################################################
         if TESTING:
+            if self.name_textfield.content.value == "admin" and self.password_textfield.content.value == "admin":
+                user_data["is_admin"] = True
             self.__init_client_mode()
             shared_vars["main_container"].change_screen("order_screen")
         else:
@@ -123,11 +125,8 @@ class Login_Screen(Column):
                     # Getting the user data
                     response_data = response.json()
                     user_data["token"] = response_data.get("token")
-                    user_data["is_admin"] = response_data.get("is_admin")
-                    self.__init_client_mode()
-                    
-                    # Change screen
-                    shared_vars["main_container"].change_screen("order_screen")
+                    self.__get_permissions()
+
                 elif response.status_code == STATUS_CODES["INVALID_CREDENTIALS"]:
                     present_snack_bar(self.__page, self.INVALID_LOGIN_ERROR_TEXT, "Red")
                 elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
@@ -149,6 +148,8 @@ class Login_Screen(Column):
         #        ------- REMOVE THIS IF CASE FOR REAL TEST !!!!!!! -------        #
         ###########################################################################
         if TESTING:
+            if self.name_textfield.content.value == "admin" and self.password_textfield.content.value == "admin":
+                user_data["is_admin"] = True
             self.__init_client_mode()
             shared_vars["main_container"].change_screen("order_screen")
         else:
@@ -168,11 +169,7 @@ class Login_Screen(Column):
                     # Getting the user data
                     response_data = response.json()
                     user_data["token"] = response_data.get("token")
-                    user_data["is_admin"] = response_data.get("is_admin")
-                    self.__init_client_mode()
-        
-                    # Change screen
-                    shared_vars["main_container"].change_screen("order_screen")
+                    self.__get_permissions()
                     
                 elif response.status_code == STATUS_CODES["INVALID_CREDENTIALS"]:
                     present_snack_bar(self.__page, self.INVALID_LOGIN_ERROR_TEXT, "Red")
@@ -185,6 +182,40 @@ class Login_Screen(Column):
             except requests.exceptions.RequestException as e:
                 # Handle network-related errors
                 present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
+    
+    # Gets the permissions of the user to know if it is an admin or not
+    def __get_permissions(self):
+        '''
+        Gets the permissions of the user to know if it is an admin or not
+        '''
+
+        headers = {
+            "Authorization": f"{user_data["token"]}"
+        }
+        try:
+            # Sending request and getting response
+            response = requests.get(endpoints_urls["PERMISSIONS"], headers=headers)
+            
+            # Check the response
+            if response.status_code == STATUS_CODES["SUCCESS"]:
+                # Getting the user data
+                response_data = response.json()
+                user_data["is_admin"] = response_data.get("is_admin")
+                self.__init_client_mode()
+                # Change screen
+                shared_vars["main_container"].change_screen("order_screen")
+                
+            elif response.status_code == STATUS_CODES["INVALID_CREDENTIALS"]:
+                present_snack_bar(self.__page, self.INVALID_LOGIN_ERROR_TEXT, "Red")
+            elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
+                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
+            elif response.status_code == STATUS_CODES["BAD_REQUEST"]:
+                present_snack_bar(self.__page, self.BAD_REQUEST_ERROR_TEXT, "Red")
+            else:
+                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
+        except requests.exceptions.RequestException as e:
+            # Handle network-related errors
+            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
     
     # Initializes all screen of a client user         
     def __init_client_mode(self):

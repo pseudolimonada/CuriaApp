@@ -121,7 +121,7 @@ class Check_Orders_Screen(Column):
             get_orders_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"])
 
             try:
-                response = requests.get(get_orders_url,headers =header)
+                response = requests.get(get_orders_url, headers=header)
 
                 if response.status_code == STATUS_CODES["SUCCESS"]:
                     response_data = response.json()
