@@ -10,14 +10,17 @@ shared_vars = {
     "current_business": {}
 }
 
+BASE_IP="http://farinhasembugs.dei.uc.pt:8080/"
+
 endpoints_urls = {
-    "LOGIN": "/login",
-    "REGISTER": "/register",
-    "GET_CATALOG": "/businesses/$business_id/products",
-    "POST_ORDER": "/businesses/$business_id/orders",
-    "GET_ORDERS": "businesses/$business_id/orders",
-    "PUT_STATE" : "businesses/$business_id/orders/$order_id",
-    "EDIT_CURRENT_DAY": "/businesses/$business_id/catalogs"
+    "LOGIN": f"{BASE_IP}users/login",
+    "REGISTER": f"{BASE_IP}users/register",
+    "PERMISSIONS": f"{BASE_IP}users/permissions/$business_id",
+    "GET_CATALOG": f"{BASE_IP}businesses/$business_id/products",
+    "POST_ORDER": f"{BASE_IP}businesses/$business_id/orders",
+    "GET_ORDERS": f"{BASE_IP}businesses/$business_id/orders",
+    "PUT_STATE" : f"{BASE_IP}businesses/$business_id/orders/$order_id",
+    "EDIT_CURRENT_DAY": f"{BASE_IP}businesses/$business_id/catalogs"
 }
 
 STATUS_CODES = {"SUCCESS": 200, "INVALID_CREDENTIALS": 401, "INTERNAL_ERROR": 500, "BAD_REQUEST": 400}
@@ -52,7 +55,7 @@ FILTER_BUTTON_TEXT: dict = {
     }
 } 
 
-TESTING = True
+TESTING = False
 
 configs = {
     "LANGUAGE": "English"
