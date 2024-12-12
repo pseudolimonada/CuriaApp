@@ -55,13 +55,9 @@ def register():
             return jsonify({"error": "Business not found"}), 404
 
     try:
-        user_data = {
-            "user_name": request.json.get("user_name"),
-            "password": request.json.get("password"),
-        }
         user = User(
-            user_name=user_data["user_name"],
-            password=hash_password(user_data["password"]),
+            user_name=request.json.get('user_name'),
+            password=hash_password(request.json.get('user_password')),
         )
         db.session.add(user)
         db.session.flush()
@@ -94,7 +90,7 @@ def login():
         return jsonify({"error": "Request Json is None"}), 400
 
     user_name = request.json.get("user_name")
-    password = request.json.get("password")
+    password = request.json.get("user_password")
 
     if not user_name or not password:
         return jsonify({"error": "Missing user_name or password"}), 400
