@@ -1,6 +1,6 @@
-from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, BorderSide, VisualDensity
-from utils import get_refreshed_catalog, present_snack_bar
-from shared import shared_vars, user_data, endpoints_urls, STATUS_CODES,FILTER_BUTTON_TEXT, TESTING
+from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, BorderSide, VisualDensity, TextStyle, Padding, alignment
+from utils import get_refreshed_catalog, present_snack_bar, Selected_Gradient, Secondary_ElevatedButton_Container, Smart_TextField, Primary_Gradient, Secondary_Gradient, Third_Gradient
+from shared import shared_vars, user_data, endpoints_urls, STATUS_CODES,FILTER_BUTTON_TEXT, TESTING, MAIN_TEXT_COLOR, BUTTON_OVERLAY_COLOR, configs
 import requests
 from string import Template
 
@@ -43,35 +43,37 @@ class Check_Orders_Screen(Column):
         self.__fill_orders_column()
 
         # Creating a column that joins order, filters and pages menu rows
-        order_row_and_pages_menu_row = Column(
-            controls=[
-                Column(
-                    controls=[
-                        Divider(),
-                        shared_vars["bottom_menu"]
-                    ],
-                    alignment=MainAxisAlignment.START,
-                    spacing=4
-                )
-            ],
-            alignment=MainAxisAlignment.START,
-            spacing=40
+        order_row_and_pages_menu_row = Container(
+            content= Column(
+                controls=[
+                    shared_vars["bottom_menu"]
+                ],
+                alignment=MainAxisAlignment.CENTER,
+                spacing=20,
+            ),       
+            padding = Padding(left=10,right=10,top=10,bottom=5),
+            border_radius=12,
+            gradient=Secondary_Gradient(),
+            alignment=alignment.center,
         )
 
         # Updating controls of the screen
         self.controls = [
             Column(
                 controls=[
-                    Container(height=10),
-                    self.__filters_row,
-                    Divider(),
+                    Container(
+                        content=self.__filters_row,
+                        padding = Padding(left=10,right=10,top=10,bottom=10),
+                        border_radius=12,
+                        gradient=Secondary_Gradient(),
+                        alignment=alignment.center
+                    ),
                     self.__orders_column,
                 ],
                 alignment=MainAxisAlignment.START,
                 expand=True
             ),
-            order_row_and_pages_menu_row,
-            Divider()
+            order_row_and_pages_menu_row,        
         ]
         
     def refresh_data(self):
@@ -84,8 +86,8 @@ class Check_Orders_Screen(Column):
 
             #get orders
             header = {
-                "user_id": user_data["user_id"],
-                "manager_business_ids": user_data["manager_business_ids"]
+                #"user_id": user_data["user_id"],
+                #"manager_business_ids": user_data["manager_business_ids"]
             }
 
             url_template = Template(endpoints_urls["GET_ORDERS"])
@@ -106,13 +108,62 @@ class Check_Orders_Screen(Column):
                 present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
 
 
+    def __create_filter_button(self,state):
+        button = Container(
+            ElevatedButton(
+                opacity = 0.9,
+                content = Text(FILTER_BUTTON_TEXT[configs["LANGUAGE"]].get(state), color = MAIN_TEXT_COLOR ),
+                bgcolor= "transparent",
+                color="#606060",
+                adaptive = True,
+                width= 160,
+                on_click = self.__change_filter_orders_list,
+                data = state,
+                style= ButtonStyle(
+                    padding = padding.all(20),
+                    overlay_color = BUTTON_OVERLAY_COLOR,
+                    elevation = 0,
+                    visual_density=VisualDensity.COMPACT
+                ),
+            ),
+            gradient = Primary_Gradient(),
+            border_radius=20
+        )
+        return button
 
     def __create_filters_row(self):
         '''
         Creates row with filter buttons
         ''' 
 
+        self.__filters_row.controls.clear()
+        self.__filters_row.controls.append(
+            Column(
+                controls=[
+                    self.__create_filter_button("waiting_validation"),
+                    self.__create_filter_button("delivered")
+                ],
+                alignment=MainAxisAlignment.END,
+                spacing = 20
+            ),
+        )
+        self.__filters_row.controls.append(
+            Column(
+                controls=[
+                    self.__create_filter_button("waiting_delivery"),
+                    self.__create_filter_button("rejected"),
+                ],
+                alignment=MainAxisAlignment.START,
+                spacing = 20
+            )
+        )
+        self.__filters_row.padding =padding.only(bottom = 100)
+
+            
+        
+
         #Appending a button in row for each filter in FILTER_BUTTON_TEXT
+        '''
         self.__filters_row.controls.clear()
         for i in FILTER_BUTTON_TEXT.keys():
             self.__filters_row.controls.append(
@@ -123,10 +174,11 @@ class Check_Orders_Screen(Column):
                     data = i,
                     style= ButtonStyle(
                         padding = padding.all(20),
+                        visual_density=VisualDensity.COMPACT
                     ),
                 )
             )
-
+        '''
 
     
     def __fill_days_row(self):
@@ -151,7 +203,7 @@ class Check_Orders_Screen(Column):
         #test order
         
         self.__orders=[{"order_id":"1","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"01","quantity":2},{"product_id":"02","quantity":3}], "order_state":"waiting_delivery"},{"order_id":"3","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"04","quantity":2}],"order_state":"waiting_validation"}] #product_id as a name for test, change it later
-        self.__catalog={"01":{"product_title":"Pao","product_price":2.0},"02":{"product_title":"Broa","product_price":2.50},"03":{"product_title":"Uma cena","product_price":4.00},"04":{"product_title":"Bolo","product_price":5.00}}
+        self.__catalog={"01":{"product_title":"Pao","product_price":2.0},"02":{"product_title":"Broa","product_price":2.5},"03":{"product_title":"Uma cena","product_price":4.0},"04":{"product_title":"Bolo","product_price":5.00}}
         if not self.__orders:
             return
          
@@ -168,13 +220,6 @@ class Check_Orders_Screen(Column):
                 if (order.get("order_state") == self.__current_filter)
             ]
 
-
-        for order in orders_to_show:
-            #row
-            pass
-
-
-
         for order in orders_to_show:
             row =self.__create_new_order_row(order)
             self.__orders_column.controls.append(row)
@@ -186,38 +231,66 @@ class Check_Orders_Screen(Column):
         order_string = ""
         data = order.get("order_data")
         #print(data)
+        '''
         for product in data:
             product_id = product.get("product_id")
             #print(product_id)
             order_string += self.__catalog[product_id]["product_title"] + " x" +str(product.get("quantity"))+", "
-            
+        ''' 
         #print(order_string)
-        return Row(
-            controls=[
-                Container(
-                    content=Row(
-                        controls=[
-                            Container(
-                                content = Text(order_string),
-                                padding=padding.only(left=10, right=20),
-                                expand=True
-                            ),
-                        ],
-                        alignment = MainAxisAlignment.SPACE_AROUND
+        return Container(
+            Row(
+                controls=[
+                    Container(
+                        content=Row(
+                            controls=[
+                                Container(
+                                    content = Text(order["order_date"], color = MAIN_TEXT_COLOR),
+                                    padding=padding.only(left=10, right=20),
+                                    alignment= alignment.center_left
+                                ),
+                                Container(
+                                    content=Text(FILTER_BUTTON_TEXT[configs["LANGUAGE"]].get(order.get("order_state")),color=MAIN_TEXT_COLOR),
+                                    padding = padding.only(right=10),
+                                    expand=True,
+                                    alignment = alignment.center_right
+                                )
+                            ],
+                            alignment=MainAxisAlignment.END
+                            
+                        ),
+                        height=60,
+                        expand=True,
+                        gradient = Third_Gradient(),
+                        border_radius=20,
+                        alignment=alignment.center
                     ),
-                    height=80,
-                    expand=True
-                ),
-                Container(
-                    content=Text(FILTER_BUTTON_TEXT.get(order.get("order_state"))),
-                    padding = padding.only(right=10)
-                ),
-                ElevatedButton(
-                                content = Text("View"),
-                                data = {"order_date":order["order_date"], "order_state":order["order_state"], "products":order["order_data"],"order_id":order["order_id"]},
-                                on_click = self.__go_full_order_screen
+                    Container(
+                        content = ElevatedButton(
+                            opacity = 0.9,
+                            content = Text("View", color = "MAIN_TEXT_COLOR"),
+                            adaptive =True,
+                            bgcolor="transparent",
+                            color="#606060",
+                            data = {"order_date":order["order_date"], "order_state":order["order_state"], "products":order["order_data"],"order_id":order["order_id"]},
+                            on_click = self.__go_full_order_screen,
+                            style = ButtonStyle(
+                                elevation=0,
+                                overlay_color="#fff791",
+                                padding=Padding(left=2, top=1, right=2, bottom=1),
+                                visual_density=VisualDensity.COMPACT
                             )
-            ]
+                        ),
+                        width=60,
+                        height=30,
+                        gradient=Third_Gradient(),
+                        border_radius=20,
+                    ),
+                ],
+                alignment=MainAxisAlignment.START    
+            ),
+            padding=padding.only(left=10,right=10),
+            expand=True
         )
 
     def __go_full_order_screen(self, e):

@@ -1,6 +1,7 @@
 from flet import TextAlign, FontWeight, Column, padding, CrossAxisAlignment, MainAxisAlignment, Page, ElevatedButton, ScrollMode, Text, icons, Row, Container, TextButton, AlertDialog, alignment, Icon, ButtonStyle
-from shared import TESTING, MAIN_TEXT_COLOR, DIALOG_BG_COLOR, BUTTON_OVERLAY_COLOR, STATUS_CODES, user_data, shared_vars, endpoints_urls, configs
+from shared import TESTING, MAIN_TEXT_COLOR, DIALOG_BG_COLOR, BUTTON_OVERLAY_COLOR, STATUS_CODES, user_data, shared_vars, endpoints_urls, configs, FILTER_BUTTON_TEXT
 from utils import Primary_Gradient, Secondary_Gradient, Third_Gradient, present_snack_bar
+
 from string import Template
 import requests
 
@@ -254,6 +255,7 @@ class Full_Order_Screen(Column):
             icon=icons.KEYBOARD_RETURN,
             icon_color="#606060",
             adaptive=True,
+
             on_click=self.__turn_back,
             bgcolor="transparent",
             color="#606060",
@@ -433,12 +435,12 @@ class Full_Order_Screen(Column):
                 color=MAIN_TEXT_COLOR
             ),
             Text(
-                value=f"{self.TITLE_TEXT}{shared_vars["current_order"]["date"]}",
+                value=f"{self.TITLE_TEXT[configs["LANGUAGE"]]}{shared_vars["current_order"]["date"]}",
                 text_align=TextAlign.CENTER,
                 color=MAIN_TEXT_COLOR
             ),
             Text(
-                value=f"{self.SUBTITLE_TEXT[configs["LANGUAGE"]]}{shared_vars["current_order"]["state"]}",
+                value=f"{self.SUBTITLE_TEXT[configs["LANGUAGE"]]}{FILTER_BUTTON_TEXT[configs["LANGUAGE"]][shared_vars["current_order"]["state"]]}",
                 text_align=TextAlign.CENTER,
                 color=MAIN_TEXT_COLOR
             ),
@@ -450,8 +452,9 @@ class Full_Order_Screen(Column):
             )
         ]
         
+        
         # TODO: need to change the logic because if it is an adm and already accepted or denied, should not appear this buttons
-        if user_data["is_admin"]:
+        if user_data["is_admin"] and shared_vars["current_order"]["state"] == "waiting_validation":
             self.__buttons_row.content.controls.append(
                 Container(
                     content=Column(
@@ -475,6 +478,7 @@ class Full_Order_Screen(Column):
         else:
             # Adding the back button
             self.__buttons_row.content.controls.append(self.__back_button)
+
     
     
     #############################################
@@ -610,6 +614,7 @@ class Full_Order_Screen(Column):
         
         shared_vars["main_container"].change_screen("check_orders_screen")
     
+
     def __change_order_state(self, e):
         '''
         Changes the order state according to the pressed button
@@ -624,6 +629,7 @@ class Full_Order_Screen(Column):
                 self.__general_message = self.__rejected_message
 
         #Beginning of test
+
         if TESTING:
             self.__page.open(self.__general_message)
             shared_vars["main_container"].change_screen("check_orders_screen")
