@@ -438,7 +438,7 @@ class Order_Screen(Column):
         
         ###############################
         # Refreshing catalog then week catalog and finally update objects
-        if self.__refresh_catalog(self):
+        if self.__refresh_catalog():
             if self.__refresh_week_catalog(self, monday.strftime("%d/%m/%Y")):
                 ###############################
                 # Initializing/Resetting current order products
