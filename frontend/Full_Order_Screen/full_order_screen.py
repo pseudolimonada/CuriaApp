@@ -123,8 +123,9 @@ class Full_Order_Screen(Column):
         ),
         actions_alignment=MainAxisAlignment.END
     )
-
-    __rejected_message = AlertDialog(
+    
+    __general_message: AlertDialog
+    __rejected_message: AlertDialog = AlertDialog(
         modal=True,
         title=Text(REJECTED_ORDER_TEXT),
         content=Column(
@@ -142,8 +143,7 @@ class Full_Order_Screen(Column):
         ),
         actions_alignment=MainAxisAlignment.CENTER
     )
-
-    __accepted_message = AlertDialog(
+    __accepted_message: AlertDialog = AlertDialog(
         modal=True,
         title=Text(ACCEPTED_ORDER_TEXT),
         content=Column(
@@ -218,7 +218,8 @@ class Full_Order_Screen(Column):
                 icon=icons.CHECK,
                 icon_color="#606060",
                 adaptive=True,
-                on_click=self.__approve_order,
+                on_click=self.__change_order_state,
+                data="approve",
                 bgcolor="transparent",
                 color="#606060",
                 style=ButtonStyle(
@@ -231,7 +232,8 @@ class Full_Order_Screen(Column):
                 icon=icons.CANCEL,
                 icon_color="#606060",
                 adaptive=True,
-                on_click=self.__deny_order,
+                on_click=self.__change_order_state,
+                data="reject",
                 bgcolor="transparent",
                 color="#606060",
                 style=ButtonStyle(
@@ -340,7 +342,7 @@ class Full_Order_Screen(Column):
                 color=MAIN_TEXT_COLOR
             ),
             Text(
-                value=f"{self.TOTAL_COST_TEXT}{self.__current_total_cost}€",
+                value=f"{self.TOTAL_COST_TEXT}{self.__current_total_cost:.2f}€",
                 text_align=TextAlign.CENTER,
                 width=FontWeight.BOLD,
                 color=MAIN_TEXT_COLOR
@@ -384,7 +386,7 @@ class Full_Order_Screen(Column):
                 color=MAIN_TEXT_COLOR
             ),
             Text(
-                value=f"{self.TOTAL_COST_TEXT}{self.__current_total_cost}€",
+                value=f"{self.TOTAL_COST_TEXT}{self.__current_total_cost:.2f}€",
                 text_align=TextAlign.CENTER,
                 width=FontWeight.BOLD,
                 color=MAIN_TEXT_COLOR
@@ -427,13 +429,17 @@ class Full_Order_Screen(Column):
         self,
         product_name: str,
         product_quantity: int,
-        product_cost: str
+        product_cost: float
     ):
         '''
         Creates a new product row with the ordered products and their cost.
         '''
         
-        total_cost = float(product_quantity*float(product_cost[:-1]))
+        print(f"product_quantity = {product_quantity} with type {type(product_quantity)}")
+        print(f"product_cost = {product_cost} with type {type(product_cost)}")
+        total_cost = product_quantity*product_cost
+        print(f"total_cost = {total_cost} with type {type(total_cost)}")
+        print(f"self.__current_total_cost = {self.__current_total_cost} with type {type(self.__current_total_cost)}")
         self.__current_total_cost += total_cost
         
         return Container(
@@ -486,10 +492,8 @@ class Full_Order_Screen(Column):
         ###########################################################################
         #        ------- REMOVE THIS IF CASE FOR REAL TEST !!!!!!! -------        #
         ###########################################################################
-        testing = True
-        if testing:
+        if TESTING:
             self.__page.open(self.__alert)
-
             shared_vars["main_container"].change_screen("order_screen")
             return
         
@@ -507,11 +511,9 @@ class Full_Order_Screen(Column):
         
         # Setting the headers and payload json
         headers = {
-            "user_id": user_data["user_id"],
-            "manager_business_ids": user_data["manager_business_ids"]
+            "Authorization": f"{user_data["token"]}"
         }
         payload = {
-            "user_id": user_data["user_id"],
             "order_date": shared_vars["current_order"]["date"],
             "order_data": order_data
         }
@@ -555,88 +557,45 @@ class Full_Order_Screen(Column):
         
         shared_vars["main_container"].change_screen("check_orders_screen")
     
-    def __deny_order(self, e):
+    def __change_order_state(self, e):
         '''
-        Rejects order
+        Changes the order state according to the pressed button
         '''
+        
+        match e.control.data:
+            case "approve":
+                new_state = "waiting_delivery"
+                self.__general_message = self.__accepted_message
+            case "reject":
+                new_state = "rejected"
+                self.__general_message = self.__rejected_message
 
         #Beginning of test
         if TESTING:
-            self.__page.open(self.__rejected_message)
-            shared_vars["main_container"].change_screen("check_orders_screen")
-            return
-        #End of test
-
-        header = {
-            "user_id": user_data["user_id"],
-            "manager_business_ids": user_data["manager_business_ids"]
-        }
-        
-        payload = {
-            "order_state" : "rejected"
-        }
-        url_template = Template(endpoints_urls["PUT_STATE"])
-        put_state_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"], order_id = shared_vars["current_order"]["order_id"])
-        
-        #Request attempt to set state in DB
-        try:
-            response = requests.put(put_state_url,headers=header,json=payload)
-
-            if response.status_code == STATUS_CODES["SUCCESS"]:
-                self.__page.open(self.__rejected_message)
-            
-            elif response.status_code == STATUS_CODES["BAD_REQUEST"]:
-                present_snack_bar(self.__page, self.BAD_REQUEST_TEXT,"Red")
-            
-            elif response.status_code == STATUS_CODES["INTERNAL_ERROR"]:
-                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
-            
-            else:
-                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
-        
-        except requests.exceptions.RequestException as e:
-            # Handle network-related errors
-            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
-            
-        shared_vars["main_container"].change_screen("check_orders_screen")
-
-    def __approve_order(self,e):
-        '''
-        Accepts order
-        '''
-
-        #Beginning of test
-        if TESTING:
-            self.__page.open(self.__accepted_message)
+            self.__page.open(self.__general_message)
             shared_vars["main_container"].change_screen("check_orders_screen")
             return
 
-        header = {
-            "user_id": user_data["user_id"],
-            "manager_business_ids": user_data["manager_business_ids"]
+        headers = {
+            "Authorization": f"{user_data["token"]}"
         }
-        
         payload = {
-            "order_state" : "waiting_delivery"
+            "order_state" : new_state
         }
         url_template = Template(endpoints_urls["PUT_STATE"])
         put_state_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"], order_id = shared_vars["current_order"]["order_id"])
         
         try:
-            response = requests.put(put_state_url,headers=header,json=payload)
+            response = requests.put(put_state_url,headers=headers,json=payload)
 
             if response.status_code == STATUS_CODES["SUCCESS"]:
-                self.__page.open(self.__accepted_message)
-            
+                self.__page.open(self.__general_message)
             elif response.status_code == STATUS_CODES["BAD_REQUEST"]:
                 present_snack_bar(self.__page, self.BAD_REQUEST_TEXT,"Red")
-            
             elif response.status_code == STATUS_CODES["INTERNAL_ERROR"]:
                 present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
-            
             else:
                 present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
-        
         except requests.exceptions.RequestException as e:
             # Handle network-related errors
             present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")

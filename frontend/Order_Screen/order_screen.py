@@ -474,13 +474,11 @@ class Order_Screen(Column):
         # Setting up all requirements for the request
         new_date_catalog = {
             "catalog_date": self.__current_date,
-            "catalog_products": []
+            "catalog_products": {}
         }
         for product_id in self.__current_date_catalog_edit.keys():
             if self.__current_date_catalog_edit[product_id]["state"]:
-                new_date_catalog["catalog_products"].append({"product_id": product_id,
-                                                             "product_quantity_total": self.__current_date_catalog_edit[product_id]["quantity"]}
-                                                            )
+                new_date_catalog[product_id] = self.__current_date_catalog_edit[product_id]["quantity"]
         
         headers = {
             "Authorization": f"{user_data["token"]}"

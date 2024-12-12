@@ -151,7 +151,7 @@ class Check_Orders_Screen(Column):
         #test order
         
         self.__orders=[{"order_id":"1","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"01","quantity":2},{"product_id":"02","quantity":3}], "order_state":"waiting_delivery"},{"order_id":"3","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"04","quantity":2}],"order_state":"waiting_validation"}] #product_id as a name for test, change it later
-        self.__catalog={"01":{"product_title":"Pao","product_price":"2.0€"},"02":{"product_title":"Broa","product_price":"2.50€"},"03":{"product_title":"Uma cena","product_price":"4.0€"},"04":{"product_title":"Bolo","product_price":"5.00€"}}
+        self.__catalog={"01":{"product_title":"Pao","product_price":2.0},"02":{"product_title":"Broa","product_price":2.50},"03":{"product_title":"Uma cena","product_price":4.00},"04":{"product_title":"Bolo","product_price":5.00}}
         if not self.__orders:
             return
          
@@ -241,7 +241,6 @@ class Check_Orders_Screen(Column):
                 }
 
         shared_vars["current_order"] = {"products":products_dict, "date":e.control.data["order_date"], "state":e.control.data["order_state"],"order_id":e.control.data["order_id"]}
-        user_ids["is_admin"] = True #remove later
         shared_vars["main_container"].change_screen("full_order_screen")
 
 
