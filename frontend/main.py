@@ -96,4 +96,4 @@ def main(page: Page):
 
 if __name__ == "__main__":
     # Program initialization
-    app(target=main)
+    app(target=main, assets_dir="../assets")

@@ -1,6 +1,6 @@
-from flet import Container, Page, alignment, LinearGradient
+from flet import Container, Page, alignment, BoxDecoration, DecorationImage, ImageRepeat, ImageFit
 from utils import present_snack_bar
-from shared import THIRD_GRADIENT_COLOR_1, MAIN_TEXT_COLOR, BG_TOP_COLOR, BG_BOTTOM_COLOR, user_data, shared_vars
+from shared import THIRD_GRADIENT_COLOR_1, MAIN_TEXT_COLOR, user_data, shared_vars
 
 class Main_Container(Container):
     '''
@@ -21,13 +21,10 @@ class Main_Container(Container):
     ):
         super().__init__(
             expand=True,
-            gradient=LinearGradient(
-                begin=alignment.top_center,
-                end=alignment.bottom_center,
-                colors=[
-                    BG_TOP_COLOR,
-                    BG_BOTTOM_COLOR
-                ],
+            image=DecorationImage(
+                fit=ImageFit.FILL,
+                repeat=ImageRepeat.REPEAT,
+                src="images/background_image.png"
             ),
             alignment=alignment.center
         )
