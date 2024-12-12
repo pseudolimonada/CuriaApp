@@ -177,41 +177,33 @@ class Full_Order_Screen(Column):
     __general_message: AlertDialog
     __rejected_message: AlertDialog = AlertDialog(
         modal=True,
+        adaptive=True,
+        bgcolor=DIALOG_BG_COLOR,
         title=Text(
-            color=MAIN_TEXT_COLOR
+            color=MAIN_TEXT_COLOR,
+            text_align=TextAlign.CENTER,
+            size=20
         ),
-        content=Column(
-            controls=[
-                Container(
-                    content=Icon(
-                        name=icons.CHECK_CIRCLE,
-                        size=100
-                    ),
-                    alignment=alignment.center
-                )
-            ],
-            alignment=MainAxisAlignment.CENTER,
-            spacing=20,
+        content=Icon(
+            name=icons.CANCEL,
+            color="#34c862",
+            size=100
         ),
         actions_alignment=MainAxisAlignment.CENTER
     )
     __accepted_message: AlertDialog = AlertDialog(
         modal=True,
+        adaptive=True,
+        bgcolor=DIALOG_BG_COLOR,
         title=Text(
-            color=MAIN_TEXT_COLOR
+            color=MAIN_TEXT_COLOR,
+            text_align=TextAlign.CENTER,
+            size=20
         ),
-        content=Column(
-            controls=[
-                Container(
-                    content=Icon(
-                        name=icons.CHECK_CIRCLE,
-                        size=100
-                    ),
-                    alignment=alignment.center
-                )
-            ],
-            alignment=MainAxisAlignment.CENTER,
-            spacing=20,
+        content=Icon(
+            name=icons.CHECK_CIRCLE,
+            color="#34c862",
+            size=100
         ),
         actions_alignment=MainAxisAlignment.CENTER
     )
@@ -346,26 +338,42 @@ class Full_Order_Screen(Column):
         self.__alert.content.value=self.ALERT_DIALOG_CONTENT_TEXT[configs["LANGUAGE"]]
         
         self.__rejected_message.actions=[
-            TextButton(
-                text = "Ok",
-                data = "deny",
-                on_click=self.__handle_close,
-                style=ButtonStyle(
-                    enable_feedback=False
-                )
-            ),
+            Container(
+                ElevatedButton(
+                    text = self.ALERT_DIALOG_OK_TEXT[configs["LANGUAGE"]],
+                    adaptive=True,
+                    data = "deny",
+                    bgcolor="transparent",
+                    color="#606060",
+                    on_click=self.__handle_close,
+                    style=ButtonStyle(
+                        elevation=0,
+                        enable_feedback=False
+                    )
+                ),
+                gradient = Primary_Gradient(),
+                border_radius=20
+            )
         ]
         self.__rejected_message.title.value=self.REJECTED_ORDER_TEXT[configs["LANGUAGE"]]
     
         self.__accepted_message.actions=[
-            TextButton(
-                "Ok",
-                data = "approve",
-                on_click=self.__handle_close,
-                style=ButtonStyle(
-                    enable_feedback=False
-                )
-            ),
+            Container(
+                ElevatedButton(
+                    text = self.ALERT_DIALOG_OK_TEXT[configs["LANGUAGE"]],
+                    adaptive=True,
+                    data = "approve",
+                    bgcolor="transparent",
+                    color="#606060",
+                    on_click=self.__handle_close,
+                    style=ButtonStyle(
+                        elevation=0,
+                        enable_feedback=False
+                    )
+                ),
+                gradient = Primary_Gradient(),
+                border_radius=20
+            )
         ]
         self.__accepted_message.title.value=self.ACCEPTED_ORDER_TEXT[configs["LANGUAGE"]]
     
