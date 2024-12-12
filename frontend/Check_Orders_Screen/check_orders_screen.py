@@ -114,8 +114,7 @@ class Check_Orders_Screen(Column):
 
             #get orders
             header = {
-                #"user_id": user_data["user_id"],
-                #"manager_business_ids": user_data["manager_business_ids"]
+                "Authorization": f"{user_data["token"]}"
             }
 
             url_template = Template(endpoints_urls["GET_ORDERS"])
@@ -125,8 +124,8 @@ class Check_Orders_Screen(Column):
                 response = requests.get(get_orders_url,headers =header)
 
                 if response.status_code == STATUS_CODES["SUCCESS"]:
-                    self.__orders = response["orders"]
-
+                    response_data = response.json()
+                    self.__orders = response_data.get("orders", [])
                 elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
                     present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
                 else:
