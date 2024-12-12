@@ -17,7 +17,7 @@ endpoints_urls = {
     "GET_CATALOG": "/businesses/$business_id/products",
     "POST_ORDER": "/businesses/$business_id/orders",
     "GET_ORDERS": "businesses/$business_id/orders",
-    "PUT_STATE" : "businesses/$business_id/orders/$order_id"
+    "PUT_STATE" : "businesses/$business_id/orders/$order_id",
     "POST_ORDER": "/businesses/$business_id/orders",
     "GET_ORDERS": "businesses/$business_id/orders",
     "PUT_STATE" : "businesses/$business_id/orders/$order_id"
