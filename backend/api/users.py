@@ -56,8 +56,8 @@ def register():
 
     try:
         user = User(
-            user_name=request.json.get('user_name'),
-            password=hash_password(request.json.get('user_password')),
+            user_name=request.json.get("user_name"),
+            password=hash_password(request.json.get("user_password")),
         )
         db.session.add(user)
         db.session.flush()
