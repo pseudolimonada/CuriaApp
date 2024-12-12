@@ -71,7 +71,7 @@ def register():
         db.session.commit()
         return (
             jsonify({"token": jwt_token(build_token_data(user.user_id))}),
-            201,
+            200,
         )
 
     except IntegrityError as e:
