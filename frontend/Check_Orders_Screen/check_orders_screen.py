@@ -1,4 +1,4 @@
-from flet import Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, BorderSide, VisualDensity, TextStyle, Padding, alignment
+from flet import Column, TextAlign, MainAxisAlignment, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, CircleBorder, BorderSide, VisualDensity, TextStyle, Padding, alignment
 from utils import get_refreshed_catalog, present_snack_bar, Selected_Gradient, Secondary_ElevatedButton_Container, Smart_TextField, Primary_Gradient, Secondary_Gradient, Third_Gradient
 from shared import shared_vars, user_data, endpoints_urls, STATUS_CODES,FILTER_BUTTON_TEXT, TESTING, MAIN_TEXT_COLOR, BUTTON_OVERLAY_COLOR, configs
 import requests
@@ -9,16 +9,25 @@ class Check_Orders_Screen(Column):
     Column that displays all the orders a user has made
     '''
 
-
+    INTERNAL_ERROR_TEXT: dict = {
+        "English": "An internal error occurred, please wait and try again...",
+        "Portuguese": "Ocorreu um erro interno, por favor, espere e tente novamente..."
+    }
+    UNRECOGNIZED_ERROR_TEXT: dict = {
+        "English": "An unexpected error occurred, please verify if your app is updated...",
+        "Portuguese": "Ocorreu um erro inesperado, por favor, verifique se a sua aplicação está atualizada..."
+    }
+    NETWORK_ERROR_TEXT: dict = {
+        "English": "Please verify your internet connection and try again...",
+        "Portuguese": "Por favor verifique a sua conexão à internet e tente novamente..."
+    }
 
     #Initializing useful variables
     __page = Page
 
-    NETWORK_ERROR_TEXT: str = "Please verify your internet connection and try again..."
-
     __days_row: Row = Row(alignment = MainAxisAlignment.START, scroll = ScrollMode.ADAPTIVE)
 
-    __filters_row: Row = Row(alignment = MainAxisAlignment.CENTER)
+    __filters_row: Row = Row(alignment = MainAxisAlignment.CENTER, wrap=True)
 
     __orders_column: Column = Column(alignment = MainAxisAlignment.START, scroll = ScrollMode.ADAPTIVE, expand = True)
 
@@ -111,23 +120,28 @@ class Check_Orders_Screen(Column):
     def __create_filter_button(self,state):
         button = Container(
             ElevatedButton(
-                opacity = 0.9,
-                content = Text(FILTER_BUTTON_TEXT[configs["LANGUAGE"]].get(state), color = MAIN_TEXT_COLOR ),
+                content = Text(
+                    value=FILTER_BUTTON_TEXT[configs["LANGUAGE"]].get(state),
+                    color = MAIN_TEXT_COLOR,
+                    text_align=TextAlign.CENTER
+                ),
                 bgcolor= "transparent",
                 color="#606060",
                 adaptive = True,
-                width= 160,
                 on_click = self.__change_filter_orders_list,
                 data = state,
+                width=120,
                 style= ButtonStyle(
-                    padding = padding.all(20),
+                    padding = padding.symmetric(10, 5),
                     overlay_color = BUTTON_OVERLAY_COLOR,
                     elevation = 0,
                     visual_density=VisualDensity.COMPACT
                 ),
             ),
+            width=120,
             gradient = Primary_Gradient(),
-            border_radius=20
+            border_radius=20,
+            alignment=alignment.center
         )
         return button
 
@@ -144,7 +158,7 @@ class Check_Orders_Screen(Column):
                     self.__create_filter_button("delivered")
                 ],
                 alignment=MainAxisAlignment.END,
-                spacing = 20
+                spacing = 10
             ),
         )
         self.__filters_row.controls.append(
@@ -154,7 +168,7 @@ class Check_Orders_Screen(Column):
                     self.__create_filter_button("rejected"),
                 ],
                 alignment=MainAxisAlignment.START,
-                spacing = 20
+                spacing = 10
             )
         )
         self.__filters_row.padding =padding.only(bottom = 100)
@@ -202,7 +216,7 @@ class Check_Orders_Screen(Column):
         '''
         #test order
         
-        self.__orders=[{"order_id":"1","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"01","quantity":2},{"product_id":"02","quantity":3}], "order_state":"waiting_delivery"},{"order_id":"3","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"04","quantity":2}],"order_state":"waiting_validation"}] #product_id as a name for test, change it later
+        self.__orders=[{"order_id":"1","user_name":"aquele","order_date":"11/11/2010","order_data":[{"product_id":"01","quantity":2},{"product_id":"02","quantity":3}], "order_state":"waiting_delivery"},{"order_id":"3","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"04","quantity":2}],"order_state":"waiting_validation"}] #product_id as a name for test, change it later
         self.__catalog={"01":{"product_title":"Pao","product_price":2.0},"02":{"product_title":"Broa","product_price":2.5},"03":{"product_title":"Uma cena","product_price":4.0},"04":{"product_title":"Bolo","product_price":5.00}}
         if not self.__orders:
             return
@@ -246,7 +260,7 @@ class Check_Orders_Screen(Column):
                             controls=[
                                 Container(
                                     content = Text(order["order_date"], color = MAIN_TEXT_COLOR),
-                                    padding=padding.only(left=10, right=20),
+                                    padding=padding.only(left=10, right=5),
                                     alignment= alignment.center_left
                                 ),
                                 Container(

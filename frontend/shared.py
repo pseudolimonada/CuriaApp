@@ -37,7 +37,20 @@ DIALOG_BG_COLOR = BG_TOP_COLOR
 
 MAIN_TEXT_COLOR = "#606060"
 
-FILTER_BUTTON_TEXT: dict = {"Portuguese":{"waiting_validation":"Por validar", "waiting_delivery":"Por entregar", "delivered":"Entregue","rejected":"Rejeitado"}, "English":{"waiting_validation":"Waiting validation", "waiting_delivery":"Waiting delivery", "delivered":"Delivered","rejected":"Rejected"}} 
+FILTER_BUTTON_TEXT: dict = {
+    "Portuguese": {
+        "waiting_validation": "Por Validar",
+        "waiting_delivery": "Por Entregar",
+        "delivered": "Entregue",
+        "rejected": "Rejeitado"
+    },
+    "English": {
+        "waiting_validation": "Wait Approve",
+        "waiting_delivery": "Wait Delivery",
+        "delivered": "Delivered",
+        "rejected": "Rejected"
+    }
+} 
 
 TESTING = True
 

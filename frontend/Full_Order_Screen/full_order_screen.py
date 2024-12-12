@@ -297,7 +297,7 @@ class Full_Order_Screen(Column):
                 )
             )
         else:
-            self.__back_button.scale=1.5
+            self.__back_button.scale=1.2
             self.__confirm_order_button.content = ElevatedButton(
                 text=self.CONFIRM_BUTTON_TEXT[configs["LANGUAGE"]],
                 icon=icons.CHECK,
@@ -455,6 +455,7 @@ class Full_Order_Screen(Column):
         
         # TODO: need to change the logic because if it is an adm and already accepted or denied, should not appear this buttons
         if user_data["is_admin"] and shared_vars["current_order"]["state"] == "waiting_validation":
+            self.__back_button.scale = 0.8
             self.__buttons_row.content.controls.append(
                 Container(
                     content=Column(
@@ -477,6 +478,7 @@ class Full_Order_Screen(Column):
             )
         else:
             # Adding the back button
+            self.__back_button.scale = 1.2
             self.__buttons_row.content.controls.append(self.__back_button)
 
     
