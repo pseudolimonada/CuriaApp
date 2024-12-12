@@ -52,8 +52,6 @@
               postgresql_16
 	  ];
         };
-
-	default = venv;
       });
     };
 }
