@@ -51,8 +51,9 @@ class Product(db.Model):
         db.ForeignKey("business.business_id"),
         nullable=False,
     )
-    product_name = db.Column(db.String(100), nullable=False)
-    product_description = db.Column(db.String(100), nullable=False)
+    image_url = db.Column(db.String(100), nullable=True)
+    product_name = db.Column(db.String(200), nullable=False)
+    product_description = db.Column(db.String(500), nullable=False)
     product_price = db.Column(db.Float, nullable=False)
 
 
