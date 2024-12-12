@@ -1,4 +1,3 @@
-
 from flet import TextAlign, FontWeight, Column, padding, CrossAxisAlignment, MainAxisAlignment, Page, ElevatedButton, ScrollMode, Text, icons, Divider, Row, Container, TextButton, AlertDialog, alignment, Icon, ButtonStyle
 from shared import MAIN_TEXT_COLOR, DIALOG_BG_COLOR, BUTTON_OVERLAY_COLOR, STATUS_CODES, user_ids, shared_vars, endpoints_urls, TESTING, FILTER_BUTTON_TEXT
 from utils import Primary_Gradient, Secondary_Gradient, Third_Gradient, present_snack_bar
@@ -27,6 +26,7 @@ class Full_Order_Screen(Column):
     BACK_BUTTON_TEXT: str = "Back"
     APPROVE_BUTTON_TEXT: str = "Approve"
     DENY_BUTTON_TEXT: str = "Deny"
+
 
     ALERT_DIALOG_TITLE_TEXT: str = "Your Order Is Done"
     ALERT_DIALOG_CONTENT_TEXT: str = "You can check order details in orders details menu."
@@ -125,44 +125,6 @@ class Full_Order_Screen(Column):
             size=16,
         ),
         actions_alignment=MainAxisAlignment.END
-    )
-
-    __rejected_message = AlertDialog(
-        modal=True,
-        title=Text(REJECTED_ORDER_TEXT),
-        content=Column(
-            controls=[
-                Container(
-                    content=Icon(
-                        name=icons.CHECK_CIRCLE,
-                        size=100
-                    ),
-                    alignment=alignment.center
-                )
-            ],
-            alignment=MainAxisAlignment.CENTER,
-            spacing=20,
-        ),
-        actions_alignment=MainAxisAlignment.CENTER
-    )
-
-    __accepted_message = AlertDialog(
-        modal=True,
-        title=Text(ACCEPTED_ORDER_TEXT),
-        content=Column(
-            controls=[
-                Container(
-                    content=Icon(
-                        name=icons.CHECK_CIRCLE,
-                        size=100
-                    ),
-                    alignment=alignment.center
-                )
-            ],
-            alignment=MainAxisAlignment.CENTER,
-            spacing=20,
-        ),
-        actions_alignment=MainAxisAlignment.CENTER
     )
 
     __rejected_message = AlertDialog(
@@ -397,7 +359,6 @@ class Full_Order_Screen(Column):
     def set_order_details_layout(self):
         # Resetting controls from before
         self.__products_column.controls.clear()
-
         self.__buttons_row.content.controls.clear()
         self.__current_total_cost = 0
         
@@ -434,9 +395,36 @@ class Full_Order_Screen(Column):
             )
         ]
         
+
+        # Setting the title column
+        self.__title_column.content.controls=[
+            Text(
+                value=f"{shared_vars["current_business"]["name"]}",
+                size=25,
+                text_align=TextAlign.CENTER,
+                width=FontWeight.BOLD,
+                color=MAIN_TEXT_COLOR
+            ),
+            Text(
+                value=f"{self.TITLE_TEXT}{shared_vars["current_order"]["date"]}",
+                text_align=TextAlign.CENTER,
+                color=MAIN_TEXT_COLOR
+            ),
+            Text(
+                value=f"{self.SUBTITLE_TEXT}{shared_vars["current_order"]["state"]}",
+                text_align=TextAlign.CENTER,
+                color=MAIN_TEXT_COLOR
+            ),
+            Text(
+                value=f"{self.TOTAL_COST_TEXT}{self.__current_total_cost}€",
+                text_align=TextAlign.CENTER,
+                width=FontWeight.BOLD,
+                color=MAIN_TEXT_COLOR
+            )
+        ]
+        
         # TODO: need to change the logic because if it is an adm and already accepted or denied, should not appear this buttons
-        user_ids["is_admin"] == True #remove when done testing
-        if user_ids["is_admin"] and shared_vars["current_order"]["state"] == "waiting_validation":
+        if user_ids["is_admin"]:
             self.__buttons_row.content.controls.append(
                 Container(
                     content=Column(
@@ -614,7 +602,6 @@ class Full_Order_Screen(Column):
             return
         #End of test
 
-
         header = {
             "user_id": user_ids["user_id"],
             "manager_business_ids": user_ids["manager_business_ids"]
@@ -645,7 +632,6 @@ class Full_Order_Screen(Column):
         except requests.exceptions.RequestException as e:
             # Handle network-related errors
             present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
-
             
         shared_vars["main_container"].change_screen("check_orders_screen")
 
@@ -706,4 +692,3 @@ class Full_Order_Screen(Column):
             self.__page.close(self.__rejected_message)
         else:
             self.__page.close(self.__accepted_message)
-
