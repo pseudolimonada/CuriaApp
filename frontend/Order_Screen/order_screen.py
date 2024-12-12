@@ -1,5 +1,5 @@
 from flet import RoundedRectangleBorder, Animation, AnimationCurve, Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight, IconButton, icons, CrossAxisAlignment, VisualDensity, Checkbox
-from shared import DIALOG_BG_COLOR, BUTTON_OVERLAY_COLOR, STATUS_CODES, MAIN_TEXT_COLOR, user_data, shared_vars, endpoints_urls, TESTING
+from shared import configs, DIALOG_BG_COLOR, BUTTON_OVERLAY_COLOR, STATUS_CODES, MAIN_TEXT_COLOR, user_data, shared_vars, endpoints_urls, TESTING
 from utils import Selected_Gradient, Secondary_ElevatedButton_Container, Smart_TextField, Primary_Gradient, Secondary_Gradient, Third_Gradient, present_snack_bar, get_refreshed_catalog
 from datetime import datetime, timedelta
 from string import Template
@@ -19,23 +19,104 @@ class Order_Screen(Column):
     ###############################
     # Initializing the texts strings
 
-    ORDER_BUTTON_TEXT: str = "Order"
-    CONFIRM_BUTTON_TEXT: str = "Confirm"
-    EDIT_BUTTON_TEXT: str = "Edit"
-    EDIT_TEXTFIELD_TEXT: str = "Quantity"
-    EDIT_TEXTFIELD_HINT_TEXT: str = "e.g.: 23"
-    EDITING_SUBTITLE_TEXT: str = "Edit day: "
-    ALERT_DIALOG_TITLE_TEXT: str = "Alert confirmation"
-    ALERT_DIALOG_CONTENT_TEXT: str = "By changing the day your current order will be cleared. If you still want to continue, press 'OK', otherwise press CANCEL."
-    ALERT_DIALOG_OK_TEXT: str = "OK"
-    ALERT_DIALOG_CANCEL_TEXT: str = "CANCEL"
-    DATE_CATALOG_EDIT_SUCCESS_TEXT: str = "Current day edited successfully!"
-    INTERNAL_ERROR_TEXT: str = "An internal error occurred, please wait and try again..."
-    UNRECOGNIZED_ERROR_TEXT: str = "An unexpected error occurred, please verify if your app is updated..."
-    NETWORK_ERROR_TEXT: str = "Please verify your internet connection and try again..."
-    PRODUCT_SCARCITY_5_TEXT: str = "\nOnly 5 or less available!"
-    PRODUCT_SCARCITY_1_TEXT: str = "\nOnly 1 available!"
-    PRODUCT_SCARCITY_0_TEXT: str = "\nOut of stock to order"
+    ORDER_BUTTON_TEXT: dict = {
+        "English": "Order",
+        "Portuguese": "Encomendar"
+    }
+    CONFIRM_BUTTON_TEXT: dict = {
+        "English": "Confirm",
+        "Portuguese": "Confirmar"
+    }
+    EDIT_BUTTON_TEXT: dict = {
+        "English": "Edit",
+        "Portuguese": "Editar"
+    }
+    EDIT_TEXTFIELD_TEXT: dict = {
+        "English": "Quantity",
+        "Portuguese": "Quantidade"
+    }
+    EDIT_TEXTFIELD_HINT_TEXT: dict = {
+        "English": "e.g.: 23",
+        "Portuguese": "ex.: 23"
+    }
+    EDITING_SUBTITLE_TEXT: dict = {
+        "English": "Edit day: ",
+        "Portuguese": "Dia em edição: "
+    }
+    ALERT_DIALOG_TITLE_TEXT: dict = {
+        "English": "Alert Confirmation",
+        "Portuguese": "Alerta de Confirmação"
+    }
+    ALERT_DIALOG_CONTENT_TEXT: dict = {
+        "English": "By changing the day your current order will be cleared. If you still want to continue, press 'OK', otherwise press CANCEL.",
+        "Portuguese": "Ao mudar o dia, a sua encomenda atual será esquecida. Se pretender continuar e mudar o dia, pressione 'OK', caso contrário pressione 'CANCELAR'."
+    }
+    ALERT_DIALOG_OK_TEXT: dict = {
+        "English": "OK",
+        "Portuguese": "OK"
+    }
+    ALERT_DIALOG_CANCEL_TEXT: dict = {
+        "English": "CANCEL",
+        "Portuguese": "CANCELAR"
+    }
+    DATE_CATALOG_EDIT_SUCCESS_TEXT: dict = {
+        "English": "Current day edited successfully!",
+        "Portuguese": "Dia atual editado com sucesso"
+    }
+    INTERNAL_ERROR_TEXT: dict = {
+        "English": "An internal error occurred, please wait and try again...",
+        "Portuguese": "Ocorreu um erro interno, por favor, espere e tente novamente..."
+    }
+    UNRECOGNIZED_ERROR_TEXT: dict = {
+        "English": "An unexpected error occurred, please verify if your app is updated...",
+        "Portuguese": "Ocorreu um erro inesperado, por favor, verifique se a sua aplicação está atualizada..."
+    }
+    NETWORK_ERROR_TEXT: dict = {
+        "English": "Please verify your internet connection and try again...",
+        "Portuguese": "Por favor verifique a sua conexão à internet e tente novamente..."
+    }
+    PRODUCT_SCARCITY_5_TEXT: dict = {
+        "English": "\nOnly 5 or less available!",
+        "Portuguese": "\nRestam 5 ou menos!"
+    }
+    PRODUCT_SCARCITY_1_TEXT: dict = {
+        "English": "\nOnly 1 available!",
+        "Portuguese": "\nResta apenas 1!"
+    }
+    PRODUCT_SCARCITY_0_TEXT: dict = {
+        "English": "\nOut of stock to order.",
+        "Portuguese": "\nEsgotado para encomenda."
+    }
+    WEEK_DAYS: dict = {
+        "Mon": {
+            "English": "Mon",
+            "Portuguese": "Seg"
+        },
+        "Tue":{
+            "English": "Tue",
+            "Portuguese": "Ter"
+        },
+        "Wed":{
+            "English": "Wed",
+            "Portuguese": "Qua"
+        },
+        "Thu":{
+            "English": "Thu",
+            "Portuguese": "Qui"
+        },
+        "Fri":{
+            "English": "Fri",
+            "Portuguese": "Sex"
+        },
+        "Sat":{
+            "English": "Sat",
+            "Portuguese": "Sab"
+        },
+        "Sun":{
+            "English": "Sun",
+            "Portuguese": "Dom"
+        }
+    }
 
     ###############################
     # Initializing the page object
@@ -136,11 +217,9 @@ class Order_Screen(Column):
         adaptive=True,
         bgcolor=DIALOG_BG_COLOR,
         title=Text(
-            value=ALERT_DIALOG_TITLE_TEXT,
             color=MAIN_TEXT_COLOR
         ),
         content=Text(
-            value=ALERT_DIALOG_CONTENT_TEXT,
             color=MAIN_TEXT_COLOR
         ),
         actions_alignment=MainAxisAlignment.END
@@ -169,7 +248,7 @@ class Order_Screen(Column):
         # Setting the current date / week day
         today = datetime.today()
         self.__current_date = today.strftime("%d/%m/%Y")
-        self.__current_week_day = today.strftime("%A")
+        self.__current_week_day = today.strftime("%A")[:3]
         
         ###############################
         # Setting up the pass week section buttons
@@ -239,7 +318,7 @@ class Order_Screen(Column):
         # Setting up the order / confirm & edit button
         if user_data["is_admin"]:
             self.__confirm_button.content = ElevatedButton(
-                text=self.CONFIRM_BUTTON_TEXT,
+                text=self.CONFIRM_BUTTON_TEXT[configs["LANGUAGE"]],
                 adaptive=True,
                 on_click=self.__update_current_day,
                 bgcolor="transparent",
@@ -251,7 +330,7 @@ class Order_Screen(Column):
                 )
             )
             self.__edit_day_button.content = ElevatedButton(
-                text=self.EDIT_BUTTON_TEXT,
+                text=self.EDIT_BUTTON_TEXT[configs["LANGUAGE"]],
                 adaptive=True,
                 on_click=self.__edit_current_day,
                 bgcolor="transparent",
@@ -266,14 +345,14 @@ class Order_Screen(Column):
         else:
             self.__order_button.content = ElevatedButton(
                 opacity=0.4,
-                text=self.ORDER_BUTTON_TEXT,
+                text=self.ORDER_BUTTON_TEXT[configs["LANGUAGE"]],
                 adaptive=True,
                 disabled=True,
                 on_click=self.__realize_order,
                 bgcolor="transparent",
                 color="#606060",
                 style=ButtonStyle(
-                    padding=padding.symmetric(10, 70),
+                    padding=padding.symmetric(10, 50),
                     elevation=0,
                     overlay_color=BUTTON_OVERLAY_COLOR
                 )
@@ -283,7 +362,7 @@ class Order_Screen(Column):
         self.__alert.actions=[
             Container(
                 content = ElevatedButton(
-                    text=self.ALERT_DIALOG_OK_TEXT,
+                    text=self.ALERT_DIALOG_OK_TEXT[configs["LANGUAGE"]],
                     adaptive=True,
                     on_click=self.__handle_close_dialog,
                     bgcolor="transparent",
@@ -298,7 +377,7 @@ class Order_Screen(Column):
             ),
             Container(
                 content = ElevatedButton(
-                    text=self.ALERT_DIALOG_CANCEL_TEXT,
+                    text=self.ALERT_DIALOG_CANCEL_TEXT[configs["LANGUAGE"]],
                     adaptive=True,
                     on_click=self.__handle_close_dialog,
                     bgcolor="transparent",
@@ -312,6 +391,8 @@ class Order_Screen(Column):
                 border_radius=20
             )
         ]
+        self.__alert.title.value=self.ALERT_DIALOG_TITLE_TEXT[configs["LANGUAGE"]]
+        self.__alert.content.value=self.ALERT_DIALOG_CONTENT_TEXT[configs["LANGUAGE"]]
         
         ###############################
         # Final setting up the main column controls with everything
@@ -495,15 +576,15 @@ class Order_Screen(Column):
             
             # Check the response
             if response.status_code == STATUS_CODES["SUCCESS"]:
-                present_snack_bar(self.__page, self.DATE_CATALOG_EDIT_SUCCESS_TEXT, "Green")
+                present_snack_bar(self.__page, self.DATE_CATALOG_EDIT_SUCCESS_TEXT[configs["LANGUAGE"]], "Green")
                 
             elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
-                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
+                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT[configs["LANGUAGE"]], "Red")
             else:
-                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
+                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT[configs["LANGUAGE"]], "Red")
         except requests.exceptions.RequestException as e:
             # Handle network-related errors
-            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
+            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT[configs["LANGUAGE"]], "Red")
         
         ###############################
         # Exits the edit mode and updates screen
@@ -604,12 +685,12 @@ class Order_Screen(Column):
                 return True
                 
             elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
-                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
+                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT[configs["LANGUAGE"]], "Red")
             else:
-                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
+                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT[configs["LANGUAGE"]], "Red")
         except requests.exceptions.RequestException as e:
             # Handle network-related errors
-            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
+            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT[configs["LANGUAGE"]], "Red")
         
         return False
     
@@ -824,7 +905,7 @@ class Order_Screen(Column):
         ###############################
         # Verifying if the OK button got clicked and if it is about
         # to change just the day or the whole week
-        if e.control.text == self.ALERT_DIALOG_OK_TEXT:
+        if e.control.text == self.ALERT_DIALOG_OK_TEXT[configs["LANGUAGE"]]:
             current_date_datetime = datetime.strptime(self.__current_date, "%d/%m/%Y")
                 
             if e.control.data in ["forward", "backward"]:
@@ -889,7 +970,7 @@ class Order_Screen(Column):
         self.__days_row.controls.append(
             Container(
                 content=ElevatedButton(
-                    text=week_day,
+                    text=self.WEEK_DAYS[week_day][configs["LANGUAGE"]],
                     adaptive=True,
                     bgcolor="transparent",
                     color="#606060",
@@ -930,11 +1011,11 @@ class Order_Screen(Column):
             case None:
                 product_scarcity_text = ""
             case 5:
-                product_scarcity_text = self.PRODUCT_SCARCITY_5_TEXT
+                product_scarcity_text = self.PRODUCT_SCARCITY_5_TEXT[configs["LANGUAGE"]]
             case 1:
-                product_scarcity_text = self.PRODUCT_SCARCITY_1_TEXT
+                product_scarcity_text = self.PRODUCT_SCARCITY_1_TEXT[configs["LANGUAGE"]]
             case 0:
-                product_scarcity_text = self.PRODUCT_SCARCITY_0_TEXT
+                product_scarcity_text = self.PRODUCT_SCARCITY_0_TEXT[configs["LANGUAGE"]]
         
         return Container (
             content=Row(
@@ -1085,8 +1166,8 @@ class Order_Screen(Column):
                                 Container(
                                     content=Smart_TextField(
                                         page=self.__page,
-                                        label=self.EDIT_TEXTFIELD_TEXT,
-                                        hint_text=self.EDIT_TEXTFIELD_HINT_TEXT,
+                                        label=self.EDIT_TEXTFIELD_TEXT[configs["LANGUAGE"]],
+                                        hint_text=self.EDIT_TEXTFIELD_HINT_TEXT[configs["LANGUAGE"]],
                                         init_value = product_quantity,
                                         numeric=True,
                                         data=product_id,
@@ -1146,7 +1227,7 @@ class Order_Screen(Column):
                                 controls=[
                                     self.__business_title,
                                     Text(
-                                        value=f"{self.EDITING_SUBTITLE_TEXT}{self.__current_date}",
+                                        value=f"{self.EDITING_SUBTITLE_TEXT[configs["LANGUAGE"]]}{self.__current_date}",
                                         color=MAIN_TEXT_COLOR
                                     )
                                 ],

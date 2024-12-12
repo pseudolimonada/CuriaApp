@@ -40,3 +40,7 @@ MAIN_TEXT_COLOR = "#606060"
 FILTER_BUTTON_TEXT: dict = {"waiting_validation":"Waiting validation", "waiting_delivery":"Waiting delivery", "delivered":"Delivered","rejected":"Rejected"} 
 
 TESTING = True
+
+configs = {
+    "LANGUAGE": "English"
+}
