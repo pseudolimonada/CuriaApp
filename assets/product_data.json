@@ -15,11 +15,6 @@
       "product_description": "Feito com milho verde cozido, farinha de trigo, leite condensado, massa mãe e levedura seca."
     },
     {
-      "product_name": "Pão de trigo com batata doce roxa",
-      "product_price": 4.50,
-      "product_description": "Feito com trigo, centeio, batata doce roxa e azeite e polvilhado com sementes de sésamo."
-    },
-    {
       "product_name": "Bolinho de fubá com goiabada",
       "product_price": 2.75,
       "product_description": "Bolinho doce, feito com farinha de trigo e fubá de milho, recheado com goiabada cremosa."
@@ -185,11 +180,6 @@
       "product_description": "fermentação natural com massa mãe, trigo, água, sal e recheado com fatias de chouriço."
     },
     {
-      "product_name": "Rústico com tâmara e noz",
-      "product_price": 6.50,
-      "product_description": "Farinha T80, com tâmara e noz."
-    },
-    {
       "product_name": "Rústico com uva passa",
       "product_price": 5.50,
       "product_description": "De fermentação natural, com farinha, água, sal e uvas passas."
@@ -208,5 +198,15 @@
       "product_name": "Rústico especial com queijo e ervas",
       "product_price": 5.50,
       "product_description": "De longa fermentação, com farinha de trigo T80, moída em mós de pedra, água, sal e massa mãe com um toque de queijo na superfície e ervas desidratadas."
+    },
+    {
+      "product_name": "Pão de trigo com batata doce roxa",
+      "product_price": 4.50,
+      "product_description": "Feito com trigo, centeio, batata doce roxa e azeite e polvilhado com sementes de sésamo."
+    },
+    {
+      "product_name": "Rústico com tâmara e noz",
+      "product_price": 6.50,
+      "product_description": "Farinha T80, com tâmara e noz."
     }
   ]
