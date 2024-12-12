@@ -38,16 +38,20 @@ if __name__ == "__main__":
         if REDEPLOY:
             db_redeploy(app)
             LOGGER.warning("Database redeployed")
-
-            db.session.add(
-                User(user_name="admin", password=hash_password(APP_ADMIN_PASSWORD))
+            user_object = User(
+                user_name="admin", password=hash_password(APP_ADMIN_PASSWORD)
             )
+            db.session.add(user_object)
             db.session.flush()
 
             db.session.add(Business(business_name="Farinha e Afeto"))
             db.session.flush()
             db.session.add(
-                BusinessUser(user_id=1, business_id=1, user_type=UserType.MANAGER)
+                BusinessUser(
+                    user_id=user_object.user_id,
+                    business_id=1,
+                    user_type=UserType.MANAGER,
+                )
             )
             LOGGER.warning("Admin user created for business_id=1")
 
