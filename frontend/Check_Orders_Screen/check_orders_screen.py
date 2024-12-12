@@ -41,7 +41,13 @@ class Check_Orders_Screen(Column):
 
     __buttons_dict : dict ={}
     
-
+    __waiting_validation_button: Container
+    __delivered_button: Container
+    __waiting_delivery_button: Container
+    __rejected_button: Container
+    __buttons_dict: dict
+    
+    
     #Constructor
     def __init__(self, page: Page):
         super().__init__(alignment = MainAxisAlignment.SPACE_BETWEEN, expand = True)
@@ -49,6 +55,17 @@ class Check_Orders_Screen(Column):
         self.__page = page
         
         self.refresh_data()
+
+        self.__waiting_validation_button = self.__create_filter_button("waiting_validation")
+        self.__delivered_button = self.__create_filter_button("delivered")
+        self.__waiting_delivery_button = self.__create_filter_button("waiting_delivery")
+        self.__rejected_button = self.__create_filter_button("rejected")
+        self.__buttons_dict = {
+            "waiting_validation": self.__waiting_validation_button,
+            "delivered": self.__delivered_button,
+            "waiting_delivery": self.__waiting_delivery_button,
+            "rejected": self.__rejected_button
+        }
 
         self.__create_filters_row()
         self.__fill_orders_column()
@@ -118,7 +135,6 @@ class Check_Orders_Screen(Column):
             except requests.exceptions.RequestException as e:
                 present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
 
-
     def __create_filter_button(self,state):
         button = Container(
             ElevatedButton(
@@ -157,8 +173,8 @@ class Check_Orders_Screen(Column):
         self.__filters_row.controls.append(
             Column(
                 controls=[
-                    self.__create_filter_button("waiting_validation"),
-                    self.__create_filter_button("delivered")
+                    self.__waiting_validation_button,
+                    self.__delivered_button
                 ],
                 alignment=MainAxisAlignment.END,
                 spacing = 10
@@ -167,51 +183,14 @@ class Check_Orders_Screen(Column):
         self.__filters_row.controls.append(
             Column(
                 controls=[
-                    self.__create_filter_button("waiting_delivery"),
-                    self.__create_filter_button("rejected"),
+                    self.__waiting_delivery_button,
+                    self.__rejected_button,
                 ],
                 alignment=MainAxisAlignment.START,
                 spacing = 10
             )
         )
         self.__filters_row.padding =padding.only(bottom = 100)
-
-            
-        
-
-        #Appending a button in row for each filter in FILTER_BUTTON_TEXT
-        '''
-        self.__filters_row.controls.clear()
-        for i in FILTER_BUTTON_TEXT.keys():
-            self.__filters_row.controls.append(
-                ElevatedButton(
-                    text = FILTER_BUTTON_TEXT.get(i),
-                    adaptive = True,
-                    on_click = self.__change_filter_orders_list,
-                    data = i,
-                    style= ButtonStyle(
-                        padding = padding.all(20),
-                        visual_density=VisualDensity.COMPACT
-                    ),
-                )
-            )
-        '''
-
-    
-    def __fill_days_row(self):
-        '''
-        Clears the days row and refill it with new data from DB.
-        '''        
-        self.__days_row.controls.clear()
-            
-        self.__create_date_button("11/11")        
-        self.__create_date_button("12/11")
-        self.__create_date_button("13/11")
-        self.__create_date_button("14/11")
-        self.__create_date_button("15/11")
-
-        self.__current_date = "11/11"
-
 
     def __fill_orders_column(self):
         '''
@@ -314,21 +293,6 @@ class Check_Orders_Screen(Column):
 
         shared_vars["current_order"] = {"products":products_dict, "date":e.control.data["order_date"], "state":e.control.data["order_state"],"order_id":e.control.data["order_id"]}
         shared_vars["main_container"].change_screen("full_order_screen")
-
-
-
-    def __create_date_button(self, date: str):
-        '''
-        Creates buttons for a date
-        '''
-        self.__days_row.controls.append(
-            ElevatedButton(
-                text = date,
-                adaptive = True,
-                on_click = self.__change_date_orders_list,
-                data = date
-            )
-        )
     
     def __change_date_orders_list(self, e):
         '''
@@ -343,25 +307,17 @@ class Check_Orders_Screen(Column):
         '''
         Change shown orders according to order status
         '''
+        state = e.control.data
 
-        if e.control.data == self.__current_filter:
+        if state != self.__current_filter:
+            if self.__current_filter != "All":
+                self.__buttons_dict[self.__current_filter].gradient = Primary_Gradient()
+            self.__buttons_dict[state].gradient = Selected_Gradient()
+            self.__current_filter = state
+        else:
+            if state != "All":
+                self.__buttons_dict[state].gradient = Primary_Gradient()
             self.__current_filter = "All"
-            self.__fill_orders_column()
-
-        elif e.control.data != self.__current_filter:
-            self.__current_filter = e.control.data
-            self.__fill_orders_column()
-
-         
-        #Row->Column->Container->Button     
-        for column in self.__filters_row.controls:
-            if not isinstance(column, Column):
-                continue
-            for container in column.controls:
-                    if not isinstance(container, Container):
-                        continue
-                    if container.content.data != self.__current_filter:
-                        container.gradient = Primary_Gradient()
-                    else: 
-                        container.gradient = Selected_Gradient()
+            
+        self.__fill_orders_column()
         self.__page.update()
