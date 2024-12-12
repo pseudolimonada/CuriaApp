@@ -88,20 +88,20 @@ def get_week_catalogs(business_id, monday_date=None):
         else []
     )
 
+    new_product_catalog = {}
     for day in product_catalog:
         if g.is_admin:
-            product_catalog[day] = [
-                {
-                    "product_id": str(product.product_id),
+            new_product_catalog[day] = {}
+            for product in product_catalog[day]:
+                new_product_catalog[day][str(product.product_id)] = {
                     "product_quantity_total": product.product_quantity_total,
                     "product_quantity_sold": product.product_quantity_sold,
                 }
-                for product in product_catalog[day]
-            ]
         else:
-            product_catalog[day] = [
-                {
-                    "product_id": str(product.product_id),
+            new_product_catalog[day] = {}
+            for product in product_catalog[day]:
+                new_product_catalog[day][str(product.product_id)] = {
+                    # "product_quantity_total": product.product_quantity_total,
                     "product_scarcity": (
                         product.product_quantity_total - product.product_quantity_sold
                         if (
@@ -110,12 +110,10 @@ def get_week_catalogs(business_id, monday_date=None):
                         )
                         <= 5
                         else None
-                    ),
+                    )
                 }
-                for product in product_catalog[day]
-            ]
 
-    return jsonify(product_catalog), 200
+    return jsonify(new_product_catalog), 200
 
 
 @catalog_blueprint.route("/<int:business_id>/catalogs", methods=["POST"])
