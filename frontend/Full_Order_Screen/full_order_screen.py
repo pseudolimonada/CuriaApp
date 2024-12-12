@@ -1,5 +1,5 @@
-from flet import TextAlign, FontWeight, Column, padding, CrossAxisAlignment, MainAxisAlignment, Page, ElevatedButton, ScrollMode, Text, icons, Divider, Row, Container, TextButton, AlertDialog, alignment, Icon, ButtonStyle
-from shared import MAIN_TEXT_COLOR, DIALOG_BG_COLOR, BUTTON_OVERLAY_COLOR, STATUS_CODES, user_ids, shared_vars, endpoints_urls, TESTING, FILTER_BUTTON_TEXT
+from flet import TextAlign, FontWeight, Column, padding, CrossAxisAlignment, MainAxisAlignment, Page, ElevatedButton, ScrollMode, Text, icons, Row, Container, TextButton, AlertDialog, alignment, Icon, ButtonStyle
+from shared import TESTING, MAIN_TEXT_COLOR, DIALOG_BG_COLOR, BUTTON_OVERLAY_COLOR, STATUS_CODES, user_data, shared_vars, endpoints_urls, configs
 from utils import Primary_Gradient, Secondary_Gradient, Third_Gradient, present_snack_bar
 
 from string import Template
@@ -17,26 +17,75 @@ class Full_Order_Screen(Column):
 
     ###############################
     # Initializing the texts strings
-    TITLE_TEXT: str = "Order Day: "
-    SUBTITLE_TEXT: str = "State: "
-    SUB_TITLE: str = "Order State: "
-    TOTAL_COST_TEXT: str = "Total Cost: "
-    CONFIRM_BUTTON_TEXT: str = "Confirm!"
-    CANCEL_BUTTON_TEXT: str = "Cancel"
-    BACK_BUTTON_TEXT: str = "Back"
-    APPROVE_BUTTON_TEXT: str = "Approve"
-    DENY_BUTTON_TEXT: str = "Deny"
+    TITLE_TEXT: dict = {
+        "English": "Order Day: ",
+        "Portuguese": "Pedido para o dia: "
+    }
+    SUBTITLE_TEXT: dict = {
+        "English": "State: ",
+        "Portuguese": "Estado: "
+    }
+    TOTAL_COST_TEXT: dict = {
+        "English": "Total Cost: ",
+        "Portuguese": "Preço Total: "
+    }
+    CONFIRM_BUTTON_TEXT: dict = {
+        "English": "Confirm!",
+        "Portuguese": "Confirmar!"
+    }
+    CANCEL_BUTTON_TEXT: dict = {
+        "English": "Cancel",
+        "Portuguese": "Cancelar"
+    }
+    BACK_BUTTON_TEXT: dict = {
+        "English": "Back",
+        "Portuguese": "Voltar"
+    }
+    APPROVE_BUTTON_TEXT: dict = {
+        "English": "Approve",
+        "Portuguese": "Aprovar"
+    }
+    DENY_BUTTON_TEXT: dict = {
+        "English": "Deny",
+        "Portuguese": "Negar"
+    }
+    ALERT_DIALOG_TITLE_TEXT: dict = {
+        "English": "Your Order Is Done",
+        "Portuguese": "Encomenda Realizada"
+    }
+    ALERT_DIALOG_CONTENT_TEXT: dict = {
+        "English": "You can check order details in orders details menu.",
+        "Portuguese": "Pode confirmar os detalhes do seu pedido na página de detalhes das encomendas."
+    }
+    ALERT_DIALOG_OK_TEXT: dict = {
+        "English": "OK",
+        "Portuguese": "OK"
+    }
+    REJECTED_ORDER_TEXT: dict = {
+        "English": "Order rejected with success",
+        "Portuguese": "Encomenda rejeitada com sucesso"
+    }
+    ACCEPTED_ORDER_TEXT: dict = {
+        "English": "Order accepted with success",
+        "Portuguese": "Encomenda aceite com sucesso"
+    }
+    INTERNAL_ERROR_TEXT: dict = {
+        "English": "An internal error occurred, please wait and try again...",
+        "Portuguese": "Ocorreu um erro interno, por favor, espere e tente novamente..."
+    }
+    UNRECOGNIZED_ERROR_TEXT: dict = {
+        "English": "An unexpected error occurred, please verify if your app is updated...",
+        "Portuguese": "Ocorreu um erro inesperado, por favor, verifique se a sua aplicação está atualizada..."
+    }
+    NETWORK_ERROR_TEXT: dict = {
+        "English": "Please verify your internet connection and try again...",
+        "Portuguese": "Por favor verifique a sua conexão à internet e tente novamente..."
+    }
+    BAD_REQUEST_TEXT: dict = {
+        "English": "An unexpected error occurred, please verify if your app is updated...",
+        "Portuguese": "Ocorreu um erro inesperado, por favor, verifique se a sua aplicação está atualizada..."
+    }
 
-
-    ALERT_DIALOG_TITLE_TEXT: str = "Your Order Is Done"
-    ALERT_DIALOG_CONTENT_TEXT: str = "You can check order details in orders details menu."
-    ALERT_DIALOG_OK_TEXT: str = "OK"
-    INTERNAL_ERROR_TEXT: str = "An internal error occurred, please wait and try again..."
-    UNRECOGNIZED_ERROR_TEXT: str = "An unexpected error occurred, please verify if your app is updated..."
-    NETWORK_ERROR_TEXT: str = "Please verify your internet connection and try again..."
-    BAD_REQUEST_TEXT : str = "Bad request error"
-    REJECTED_ORDER_TEXT : str = "The order was rejected with sucess"
-    ACCEPTED_ORDER_TEXT : str = "The order was accepted with sucess"
 
     ###############################
     # Initializing the page object
@@ -116,20 +165,21 @@ class Full_Order_Screen(Column):
             size=100
         ),
         title=Text(
-            value=ALERT_DIALOG_TITLE_TEXT,
             color=MAIN_TEXT_COLOR
         ),
         content=Text(
-            ALERT_DIALOG_CONTENT_TEXT,
             color=MAIN_TEXT_COLOR,
             size=16,
         ),
         actions_alignment=MainAxisAlignment.END
     )
-
-    __rejected_message = AlertDialog(
+    
+    __general_message: AlertDialog
+    __rejected_message: AlertDialog = AlertDialog(
         modal=True,
-        title=Text(REJECTED_ORDER_TEXT),
+        title=Text(
+            color=MAIN_TEXT_COLOR
+        ),
         content=Column(
             controls=[
                 Container(
@@ -145,10 +195,11 @@ class Full_Order_Screen(Column):
         ),
         actions_alignment=MainAxisAlignment.CENTER
     )
-
-    __accepted_message = AlertDialog(
+    __accepted_message: AlertDialog = AlertDialog(
         modal=True,
-        title=Text(ACCEPTED_ORDER_TEXT),
+        title=Text(
+            color=MAIN_TEXT_COLOR
+        ),
         content=Column(
             controls=[
                 Container(
@@ -200,7 +251,7 @@ class Full_Order_Screen(Column):
         ###############################
         # Setting up the buttons
         self.__back_button.content = ElevatedButton(
-            text=self.CANCEL_BUTTON_TEXT,
+            text=self.BACK_BUTTON_TEXT[configs["LANGUAGE"]],
             icon=icons.KEYBOARD_RETURN,
             icon_color="#606060",
             adaptive=True,
@@ -215,14 +266,15 @@ class Full_Order_Screen(Column):
             )
         )
         
-        if user_ids["is_admin"]:
+        if user_data["is_admin"]:
             self.__back_button.scale=0.8
             self.__approve_order_button.content = ElevatedButton(
-                text=self.APPROVE_BUTTON_TEXT,
+                text=self.APPROVE_BUTTON_TEXT[configs["LANGUAGE"]],
                 icon=icons.CHECK,
                 icon_color="#606060",
                 adaptive=True,
-                on_click=self.__approve_order,
+                on_click=self.__change_order_state,
+                data="approve",
                 bgcolor="transparent",
                 color="#606060",
                 style=ButtonStyle(
@@ -231,11 +283,12 @@ class Full_Order_Screen(Column):
                 )
             )
             self.__deny_order_button.content = ElevatedButton(
-                text=self.DENY_BUTTON_TEXT,
+                text=self.DENY_BUTTON_TEXT[configs["LANGUAGE"]],
                 icon=icons.CANCEL,
                 icon_color="#606060",
                 adaptive=True,
-                on_click=self.__deny_order,
+                on_click=self.__change_order_state,
+                data="reject",
                 bgcolor="transparent",
                 color="#606060",
                 style=ButtonStyle(
@@ -246,7 +299,7 @@ class Full_Order_Screen(Column):
         else:
             self.__back_button.scale=1.5
             self.__confirm_order_button.content = ElevatedButton(
-                text=self.CONFIRM_BUTTON_TEXT,
+                text=self.CONFIRM_BUTTON_TEXT[configs["LANGUAGE"]],
                 icon=icons.CHECK,
                 icon_color="#606060",
                 adaptive=True,
@@ -259,7 +312,7 @@ class Full_Order_Screen(Column):
                 )
             )
             self.__cancel_button.content = ElevatedButton(
-                text=self.CANCEL_BUTTON_TEXT,
+                text=self.CANCEL_BUTTON_TEXT[configs["LANGUAGE"]],
                 icon=icons.CANCEL,
                 icon_color="#606060",
                 adaptive=True,
@@ -275,7 +328,7 @@ class Full_Order_Screen(Column):
         self.__alert.actions=[
             Container(
                 content = ElevatedButton(
-                    text=self.ALERT_DIALOG_OK_TEXT,
+                    text=self.ALERT_DIALOG_OK_TEXT[configs["LANGUAGE"]],
                     adaptive=True,
                     on_click=self.__handle_close_dialog,
                     bgcolor="transparent",
@@ -289,6 +342,8 @@ class Full_Order_Screen(Column):
                 border_radius=20
             )
         ]
+        self.__alert.title.value=self.ALERT_DIALOG_TITLE_TEXT[configs["LANGUAGE"]]
+        self.__alert.content.value=self.ALERT_DIALOG_CONTENT_TEXT[configs["LANGUAGE"]]
         
         self.__rejected_message.actions=[
             TextButton(
@@ -300,6 +355,7 @@ class Full_Order_Screen(Column):
                 )
             ),
         ]
+        self.__rejected_message.title.value=self.REJECTED_ORDER_TEXT[configs["LANGUAGE"]]
     
         self.__accepted_message.actions=[
             TextButton(
@@ -311,6 +367,7 @@ class Full_Order_Screen(Column):
                 )
             ),
         ]
+        self.__accepted_message.title.value=self.ACCEPTED_ORDER_TEXT[configs["LANGUAGE"]]
     
     #############################################
     #               Layout Methods              #
@@ -339,12 +396,12 @@ class Full_Order_Screen(Column):
                 color=MAIN_TEXT_COLOR
             ),
             Text(
-                value=f"{self.TITLE_TEXT}{shared_vars["current_order"]["date"]}",
+                value=f"{self.TITLE_TEXT[configs["LANGUAGE"]]}{shared_vars["current_order"]["date"]}",
                 text_align=TextAlign.CENTER,
                 color=MAIN_TEXT_COLOR
             ),
             Text(
-                value=f"{self.TOTAL_COST_TEXT}{self.__current_total_cost}€",
+                value=f"{self.TOTAL_COST_TEXT[configs["LANGUAGE"]]}{self.__current_total_cost:.2f}€",
                 text_align=TextAlign.CENTER,
                 width=FontWeight.BOLD,
                 color=MAIN_TEXT_COLOR
@@ -367,7 +424,7 @@ class Full_Order_Screen(Column):
         for product in products_dict:
             if products_dict[product]["quantity"] > 0:
                 self.__products_column.controls.append(self.__create_new_product_row(product, products_dict[product]["quantity"], products_dict[product]["cost"]))
-
+        
         # Setting the title column
         self.__title_column.content.controls=[
             Text(
@@ -383,12 +440,12 @@ class Full_Order_Screen(Column):
                 color=MAIN_TEXT_COLOR
             ),
             Text(
-                value=f"{self.SUBTITLE_TEXT}{FILTER_BUTTON_TEXT[shared_vars["current_order"]["state"]]}",
+                value=f"{self.SUBTITLE_TEXT[configs["LANGUAGE"]]}{shared_vars["current_order"]["state"]}",
                 text_align=TextAlign.CENTER,
                 color=MAIN_TEXT_COLOR
             ),
             Text(
-                value=f"{self.TOTAL_COST_TEXT}{self.__current_total_cost}€",
+                value=f"{self.TOTAL_COST_TEXT[configs["LANGUAGE"]]}{self.__current_total_cost:.2f}€",
                 text_align=TextAlign.CENTER,
                 width=FontWeight.BOLD,
                 color=MAIN_TEXT_COLOR
@@ -411,12 +468,12 @@ class Full_Order_Screen(Column):
                 color=MAIN_TEXT_COLOR
             ),
             Text(
-                value=f"{self.SUBTITLE_TEXT}{shared_vars["current_order"]["state"]}",
+                value=f"{self.SUBTITLE_TEXT[configs["LANGUAGE"]]}{shared_vars["current_order"]["state"]}",
                 text_align=TextAlign.CENTER,
                 color=MAIN_TEXT_COLOR
             ),
             Text(
-                value=f"{self.TOTAL_COST_TEXT}{self.__current_total_cost}€",
+                value=f"{self.TOTAL_COST_TEXT[configs["LANGUAGE"]]}{self.__current_total_cost:.2f}€",
                 text_align=TextAlign.CENTER,
                 width=FontWeight.BOLD,
                 color=MAIN_TEXT_COLOR
@@ -424,7 +481,7 @@ class Full_Order_Screen(Column):
         ]
         
         # TODO: need to change the logic because if it is an adm and already accepted or denied, should not appear this buttons
-        if user_ids["is_admin"]:
+        if user_data["is_admin"]:
             self.__buttons_row.content.controls.append(
                 Container(
                     content=Column(
@@ -460,13 +517,13 @@ class Full_Order_Screen(Column):
         self,
         product_name: str,
         product_quantity: int,
-        product_cost: str
+        product_cost: float
     ):
         '''
         Creates a new product row with the ordered products and their cost.
         '''
-        
-        total_cost = float(product_quantity*float(product_cost[:-1]))
+
+        total_cost = product_quantity*product_cost
         self.__current_total_cost += total_cost
         
         return Container(
@@ -519,10 +576,8 @@ class Full_Order_Screen(Column):
         ###########################################################################
         #        ------- REMOVE THIS IF CASE FOR REAL TEST !!!!!!! -------        #
         ###########################################################################
-        testing = True
-        if testing:
+        if TESTING:
             self.__page.open(self.__alert)
-
             shared_vars["main_container"].change_screen("order_screen")
             return
         
@@ -540,11 +595,9 @@ class Full_Order_Screen(Column):
         
         # Setting the headers and payload json
         headers = {
-            "user_id": user_ids["user_id"],
-            "manager_business_ids": user_ids["manager_business_ids"]
+            "Authorization": f"{user_data["token"]}"
         }
         payload = {
-            "user_id": user_ids["user_id"],
             "order_date": shared_vars["current_order"]["date"],
             "order_data": order_data
         }
@@ -562,12 +615,12 @@ class Full_Order_Screen(Column):
                 self.__page.open(self.__alert)
                 
             elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
-                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
+                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT[configs["LANGUAGE"]], "Red")
             else:
-                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
+                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT[configs["LANGUAGE"]], "Red")
         except requests.exceptions.RequestException as e:
             # Handle network-related errors
-            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
+            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT[configs["LANGUAGE"]], "Red")
         
         # Change the screen for the order screen again
         shared_vars["main_container"].change_screen("order_screen")
@@ -589,92 +642,49 @@ class Full_Order_Screen(Column):
         shared_vars["main_container"].change_screen("check_orders_screen")
     
 
-    def __deny_order(self, e):
+    def __change_order_state(self, e):
         '''
-        Rejects order
+        Changes the order state according to the pressed button
         '''
+        
+        match e.control.data:
+            case "approve":
+                new_state = "waiting_delivery"
+                self.__general_message = self.__accepted_message
+            case "reject":
+                new_state = "rejected"
+                self.__general_message = self.__rejected_message
 
         #Beginning of test
 
         if TESTING:
-            self.__page.open(self.__rejected_message)
-            shared_vars["main_container"].change_screen("check_orders_screen")
-            return
-        #End of test
-
-        header = {
-            "user_id": user_ids["user_id"],
-            "manager_business_ids": user_ids["manager_business_ids"]
-        }
-        
-        payload = {
-            "order_state" : "rejected"
-        }
-        url_template = Template(endpoints_urls["PUT_STATE"])
-        put_state_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"], order_id = shared_vars["current_order"]["order_id"])
-        
-        #Request attempt to set state in DB
-        try:
-            response = requests.put(put_state_url,headers=header,json=payload)
-
-            if response.status_code == STATUS_CODES["SUCCESS"]:
-                self.__page.open(self.__rejected_message)
-            
-            elif response.status_code == STATUS_CODES["BAD_REQUEST"]:
-                present_snack_bar(self.__page, self.BAD_REQUEST_TEXT,"Red")
-            
-            elif response.status_code == STATUS_CODES["INTERNAL_ERROR"]:
-                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
-            
-            else:
-                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
-        
-        except requests.exceptions.RequestException as e:
-            # Handle network-related errors
-            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
-            
-        shared_vars["main_container"].change_screen("check_orders_screen")
-
-    def __approve_order(self,e):
-        '''
-        Accepts order
-        '''
-
-        #Beginning of test
-        if TESTING:
-            self.__page.open(self.__accepted_message)
+            self.__page.open(self.__general_message)
             shared_vars["main_container"].change_screen("check_orders_screen")
             return
 
-        header = {
-            "user_id": user_ids["user_id"],
-            "manager_business_ids": user_ids["manager_business_ids"]
+        headers = {
+            "Authorization": f"{user_data["token"]}"
         }
-        
         payload = {
-            "order_state" : "waiting_delivery"
+            "order_state" : new_state
         }
         url_template = Template(endpoints_urls["PUT_STATE"])
         put_state_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"], order_id = shared_vars["current_order"]["order_id"])
         
         try:
-            response = requests.put(put_state_url,headers=header,json=payload)
+            response = requests.put(put_state_url,headers=headers,json=payload)
 
             if response.status_code == STATUS_CODES["SUCCESS"]:
-                self.__page.open(self.__accepted_message)
-            
+                self.__page.open(self.__general_message)
             elif response.status_code == STATUS_CODES["BAD_REQUEST"]:
-                present_snack_bar(self.__page, self.BAD_REQUEST_TEXT,"Red")
-            
+                present_snack_bar(self.__page, self.BAD_REQUEST_TEXT[configs["LANGUAGE"]],"Red")
             elif response.status_code == STATUS_CODES["INTERNAL_ERROR"]:
-                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
-            
+                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT[configs["LANGUAGE"]], "Red")
             else:
-                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
-        
+                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT[configs["LANGUAGE"]], "Red")
         except requests.exceptions.RequestException as e:
             # Handle network-related errors
-            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
+            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT[configs["LANGUAGE"]], "Red")
 
         shared_vars["main_container"].change_screen("check_orders_screen")
     

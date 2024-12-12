@@ -36,14 +36,17 @@ from flet import (
 from main_container import Main_Container
 from Login_Screen.login_screen import Login_Screen
 from bottom_menu import Bottom_Menu
-from shared import MAIN_TEXT_COLOR, shared_vars, user_ids
+from shared import configs, MAIN_TEXT_COLOR, shared_vars, user_data
 
 # Program Function
 def main(page: Page):
     """
     Program Function
     """
-    user_ids["is_admin"] = False
+    
+    configs["LANGUAGE"] = "English"
+    #configs["LANGUAGE"] = "Portuguese"
+    user_data["is_admin"] = False
     shared_vars["current_business"]["name"] = "Farinha e Afeto"
     shared_vars["current_business"]["id"] = "1"
     shared_vars["main_container"] = Main_Container(page)

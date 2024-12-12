@@ -1,5 +1,5 @@
-from flet import Animation, AnimationCurve, Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight, IconButton, icons, CrossAxisAlignment, VisualDensity, Checkbox
-from shared import DIALOG_BG_COLOR, BUTTON_OVERLAY_COLOR, STATUS_CODES, MAIN_TEXT_COLOR, user_ids, shared_vars, endpoints_urls, TESTING
+from flet import RoundedRectangleBorder, Animation, AnimationCurve, Column, MainAxisAlignment, Divider, ElevatedButton, Row, Page, ScrollMode, ButtonStyle, padding, Container, Text, AlertDialog, TextButton, TextStyle, Padding, alignment, TextAlign, FontWeight, IconButton, icons, CrossAxisAlignment, VisualDensity, Checkbox
+from shared import configs, DIALOG_BG_COLOR, BUTTON_OVERLAY_COLOR, STATUS_CODES, MAIN_TEXT_COLOR, user_data, shared_vars, endpoints_urls, TESTING
 from utils import Selected_Gradient, Secondary_ElevatedButton_Container, Smart_TextField, Primary_Gradient, Secondary_Gradient, Third_Gradient, present_snack_bar, get_refreshed_catalog
 from datetime import datetime, timedelta
 from string import Template
@@ -19,22 +19,104 @@ class Order_Screen(Column):
     ###############################
     # Initializing the texts strings
 
-    ORDER_BUTTON_TEXT: str = "Order"
-    CONFIRM_BUTTON_TEXT: str = "Confirm"
-    EDIT_BUTTON_TEXT: str = "Edit"
-    EDIT_TEXTFIELD_TEXT: str = "Quantity"
-    EDIT_TEXTFIELD_HINT_TEXT: str = "e.g.: 23"
-    EDITING_SUBTITLE_TEXT: str = "Edit day: "
-    ALERT_DIALOG_TITLE_TEXT: str = "Alert confirmation"
-    ALERT_DIALOG_CONTENT_TEXT: str = "By changing the day your current order will be cleared. If you still want to continue, press 'OK', otherwise press CANCEL."
-    ALERT_DIALOG_OK_TEXT: str = "OK"
-    ALERT_DIALOG_CANCEL_TEXT: str = "CANCEL"
-    INTERNAL_ERROR_TEXT: str = "An internal error occurred, please wait and try again..."
-    UNRECOGNIZED_ERROR_TEXT: str = "An unexpected error occurred, please verify if your app is updated..."
-    NETWORK_ERROR_TEXT: str = "Please verify your internet connection and try again..."
-    PRODUCT_SCARCITY_5_TEXT: str = "\nOnly 5 or less available!"
-    PRODUCT_SCARCITY_1_TEXT: str = "\nOnly 1 available!"
-    PRODUCT_SCARCITY_0_TEXT: str = "\nOut of stock to order"
+    ORDER_BUTTON_TEXT: dict = {
+        "English": "Order",
+        "Portuguese": "Encomendar"
+    }
+    CONFIRM_BUTTON_TEXT: dict = {
+        "English": "Confirm",
+        "Portuguese": "Confirmar"
+    }
+    EDIT_BUTTON_TEXT: dict = {
+        "English": "Edit",
+        "Portuguese": "Editar"
+    }
+    EDIT_TEXTFIELD_TEXT: dict = {
+        "English": "Quantity",
+        "Portuguese": "Quantidade"
+    }
+    EDIT_TEXTFIELD_HINT_TEXT: dict = {
+        "English": "e.g.: 23",
+        "Portuguese": "ex.: 23"
+    }
+    EDITING_SUBTITLE_TEXT: dict = {
+        "English": "Edit day: ",
+        "Portuguese": "Dia em edição: "
+    }
+    ALERT_DIALOG_TITLE_TEXT: dict = {
+        "English": "Alert Confirmation",
+        "Portuguese": "Alerta de Confirmação"
+    }
+    ALERT_DIALOG_CONTENT_TEXT: dict = {
+        "English": "By changing the day your current order will be cleared. If you still want to continue, press 'OK', otherwise press CANCEL.",
+        "Portuguese": "Ao mudar o dia, a sua encomenda atual será esquecida. Se pretender continuar e mudar o dia, pressione 'OK', caso contrário pressione 'CANCELAR'."
+    }
+    ALERT_DIALOG_OK_TEXT: dict = {
+        "English": "OK",
+        "Portuguese": "OK"
+    }
+    ALERT_DIALOG_CANCEL_TEXT: dict = {
+        "English": "CANCEL",
+        "Portuguese": "CANCELAR"
+    }
+    DATE_CATALOG_EDIT_SUCCESS_TEXT: dict = {
+        "English": "Current day edited successfully!",
+        "Portuguese": "Dia atual editado com sucesso"
+    }
+    INTERNAL_ERROR_TEXT: dict = {
+        "English": "An internal error occurred, please wait and try again...",
+        "Portuguese": "Ocorreu um erro interno, por favor, espere e tente novamente..."
+    }
+    UNRECOGNIZED_ERROR_TEXT: dict = {
+        "English": "An unexpected error occurred, please verify if your app is updated...",
+        "Portuguese": "Ocorreu um erro inesperado, por favor, verifique se a sua aplicação está atualizada..."
+    }
+    NETWORK_ERROR_TEXT: dict = {
+        "English": "Please verify your internet connection and try again...",
+        "Portuguese": "Por favor verifique a sua conexão à internet e tente novamente..."
+    }
+    PRODUCT_SCARCITY_5_TEXT: dict = {
+        "English": "\nOnly 5 or less available!",
+        "Portuguese": "\nRestam 5 ou menos!"
+    }
+    PRODUCT_SCARCITY_1_TEXT: dict = {
+        "English": "\nOnly 1 available!",
+        "Portuguese": "\nResta apenas 1!"
+    }
+    PRODUCT_SCARCITY_0_TEXT: dict = {
+        "English": "\nOut of stock to order.",
+        "Portuguese": "\nEsgotado para encomenda."
+    }
+    WEEK_DAYS: dict = {
+        "Mon": {
+            "English": "Mon",
+            "Portuguese": "Seg"
+        },
+        "Tue":{
+            "English": "Tue",
+            "Portuguese": "Ter"
+        },
+        "Wed":{
+            "English": "Wed",
+            "Portuguese": "Qua"
+        },
+        "Thu":{
+            "English": "Thu",
+            "Portuguese": "Qui"
+        },
+        "Fri":{
+            "English": "Fri",
+            "Portuguese": "Sex"
+        },
+        "Sat":{
+            "English": "Sat",
+            "Portuguese": "Sab"
+        },
+        "Sun":{
+            "English": "Sun",
+            "Portuguese": "Dom"
+        }
+    }
 
     ###############################
     # Initializing the page object
@@ -135,11 +217,9 @@ class Order_Screen(Column):
         adaptive=True,
         bgcolor=DIALOG_BG_COLOR,
         title=Text(
-            value=ALERT_DIALOG_TITLE_TEXT,
             color=MAIN_TEXT_COLOR
         ),
         content=Text(
-            value=ALERT_DIALOG_CONTENT_TEXT,
             color=MAIN_TEXT_COLOR
         ),
         actions_alignment=MainAxisAlignment.END
@@ -168,7 +248,7 @@ class Order_Screen(Column):
         # Setting the current date / week day
         today = datetime.today()
         self.__current_date = today.strftime("%d/%m/%Y")
-        self.__current_week_day = today.strftime("%A")
+        self.__current_week_day = today.strftime("%A")[:3]
         
         ###############################
         # Setting up the pass week section buttons
@@ -236,9 +316,9 @@ class Order_Screen(Column):
         
         ###############################
         # Setting up the order / confirm & edit button
-        if user_ids["is_admin"]:
+        if user_data["is_admin"]:
             self.__confirm_button.content = ElevatedButton(
-                text=self.CONFIRM_BUTTON_TEXT,
+                text=self.CONFIRM_BUTTON_TEXT[configs["LANGUAGE"]],
                 adaptive=True,
                 on_click=self.__update_current_day,
                 bgcolor="transparent",
@@ -250,7 +330,7 @@ class Order_Screen(Column):
                 )
             )
             self.__edit_day_button.content = ElevatedButton(
-                text=self.EDIT_BUTTON_TEXT,
+                text=self.EDIT_BUTTON_TEXT[configs["LANGUAGE"]],
                 adaptive=True,
                 on_click=self.__edit_current_day,
                 bgcolor="transparent",
@@ -265,14 +345,14 @@ class Order_Screen(Column):
         else:
             self.__order_button.content = ElevatedButton(
                 opacity=0.4,
-                text=self.ORDER_BUTTON_TEXT,
+                text=self.ORDER_BUTTON_TEXT[configs["LANGUAGE"]],
                 adaptive=True,
                 disabled=True,
                 on_click=self.__realize_order,
                 bgcolor="transparent",
                 color="#606060",
                 style=ButtonStyle(
-                    padding=padding.symmetric(10, 70),
+                    padding=padding.symmetric(10, 50),
                     elevation=0,
                     overlay_color=BUTTON_OVERLAY_COLOR
                 )
@@ -282,7 +362,7 @@ class Order_Screen(Column):
         self.__alert.actions=[
             Container(
                 content = ElevatedButton(
-                    text=self.ALERT_DIALOG_OK_TEXT,
+                    text=self.ALERT_DIALOG_OK_TEXT[configs["LANGUAGE"]],
                     adaptive=True,
                     on_click=self.__handle_close_dialog,
                     bgcolor="transparent",
@@ -297,7 +377,7 @@ class Order_Screen(Column):
             ),
             Container(
                 content = ElevatedButton(
-                    text=self.ALERT_DIALOG_CANCEL_TEXT,
+                    text=self.ALERT_DIALOG_CANCEL_TEXT[configs["LANGUAGE"]],
                     adaptive=True,
                     on_click=self.__handle_close_dialog,
                     bgcolor="transparent",
@@ -311,6 +391,8 @@ class Order_Screen(Column):
                 border_radius=20
             )
         ]
+        self.__alert.title.value=self.ALERT_DIALOG_TITLE_TEXT[configs["LANGUAGE"]]
+        self.__alert.content.value=self.ALERT_DIALOG_CONTENT_TEXT[configs["LANGUAGE"]]
         
         ###############################
         # Final setting up the main column controls with everything
@@ -346,7 +428,7 @@ class Order_Screen(Column):
                     "product_id": f"{i}",
                     "quantity_text": Text(value="0", color=MAIN_TEXT_COLOR, weight=FontWeight.BOLD),
                     "quantity": 0,
-                    "cost": "1.50€"
+                    "cost": 1.50
                 }
             self.__current_order["date"] = self.__current_date
             if update_days_row:
@@ -425,7 +507,7 @@ class Order_Screen(Column):
 
             state = False
             for i in range(num):
-                new_container = self.__create_new_product_container(f"Este é um Pao disto assim {i}", i, state)
+                new_container = self.__create_new_product_container(f"Este é um Pao disto assim {i}", i, str(i+20), state)
                 self.__products_column.controls.append(new_container)
             
             self.__update_controls()
@@ -434,17 +516,19 @@ class Order_Screen(Column):
         ###############################
         # Creating and adding products containers according to the products in the catalog
         for product_id in self.__catalog.keys():
+            quantity = 0
+            state = False
+            
             if product_id in self.__current_week_catalog[self.__current_week_day].keys():
+                quantity = self.__current_week_catalog[self.__current_week_day][product_id]["quantity"]
                 state = True
-            else:
-                state = False
                 
             self.__current_date_catalog_edit[product_id] = {
-                "quantity": None, #TODO
+                "quantity": quantity,
                 "state": state
             }
             
-            new_container = self.__create_new_product_container(self.__catalog[product_id]["product_title"], product_id, state)
+            new_container = self.__create_new_product_container(self.__catalog[product_id]["product_title"], product_id, str(quantity), state)
             self.__products_column.controls.append(new_container)
         
         ###############################
@@ -469,38 +553,38 @@ class Order_Screen(Column):
         
         ###############################
         # Setting up all requirements for the request
-        new_date_catalog = {}
+        new_date_catalog = {
+            "catalog_date": self.__current_date,
+            "catalog_products": {}
+        }
         for product_id in self.__current_date_catalog_edit.keys():
             if self.__current_date_catalog_edit[product_id]["state"]:
                 new_date_catalog[product_id] = self.__current_date_catalog_edit[product_id]["quantity"]
         
         headers = {
-            "user_id": user_ids["user_id"],
-            "manager_business_ids": user_ids["manager_business_ids"]
+            "Authorization": f"{user_data["token"]}"
         }
-        payload = {
-            "new_date_catalog": new_date_catalog,
-        }
-        url_template = Template(endpoints_urls[""])
+
+        url_template = Template(endpoints_urls["EDIT_CURRENT_DAY"])
         get_catalog_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"])
         
         ###############################
         # Making and processing the request
         try:
             # Sending request and getting response
-            response = requests.post(get_catalog_url, headers=headers, json=payload)
+            response = requests.post(get_catalog_url, headers=headers, json=new_date_catalog)
             
             # Check the response
             if response.status_code == STATUS_CODES["SUCCESS"]:
-                present_snack_bar(self.__page, self.DATE_CATALOG_EDIT_SUCCESS_TEXT, "Green")
+                present_snack_bar(self.__page, self.DATE_CATALOG_EDIT_SUCCESS_TEXT[configs["LANGUAGE"]], "Green")
                 
             elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
-                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
+                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT[configs["LANGUAGE"]], "Red")
             else:
-                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
+                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT[configs["LANGUAGE"]], "Red")
         except requests.exceptions.RequestException as e:
             # Handle network-related errors
-            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
+            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT[configs["LANGUAGE"]], "Red")
         
         ###############################
         # Exits the edit mode and updates screen
@@ -548,6 +632,7 @@ class Order_Screen(Column):
         Refreshes the week catalog for the actual business and save it in self.__current_week_catalog
         If any error occurs return false, otherwise return true
         Week Catalog Structure:  (product_scarcity can be 5, 1, 0 or null, the null is in case there are more then 5)
+        FOR CLIENT:
         {
             "Mon": {"product_idX": product_scarcity, "product_idX": product_scarcity, ...},
             "Tue": {"product_idX": product_scarcity, "product_idX": product_scarcity, ...},
@@ -557,13 +642,22 @@ class Order_Screen(Column):
             "Sat": {"product_idX": product_scarcity, "product_idX": product_scarcity, ...},
             "Sun": {"product_idX": product_scarcity, "product_idX": product_scarcity, ...}
         }
+        FOR ADMIN:
+        {
+            "Mon": {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5},
+            "Tue": {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5},
+            "Wed": {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5},
+            "Thu": {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5},
+            "Fri": {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5},
+            "Sat": {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5},
+            "Sun": {"product_id":"...", "product_quantity_total": 5, "product_quantity_sold": 5}
+        }
         '''
         
         ###############################
         # Setting up all requirements for the request
         headers = {
-            "user_id": user_ids["user_id"],
-            "manager_business_ids": user_ids["manager_business_ids"]
+            "Authorization": f"{user_data["token"]}"
         }
         params = {
             "monday_date": monday_date,
@@ -580,22 +674,23 @@ class Order_Screen(Column):
             # Check the response
             if response.status_code == STATUS_CODES["SUCCESS"]:
                 # Saving the catalog for each day
-                self.__current_week_catalog["Mon"] = response["Mon"]
-                self.__current_week_catalog["Tue"] = response["Tue"]
-                self.__current_week_catalog["Wed"] = response["Wed"]
-                self.__current_week_catalog["Thu"] = response["Thu"]
-                self.__current_week_catalog["Fri"] = response["Fri"]
-                self.__current_week_catalog["Sat"] = response["Sat"]
-                self.__current_week_catalog["Sun"] = response["Sun"]
+                response_data = response.json()
+                self.__current_week_catalog["Mon"] = response_data.get("Mon", [])
+                self.__current_week_catalog["Tue"] = response_data.get("Tue", [])
+                self.__current_week_catalog["Wed"] = response_data.get("Wed", [])
+                self.__current_week_catalog["Thu"] = response_data.get("Thu", [])
+                self.__current_week_catalog["Fri"] = response_data.get("Fri", [])
+                self.__current_week_catalog["Sat"] = response_data.get("Sat", [])
+                self.__current_week_catalog["Sun"] = response_data.get("Sun", [])
                 return True
                 
             elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
-                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
+                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT[configs["LANGUAGE"]], "Red")
             else:
-                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
+                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT[configs["LANGUAGE"]], "Red")
         except requests.exceptions.RequestException as e:
             # Handle network-related errors
-            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
+            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT[configs["LANGUAGE"]], "Red")
         
         return False
     
@@ -651,8 +746,8 @@ class Order_Screen(Column):
             else:
                 num = 0
             for i in range(num):
-                if user_ids["is_admin"]:
-                    product_row = self.__create_new_product_row_manager(f"Este é um Pao disto assim {i}", self.__current_order["products"][f"Este é um Pao disto assim {i}"]["cost"])
+                if user_data["is_admin"]:
+                    product_row = self.__create_new_product_row_manager(f"Este é um Pao disto assim {i}", self.__current_order["products"][f"Este é um Pao disto assim {i}"]["cost"], i+10, i+20)
                 else:
                     product_row = self.__create_new_product_row_client("1", f"Este é um Pao disto assim {i}", self.__current_order["products"][f"Este é um Pao disto assim {i}"]["cost"], product_scarcity)
                 self.__products_column.controls.append(product_row)
@@ -661,8 +756,10 @@ class Order_Screen(Column):
         ###############################
         # Adding products rows according to the products in the catalog day
         for product_id in self.__current_week_catalog[self.__current_week_day].keys():
-            if user_ids["is_admin"]:
-                product_row = self.__create_new_product_row_manager(self.__catalog[product_id]["product_title"], self.__catalog[product_id]["product_price"])
+            if user_data["is_admin"]:
+                product_quantity_sold = self.__current_week_catalog[self.__current_week_day][product_id]["product_quantity_sold"]
+                product_quantity_total = self.__current_week_catalog[self.__current_week_day][product_id]["product_quantity_total"]
+                product_row = self.__create_new_product_row_manager(self.__catalog[product_id]["product_title"], self.__catalog[product_id]["product_price"], product_quantity_sold, product_quantity_total)
             else:
                 product_scarcity = self.__current_week_catalog[self.__current_week_day][product_id]
                 product_row = self.__create_new_product_row_client(product_id, self.__catalog[product_id]["product_title"], self.__catalog[product_id]["product_price"], product_scarcity)
@@ -808,7 +905,7 @@ class Order_Screen(Column):
         ###############################
         # Verifying if the OK button got clicked and if it is about
         # to change just the day or the whole week
-        if e.control.text == self.ALERT_DIALOG_OK_TEXT:
+        if e.control.text == self.ALERT_DIALOG_OK_TEXT[configs["LANGUAGE"]]:
             current_date_datetime = datetime.strptime(self.__current_date, "%d/%m/%Y")
                 
             if e.control.data in ["forward", "backward"]:
@@ -873,7 +970,7 @@ class Order_Screen(Column):
         self.__days_row.controls.append(
             Container(
                 content=ElevatedButton(
-                    text=week_day,
+                    text=self.WEEK_DAYS[week_day][configs["LANGUAGE"]],
                     adaptive=True,
                     bgcolor="transparent",
                     color="#606060",
@@ -901,7 +998,7 @@ class Order_Screen(Column):
         self,
         product_id: str,
         product_name: str,
-        product_cost: str,
+        product_cost: float,
         product_scarcity: int = None
     ):
         '''
@@ -914,11 +1011,11 @@ class Order_Screen(Column):
             case None:
                 product_scarcity_text = ""
             case 5:
-                product_scarcity_text = self.PRODUCT_SCARCITY_5_TEXT
+                product_scarcity_text = self.PRODUCT_SCARCITY_5_TEXT[configs["LANGUAGE"]]
             case 1:
-                product_scarcity_text = self.PRODUCT_SCARCITY_1_TEXT
+                product_scarcity_text = self.PRODUCT_SCARCITY_1_TEXT[configs["LANGUAGE"]]
             case 0:
-                product_scarcity_text = self.PRODUCT_SCARCITY_0_TEXT
+                product_scarcity_text = self.PRODUCT_SCARCITY_0_TEXT[configs["LANGUAGE"]]
         
         return Container (
             content=Row(
@@ -936,7 +1033,7 @@ class Order_Screen(Column):
                                 ),
                                 Container(
                                     content=Text(
-                                        value=product_cost,
+                                        value=f"{product_cost:.2f}€",
                                         color=MAIN_TEXT_COLOR
                                     ),
                                     padding=padding.only(left=5, right=5),
@@ -981,7 +1078,9 @@ class Order_Screen(Column):
     def __create_new_product_row_manager(
         self,
         product_name: str,
-        product_cost: str,
+        product_cost: float,
+        product_quantity_sold: int,
+        product_quantity_total: int
     ):
         '''
         Creates and returns a row with the information about the product
@@ -998,15 +1097,22 @@ class Order_Screen(Column):
                                         value = f"{product_name}",
                                         color = MAIN_TEXT_COLOR
                                     ),
-                                    padding=padding.only(left=5, right=10),
+                                    padding=padding.only(left=5, right=5),
                                     expand=True
                                 ),
                                 Container(
                                     content=Text(
-                                        value = product_cost,
+                                        value = f"{product_quantity_sold}/{product_quantity_total}",
                                         color = MAIN_TEXT_COLOR
                                     ),
-                                    padding=padding.only(left=10, right=5),
+                                    padding=padding.only(left=5, right=5),
+                                ),
+                                Container(
+                                    content=Text(
+                                        value = f"{product_cost:.2f}€",
+                                        color = MAIN_TEXT_COLOR
+                                    ),
+                                    padding=padding.only(left=5, right=5),
                                 )
                             ],
                             alignment=MainAxisAlignment.SPACE_AROUND
@@ -1029,6 +1135,7 @@ class Order_Screen(Column):
         self,
         product_name: str,
         product_id: str,
+        product_quantity: str,
         current_state: bool
     ):
         '''
@@ -1036,43 +1143,57 @@ class Order_Screen(Column):
         '''
         
         return Container(
-            content=Column(
-                controls=[
-                    Text(
-                        value= f"{product_name}"
-                    ),
-                    Row(
-                        controls=[
-                            Checkbox(
-                                adaptive=True,
-                                value=current_state,
-                                data=product_id,
-                                on_change=self.__edit_product_state
-                            ),
-                            Container(
-                                content=Smart_TextField(
-                                    page=self.__page,
-                                    label=self.EDIT_TEXTFIELD_TEXT,
-                                    hint_text=self.EDIT_TEXTFIELD_HINT_TEXT,
-                                    numeric=True,
+            content=Container(
+                content=Column(
+                    controls=[
+                        Text(
+                            value= f"{product_name}",
+                            color=MAIN_TEXT_COLOR
+                        ),
+                        Row(
+                            controls=[
+                                Checkbox(
+                                    adaptive=True,
+                                    value=current_state,
                                     data=product_id,
-                                    on_blur=self.__edit_product_amount,
-                                    expand=True,
-                                    label_style=TextStyle(size=10),
-                                    hint_style=TextStyle(size=10)
+                                    on_change=self.__edit_product_state,
+                                    check_color="#606060",
+                                    fill_color="transparent",
+                                    overlay_color="#606060",
+                                    hover_color="#606060",
+                                    shape=RoundedRectangleBorder(radius=5)
                                 ),
-                                width=100,
-                                height=30,
-                                alignment=alignment.center
-                            )
-                        ],
-                        alignment=MainAxisAlignment.CENTER,
-                        spacing=3
-                    )
-                ],
-                alignment=MainAxisAlignment.SPACE_AROUND,
-                horizontal_alignment=CrossAxisAlignment.CENTER
+                                Container(
+                                    content=Smart_TextField(
+                                        page=self.__page,
+                                        label=self.EDIT_TEXTFIELD_TEXT[configs["LANGUAGE"]],
+                                        hint_text=self.EDIT_TEXTFIELD_HINT_TEXT[configs["LANGUAGE"]],
+                                        init_value = product_quantity,
+                                        numeric=True,
+                                        data=product_id,
+                                        on_blur=self.__edit_product_amount,
+                                        expand=True,
+                                        label_style=TextStyle(size=15, color="#606060", weight=FontWeight.BOLD),
+                                        hint_style=TextStyle(size=15, color="#606060")
+                                    ),
+                                    width=130,
+                                    height=40,
+                                    alignment=alignment.center
+                                )
+                            ],
+                            alignment=MainAxisAlignment.CENTER,
+                            spacing=3
+                        )
+                    ],
+                    alignment=MainAxisAlignment.SPACE_AROUND,
+                    horizontal_alignment=CrossAxisAlignment.CENTER
+                ),
+                height=80,
+                gradient=Third_Gradient(),
+                border_radius=12,
+                alignment=alignment.center
             ),
+            padding=padding.symmetric(2, 25),
             alignment=alignment.center
         )
           
@@ -1106,16 +1227,19 @@ class Order_Screen(Column):
                                 controls=[
                                     self.__business_title,
                                     Text(
-                                        value=f"{self.EDITING_SUBTITLE_TEXT}{self.__current_date}"
+                                        value=f"{self.EDITING_SUBTITLE_TEXT[configs["LANGUAGE"]]}{self.__current_date}",
+                                        color=MAIN_TEXT_COLOR
                                     )
                                 ],
+                                spacing=6,
                                 alignment=MainAxisAlignment.CENTER,
                                 horizontal_alignment=CrossAxisAlignment.CENTER
                             ),
-                            padding=Padding(left=1, top=5, right=1, bottom=5),
+                            border_radius=12,
+                            gradient=Secondary_Gradient(),
+                            padding=Padding(left=1, top=5, right=1, bottom=10),
                             alignment=alignment.center
                         ),
-                        Divider(),
                         self.__products_column,
                     ],
                     alignment=MainAxisAlignment.START,
@@ -1123,6 +1247,8 @@ class Order_Screen(Column):
                 ),
                 Container(
                     content=self.__main_button_row,
+                    border_radius=12,
+                    gradient=Secondary_Gradient(),
                     padding=padding.symmetric(20, 0),
                     alignment=alignment.center
                 )

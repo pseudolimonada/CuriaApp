@@ -1,6 +1,5 @@
-user_ids = {
-    "user_id": str,
-    "manager_business_ids": list,
+user_data = {
+    "token": str,
     "is_admin": bool
 }
 
@@ -18,9 +17,7 @@ endpoints_urls = {
     "POST_ORDER": "/businesses/$business_id/orders",
     "GET_ORDERS": "businesses/$business_id/orders",
     "PUT_STATE" : "businesses/$business_id/orders/$order_id",
-    "POST_ORDER": "/businesses/$business_id/orders",
-    "GET_ORDERS": "businesses/$business_id/orders",
-    "PUT_STATE" : "businesses/$business_id/orders/$order_id"
+    "EDIT_CURRENT_DAY": "/businesses/$business_id/catalogs"
 }
 
 STATUS_CODES = {"SUCCESS": 200, "INVALID_CREDENTIALS": 401, "INTERNAL_ERROR": 500, "BAD_REQUEST": 400}
@@ -43,3 +40,7 @@ MAIN_TEXT_COLOR = "#606060"
 FILTER_BUTTON_TEXT: dict = {"waiting_validation":"Waiting validation", "waiting_delivery":"Waiting delivery", "delivered":"Delivered","rejected":"Rejected"} 
 
 TESTING = True
+
+configs = {
+    "LANGUAGE": "English"
+}
