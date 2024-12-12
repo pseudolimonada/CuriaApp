@@ -39,7 +39,7 @@ class Check_Orders_Screen(Column):
 
     __catalog: dict
 
-    __buttons_dict : dict ={}
+    __buttons_dict : dict = {}
     
     __waiting_validation_button: Container
     __delivered_button: Container
@@ -136,8 +136,9 @@ class Check_Orders_Screen(Column):
                 present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
 
     def __create_filter_button(self,state):
-        button = Container(
-            ElevatedButton(
+        
+        return Container(
+            content=ElevatedButton(
                 content = Text(
                     value=FILTER_BUTTON_TEXT[configs["LANGUAGE"]].get(state),
                     color = MAIN_TEXT_COLOR,
@@ -161,13 +162,11 @@ class Check_Orders_Screen(Column):
             border_radius=20,
             alignment=alignment.center
         )
-        return button
 
     def __create_filters_row(self):
         '''
         Creates row with filter buttons
         ''' 
-        self.__buttons_dict["waiting_validation"] = self.__create_filter_button("waiting_validation")
         
         self.__filters_row.controls.clear()
         self.__filters_row.controls.append(
@@ -308,7 +307,7 @@ class Check_Orders_Screen(Column):
         Change shown orders according to order status
         '''
         state = e.control.data
-
+        
         if state != self.__current_filter:
             if self.__current_filter != "All":
                 self.__buttons_dict[self.__current_filter].gradient = Primary_Gradient()
