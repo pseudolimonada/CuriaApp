@@ -49,10 +49,10 @@ def register():
     if business_id:
         user_id, is_admin = check_token(request, business_id)
         if not is_admin or user_id != 1:
-            return jsonify({"error": "Unauthorized"}), 401
+            return jsonify({"error": "Unauthorized"}), 400
         business = Business.query.filter_by(business_id=business_id).first()
         if not business:
-            return jsonify({"error": "Business not found"}), 404
+            return jsonify({"error": "Business not found"}), 400
 
     try:
         user = User(

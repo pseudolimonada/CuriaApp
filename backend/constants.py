@@ -121,7 +121,7 @@ def jwt_required(admin_required=False):
         def decorated_function(*args, **kwargs):
             token = request.headers.get("Authorization")
             if not token:
-                return jsonify({"error": "Token is missing"}), 401
+                return jsonify({"error": "Token is missing"}), 400
             try:
                 decoded_data = decode_jwt(token)
                 g.user_id = decoded_data["user_id"]
@@ -129,12 +129,12 @@ def jwt_required(admin_required=False):
                 g.is_admin = business_id in decoded_data["manager_business_ids"]
 
                 if admin_required and not g.is_admin:
-                    return jsonify({"error": "Admin access required"}), 403
+                    return jsonify({"error": "Admin access required"}), 400
 
             except jwt.ExpiredSignatureError:
-                return jsonify({"error": "Token has expired"}), 401
+                return jsonify({"error": "Token has expired"}), 400
             except jwt.InvalidTokenError:
-                return jsonify({"error": "Invalid token"}), 401
+                return jsonify({"error": "Invalid token"}), 400
             return f(*args, **kwargs)
 
         return decorated_function
@@ -149,7 +149,7 @@ def check_token(request, business_id):
         user_id = decoded_data["user_id"]
         is_admin = business_id in decoded_data["manager_business_ids"]
     except jwt.ExpiredSignatureError:
-        return jsonify({"error": "Token has expired"}), 401
+        return jsonify({"error": "Token has expired"}), 400
     except jwt.InvalidTokenError:
-        return jsonify({"error": "Invalid token"}), 401
+        return jsonify({"error": "Invalid token"}), 400
     return user_id, is_admin

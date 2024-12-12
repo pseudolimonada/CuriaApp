@@ -148,7 +148,7 @@ def submit_catalog(business_id):
 
             if not db_product or db_product.business_id != business_id:
                 db.session.rollback()
-                return jsonify({"error": "Product not found"}), 404
+                return jsonify({"error": "Product not found"}), 400
 
             catalog_product = CatalogProduct(
                 catalog_id=catalog.catalog_id,
