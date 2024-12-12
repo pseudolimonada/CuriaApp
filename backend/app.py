@@ -43,13 +43,13 @@ if __name__ == "__main__":
             )
             db.session.add(user_object)
             db.session.flush()
-
-            db.session.add(Business(business_name="Farinha e Afeto"))
+            business_object = Business(business_name="Farinha e Afeto")
+            db.session.add(business_object)
             db.session.flush()
             db.session.add(
                 BusinessUser(
                     user_id=user_object.user_id,
-                    business_id=1,
+                    business_id=business_object.business_id,
                     user_type=UserType.MANAGER,
                 )
             )
