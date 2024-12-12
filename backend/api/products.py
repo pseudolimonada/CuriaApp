@@ -15,7 +15,7 @@ def get_products(business_id):
     catalog = {}
     for product in products:
         catalog[product.product_id] = {
-            "product_name": product.product_name,
+            "product_title": product.product_name,
             "product_description": product.product_description,
             "product_price": product.product_price,
             "image_url": product.image_url,
@@ -31,7 +31,7 @@ def post_product(business_id):
     product_data = {
         "business_id": business_id,
         "image_url": request.json.get("image_url"),
-        "product_name": request.json.get("product_name"),
+        "product_name": request.json.get("product_title"),
         "product_description": request.json.get("product_description"),
         "product_price": request.json.get("product_price"),
     }
@@ -64,8 +64,8 @@ def put_product(business_id, product_id):
 
     if "image_url" in request.json:
         product.image_url = request.json["image_url"]
-    if "product_name" in request.json:
-        product.product_name = request.json["product_name"]
+    if "product_title" in request.json:
+        product.product_name = request.json["product_title"]
     if "product_description" in request.json:
         product.product_description = request.json["product_description"]
     if "product_price" in request.json:
