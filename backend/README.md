@@ -50,6 +50,9 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO admin;
 DB_USER = admin
 DB_PASS = admin
 DB_HOST = localhost
+DB_USER = admin
+DB_PASS = admin
+DB_HOST = localhost
 DB_PORT = 5432
 DB_NAME = pgi2024
 ```
