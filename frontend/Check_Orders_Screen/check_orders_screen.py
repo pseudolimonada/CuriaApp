@@ -228,15 +228,6 @@ class Check_Orders_Screen(Column):
         '''
         Creates order row
         '''
-        order_string = ""
-        data = order.get("order_data")
-        #print(data)
-        '''
-        for product in data:
-            product_id = product.get("product_id")
-            #print(product_id)
-            order_string += self.__catalog[product_id]["product_title"] + " x" +str(product.get("quantity"))+", "
-        ''' 
         #print(order_string)
         return Container(
             Row(
@@ -294,15 +285,6 @@ class Check_Orders_Screen(Column):
         )
 
     def __go_full_order_screen(self, e):
-        '''
-        shared_vars["current_order"]
-        {
-        ["date] : "DD/MM/YYYY"
-        ["state] : str
-        ["products_title"] : [{"quantity":int, "product_id":, "cost": "1,50€", "quantity_text":},{},...]
-        }
-        '''
-        #print(e.control.data["products"])
         
         products_dict={}
 
