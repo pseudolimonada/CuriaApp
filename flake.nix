@@ -39,6 +39,19 @@
         };
 
 	default = venv;
+
+        server = pkgs.mkShell {
+          venvDir = ".venv";
+          packages = with pkgs; [ python312 ] ++
+            (with pkgs.python312Packages; [
+              pip
+              venvShellHook
+            ]);
+	  nativeBuildInputs = with pkgs; [
+              pgcli
+              postgresql_16
+	  ];
+        };
       });
     };
 }
