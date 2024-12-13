@@ -61,7 +61,14 @@ def main(page: Page):
     page.window.height = 800
     
     page.padding = 0
+    
+    page.fonts = {
+        "Oswald_Regular": "/fonts/Oswald-Regular.ttf",
+        "Oswald_Bold": "/fonts/Oswald-Bold.ttf"
+    }
+    
     page.theme = Theme(
+        font_family="Oswald_Regular",
         color_scheme=ColorScheme(
             ###primary="",      # Buttons Text, TextBox Outline, Icons Color
             #on_primary="",

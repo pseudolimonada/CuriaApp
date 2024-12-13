@@ -1,6 +1,6 @@
-from flet import Column, MainAxisAlignment, Row, Page
-from shared import TESTING, STATUS_CODES, user_data, shared_vars, endpoints_urls
-from utils import Main_TextField_Container, Main_ElevatedButton_Container, present_snack_bar
+from flet import Column, MainAxisAlignment, Row, Page, FontWeight, TextAlign, Container, alignment, padding
+from shared import TESTING, STATUS_CODES, user_data, shared_vars, endpoints_urls, MAIN_TEXT_COLOR
+from utils import Main_TextField_Container, Main_ElevatedButton_Container, Text, present_snack_bar
 import requests
 from string import Template
 from Order_Screen.order_screen import Order_Screen
@@ -33,6 +33,19 @@ class Login_Screen(Column):
     ###############################
     # Initializing the page object
     __page: Page
+    
+    __curia_name: Container = Container(
+        content=Text(
+            value="CURIA",
+            size=35,
+            weight=FontWeight.BOLD,
+            color=MAIN_TEXT_COLOR,
+            text_align=TextAlign.CENTER,
+            font_family="Oswald_Bold"
+        ),
+        alignment=alignment.center,
+        padding=padding.only(top=1, bottom=20, right=10, left=10)
+    )
     
     ###############################
     # Initializing and setting up the textfields
@@ -73,6 +86,7 @@ class Login_Screen(Column):
         # Setting the column with the text fields
         self.credentials_column = Column(
             controls=[
+                self.__curia_name,
                 Row(controls=[self.name_textfield], alignment=MainAxisAlignment.CENTER),
                 Row(controls=[self.password_textfield], alignment=MainAxisAlignment.CENTER)
             ],
