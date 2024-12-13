@@ -73,6 +73,8 @@ class Main_Container(Container):
                 shared_vars["bottom_menu"].controls[0].icon_color = THIRD_GRADIENT_COLOR_1
                 shared_vars["bottom_menu"].controls[1].icon_color = MAIN_TEXT_COLOR
             elif screen_name == "check_orders_screen":
+                self.__screens_dict[screen_name].refresh_data()
+                self.__screens_dict[screen_name].fill_orders_column()
                 shared_vars["bottom_menu"].controls[0].icon_color = MAIN_TEXT_COLOR
                 shared_vars["bottom_menu"].controls[1].icon_color = THIRD_GRADIENT_COLOR_1
             

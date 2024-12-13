@@ -17,6 +17,7 @@ endpoints_urls = {
     "REGISTER": f"{BASE_IP}users/register",
     "PERMISSIONS": f"{BASE_IP}users/permissions/$business_id",
     "GET_CATALOG": f"{BASE_IP}businesses/$business_id/products",
+    "GET_WEEK_CATALOG": f"{BASE_IP}/businesses/$business_id/catalogs",
     "POST_ORDER": f"{BASE_IP}businesses/$business_id/orders",
     "GET_ORDERS": f"{BASE_IP}businesses/$business_id/orders",
     "PUT_STATE" : f"{BASE_IP}businesses/$business_id/orders/$order_id",

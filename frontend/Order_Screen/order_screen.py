@@ -247,7 +247,7 @@ class Order_Screen(Column):
         ###############################
         # Setting the current date / week day
         today = datetime.today()
-        self.__current_date = today.strftime("%d/%m/%Y")
+        self.__current_date = today.strftime("%d-%m-%Y")
         self.__current_week_day = today.strftime("%A")[:3]
         
         ###############################
@@ -284,7 +284,7 @@ class Order_Screen(Column):
         days_to_monday = today.weekday()
         monday = today - timedelta(days=days_to_monday)
         sunday = monday + timedelta(days=6)
-        self.__current_week_text.value = f"{monday.strftime('%d/%m')} - {sunday.strftime('%d/%m')}"
+        self.__current_week_text.value = f"{monday.strftime('%d-%m')} - {sunday.strftime('%d-%m')}"
         self.__pass_week_section.content = Column(
             controls=[
                 Container(
@@ -414,7 +414,7 @@ class Order_Screen(Column):
         
         ###############################
         # Calculating monday datetime of the current week
-        current_date_datetime = datetime.strptime(self.__current_date, "%d/%m/%Y")
+        current_date_datetime = datetime.strptime(self.__current_date, "%d-%m-%Y")
         days_to_monday = current_date_datetime.weekday()
         monday = current_date_datetime - timedelta(days=days_to_monday)
         
@@ -439,7 +439,7 @@ class Order_Screen(Column):
         ###############################
         # Refreshing catalog then week catalog and finally update objects
         if self.__refresh_catalog():
-            if self.__refresh_week_catalog(monday.strftime("%d/%m/%Y")):
+            if self.__refresh_week_catalog(monday.strftime("%d-%m-%Y")):
                 ###############################
                 # Initializing/Resetting current order products
                 self.__current_order["products"] = {}
@@ -490,11 +490,11 @@ class Order_Screen(Column):
         ###########################################################################
 
         if TESTING:
-            if self.__current_week_day == "Wed" and self.__current_date == "04/12/2024":
+            if self.__current_week_day == "Wed" and self.__current_date == "04-12-2024":
                 num = 20
-            elif self.__current_week_day == "Thu" and self.__current_date == "05/12/2024":
+            elif self.__current_week_day == "Thu" and self.__current_date == "05-12-2024":
                 num = 5
-            elif self.__current_week_day == "Fri" and self.__current_date == "06/12/2024":
+            elif self.__current_week_day == "Fri" and self.__current_date == "06-12-2024":
                 num = 2
             elif self.__current_week_day == "Wed":
                 num = 10
@@ -662,7 +662,7 @@ class Order_Screen(Column):
         params = {
             "monday_date": monday_date,
         }
-        url_template = Template(endpoints_urls["GET_CATALOG"])
+        url_template = Template(endpoints_urls["GET_WEEK_CATALOG"])
         get_catalog_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"])
         
         ###############################
@@ -675,13 +675,13 @@ class Order_Screen(Column):
             if response.status_code == STATUS_CODES["SUCCESS"]:
                 # Saving the catalog for each day
                 response_data = response.json()
-                self.__current_week_catalog["Mon"] = response_data.get("Mon", [])
-                self.__current_week_catalog["Tue"] = response_data.get("Tue", [])
-                self.__current_week_catalog["Wed"] = response_data.get("Wed", [])
-                self.__current_week_catalog["Thu"] = response_data.get("Thu", [])
-                self.__current_week_catalog["Fri"] = response_data.get("Fri", [])
-                self.__current_week_catalog["Sat"] = response_data.get("Sat", [])
-                self.__current_week_catalog["Sun"] = response_data.get("Sun", [])
+                self.__current_week_catalog["Mon"] = response_data.get("Mon", {})
+                self.__current_week_catalog["Tue"] = response_data.get("Tue", {})
+                self.__current_week_catalog["Wed"] = response_data.get("Wed", {})
+                self.__current_week_catalog["Thu"] = response_data.get("Thu", {})
+                self.__current_week_catalog["Fri"] = response_data.get("Fri", {})
+                self.__current_week_catalog["Sat"] = response_data.get("Sat", {})
+                self.__current_week_catalog["Sun"] = response_data.get("Sun", {})
                 return True
                 
             elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
@@ -705,13 +705,13 @@ class Order_Screen(Column):
         
         self.__days_row.controls.clear()
         
-        self.__create_new_date_button("Mon", monday.strftime("%d/%m/%Y"))
-        self.__create_new_date_button("Tue", (monday + timedelta(days=1)).strftime("%d/%m/%Y"))
-        self.__create_new_date_button("Wed", (monday + timedelta(days=2)).strftime("%d/%m/%Y"))
-        self.__create_new_date_button("Thu", (monday + timedelta(days=3)).strftime("%d/%m/%Y"))
-        self.__create_new_date_button("Fri", (monday + timedelta(days=4)).strftime("%d/%m/%Y"))
-        self.__create_new_date_button("Sat", (monday + timedelta(days=5)).strftime("%d/%m/%Y"))
-        self.__create_new_date_button("Sun", (monday + timedelta(days=6)).strftime("%d/%m/%Y"))
+        self.__create_new_date_button("Mon", monday.strftime("%d-%m-%Y"))
+        self.__create_new_date_button("Tue", (monday + timedelta(days=1)).strftime("%d-%m-%Y"))
+        self.__create_new_date_button("Wed", (monday + timedelta(days=2)).strftime("%d-%m-%Y"))
+        self.__create_new_date_button("Thu", (monday + timedelta(days=3)).strftime("%d-%m-%Y"))
+        self.__create_new_date_button("Fri", (monday + timedelta(days=4)).strftime("%d-%m-%Y"))
+        self.__create_new_date_button("Sat", (monday + timedelta(days=5)).strftime("%d-%m-%Y"))
+        self.__create_new_date_button("Sun", (monday + timedelta(days=6)).strftime("%d-%m-%Y"))
         
     # Clears the products column and refill it with new data from DB for a specific date
     def __fill_products_column(self):
@@ -725,13 +725,13 @@ class Order_Screen(Column):
         #        ------- REMOVE THIS IF CASE FOR REAL TEST !!!!!!! -------        #
         ###########################################################################
         if TESTING:
-            if self.__current_week_day == "Wed" and self.__current_date == "04/12/2024":
+            if self.__current_week_day == "Wed" and self.__current_date == "04-12-2024":
                 num = 20
                 product_scarcity = None
-            elif self.__current_week_day == "Thu" and self.__current_date == "05/12/2024":
+            elif self.__current_week_day == "Thu" and self.__current_date == "05-12-2024":
                 num = 5
                 product_scarcity = 1
-            elif self.__current_week_day == "Fri" and self.__current_date == "06/12/2024":
+            elif self.__current_week_day == "Fri" and self.__current_date == "06-12-2024":
                 num = 2
                 product_scarcity = 0
             elif self.__current_week_day == "Wed":
@@ -755,13 +755,15 @@ class Order_Screen(Column):
         
         ###############################
         # Adding products rows according to the products in the catalog day
+        print(self.__current_week_catalog)
         for product_id in self.__current_week_catalog[self.__current_week_day].keys():
             if user_data["is_admin"]:
                 product_quantity_sold = self.__current_week_catalog[self.__current_week_day][product_id]["product_quantity_sold"]
                 product_quantity_total = self.__current_week_catalog[self.__current_week_day][product_id]["product_quantity_total"]
                 product_row = self.__create_new_product_row_manager(self.__catalog[product_id]["product_title"], self.__catalog[product_id]["product_price"], product_quantity_sold, product_quantity_total)
             else:
-                product_scarcity = self.__current_week_catalog[self.__current_week_day][product_id]
+                product_scarcity = self.__current_week_catalog[self.__current_week_day][product_id]["product_scarcity"]
+                print(product_scarcity)
                 product_row = self.__create_new_product_row_client(product_id, self.__catalog[product_id]["product_title"], self.__catalog[product_id]["product_price"], product_scarcity)
             
             self.__products_column.controls.append(product_row)
@@ -784,7 +786,7 @@ class Order_Screen(Column):
             self.__alert.actions[0].content.data=e.control.data
             self.__page.open(self.__alert)
         else:        
-            current_date_datetime = datetime.strptime(self.__current_date, "%d/%m/%Y")
+            current_date_datetime = datetime.strptime(self.__current_date, "%d-%m-%Y")
             if e.control.data == "forward":
                 current_date_datetime += timedelta(days=7)
             elif e.control.data == "backward":
@@ -793,8 +795,8 @@ class Order_Screen(Column):
             days_to_monday = current_date_datetime.weekday()
             monday = current_date_datetime - timedelta(days=days_to_monday)
             sunday = monday + timedelta(days=6)
-            self.__current_date = current_date_datetime.strftime("%d/%m/%Y")
-            self.__current_week_text.value = f"{monday.strftime('%d/%m')} - {sunday.strftime('%d/%m')}"
+            self.__current_date = current_date_datetime.strftime("%d-%m-%Y")
+            self.__current_week_text.value = f"{monday.strftime('%d-%m')} - {sunday.strftime('%d-%m')}"
             self.__current_order["date"] = self.__current_date
             
             self.refresh_data(True)
@@ -811,14 +813,14 @@ class Order_Screen(Column):
                 self.__alert.actions[0].content.data=e.control.data
                 self.__page.open(self.__alert)
             else:
-                current_date_datetime = datetime.strptime(self.__current_date, "%d/%m/%Y")
+                current_date_datetime = datetime.strptime(self.__current_date, "%d-%m-%Y")
                 days_to_monday = current_date_datetime.weekday()
                 self.__days_row.controls[days_to_monday].gradient=Primary_Gradient()
                 
                 self.__current_date = e.control.data[1]
                 self.__current_week_day = e.control.data[0]
                 
-                new_current_date_datetime = datetime.strptime(self.__current_date, "%d/%m/%Y")
+                new_current_date_datetime = datetime.strptime(self.__current_date, "%d-%m-%Y")
                 days_to_monday = new_current_date_datetime.weekday()
                 self.__days_row.controls[days_to_monday].gradient=Selected_Gradient()
                 
@@ -906,7 +908,7 @@ class Order_Screen(Column):
         # Verifying if the OK button got clicked and if it is about
         # to change just the day or the whole week
         if e.control.text == self.ALERT_DIALOG_OK_TEXT[configs["LANGUAGE"]]:
-            current_date_datetime = datetime.strptime(self.__current_date, "%d/%m/%Y")
+            current_date_datetime = datetime.strptime(self.__current_date, "%d-%m-%Y")
                 
             if e.control.data in ["forward", "backward"]:
                 if e.control.data == "forward":
@@ -919,8 +921,8 @@ class Order_Screen(Column):
                 days_to_monday = current_date_datetime.weekday()
                 monday = current_date_datetime - timedelta(days=days_to_monday)
                 sunday = monday + timedelta(days=6)
-                self.__current_date = current_date_datetime.strftime("%d/%m/%Y")
-                self.__current_week_text.value = f"{monday.strftime('%d/%m')} - {sunday.strftime('%d/%m')}"
+                self.__current_date = current_date_datetime.strftime("%d-%m-%Y")
+                self.__current_week_text.value = f"{monday.strftime('%d-%m')} - {sunday.strftime('%d-%m')}"
                 
                 ###############################
                 # Resetting the current order and refreshing all data
@@ -936,7 +938,7 @@ class Order_Screen(Column):
                 self.__current_date = e.control.data[1]
                 self.__current_week_day = e.control.data[0]
                 
-                new_current_date_datetime = datetime.strptime(self.__current_date, "%d/%m/%Y")
+                new_current_date_datetime = datetime.strptime(self.__current_date, "%d-%m-%Y")
                 days_to_monday = new_current_date_datetime.weekday()
                 self.__days_row.controls[days_to_monday].gradient=Selected_Gradient()
                 
@@ -1011,6 +1013,12 @@ class Order_Screen(Column):
             case None:
                 product_scarcity_text = ""
             case 5:
+                product_scarcity_text = self.PRODUCT_SCARCITY_5_TEXT[configs["LANGUAGE"]]
+            case 4:
+                product_scarcity_text = self.PRODUCT_SCARCITY_5_TEXT[configs["LANGUAGE"]]
+            case 3:
+                product_scarcity_text = self.PRODUCT_SCARCITY_5_TEXT[configs["LANGUAGE"]]
+            case 2:
                 product_scarcity_text = self.PRODUCT_SCARCITY_5_TEXT[configs["LANGUAGE"]]
             case 1:
                 product_scarcity_text = self.PRODUCT_SCARCITY_1_TEXT[configs["LANGUAGE"]]

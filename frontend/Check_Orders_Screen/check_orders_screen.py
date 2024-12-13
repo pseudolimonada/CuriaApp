@@ -68,7 +68,7 @@ class Check_Orders_Screen(Column):
         }
 
         self.__create_filters_row()
-        self.__fill_orders_column()
+        self.fill_orders_column()
 
         # Creating a column that joins order, filters and pages menu rows
         order_row_and_pages_menu_row = Container(
@@ -126,6 +126,7 @@ class Check_Orders_Screen(Column):
                 if response.status_code == STATUS_CODES["SUCCESS"]:
                     response_data = response.json()
                     self.__orders = response_data.get("orders", [])
+                    print(self.__orders)
                 elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
                     present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
                 else:
@@ -190,7 +191,7 @@ class Check_Orders_Screen(Column):
         )
         self.__filters_row.padding =padding.only(bottom = 100)
 
-    def __fill_orders_column(self):
+    def fill_orders_column(self):
         '''
         Clears orders column and fills it with the orders according to __current_date and __current_filter
         '''
@@ -215,7 +216,7 @@ class Check_Orders_Screen(Column):
                 if (order.get("order_state") == self.__current_filter)
             ]
 
-        for order in orders_to_show:
+        for order in orders_to_show[::-1]:
             row =self.__create_new_order_row(order)
             self.__orders_column.controls.append(row)
         
@@ -285,10 +286,10 @@ class Check_Orders_Screen(Column):
 
         for product in e.control.data["products"]:
             products_dict[self.__catalog[product["product_id"]]["product_title"]] = {
-                "quantity": int(product["quantity"]),
-                "quantity_text": product["quantity"],
+                "quantity": int(product["product_quantity"]),
+                "quantity_text": product["product_quantity"],
                 "cost" : self.__catalog[product["product_id"]]["product_price"]
-                }
+            }
 
         shared_vars["current_order"] = {"products":products_dict, "date":e.control.data["order_date"], "state":e.control.data["order_state"],"order_id":e.control.data["order_id"]}
         shared_vars["main_container"].change_screen("full_order_screen")
@@ -299,7 +300,7 @@ class Check_Orders_Screen(Column):
         '''
         if e.control.data != self.__current_date:
             self.__current_date = e.control.data
-            self.__fill_orders_column()
+            self.fill_orders_column()
             self.__page.update()
 
     def __change_filter_orders_list(self, e):
@@ -318,5 +319,5 @@ class Check_Orders_Screen(Column):
                 self.__buttons_dict[state].gradient = Primary_Gradient()
             self.__current_filter = "All"
             
-        self.__fill_orders_column()
+        self.fill_orders_column()
         self.__page.update()
