@@ -46,8 +46,8 @@ class UserType(Enum):
 
 
 class OrderStateType(Enum):
-    TO_BE_VALIDATED = "to_be_validated"
-    TO_BE_DELIVERED = "to_be_delivered"
+    TO_BE_VALIDATED = "waiting_validation"
+    TO_BE_DELIVERED = "waiting_delivery"
     REJECTED = "rejected"
     DELIVERED = "delivered"
 
