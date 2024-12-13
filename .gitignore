@@ -163,3 +163,4 @@ cython_debug/
 
 .direnv
 backend/docker-data
+docs/*.pdf

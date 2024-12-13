@@ -2,6 +2,7 @@ from flet import Column, MainAxisAlignment, Row, Page
 from shared import TESTING, STATUS_CODES, user_data, shared_vars, endpoints_urls
 from utils import Main_TextField_Container, Main_ElevatedButton_Container, present_snack_bar
 import requests
+from string import Template
 from Order_Screen.order_screen import Order_Screen
 from Full_Order_Screen.full_order_screen import Full_Order_Screen
 from Check_Orders_Screen.check_orders_screen import Check_Orders_Screen
@@ -159,7 +160,7 @@ class Login_Screen(Column):
                 "user_name": self.name_textfield.content.value,
                 "user_password": self.password_textfield.content.value
             }
-
+            
             try:
                 # Sending request and getting response
                 response = requests.post(endpoints_urls["REGISTER"], json=payload)
@@ -192,9 +193,13 @@ class Login_Screen(Column):
         headers = {
             "Authorization": f"{user_data["token"]}"
         }
+        
+        url_template = Template(endpoints_urls["PERMISSIONS"])
+        get_permissions_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"])
+        
         try:
             # Sending request and getting response
-            response = requests.get(endpoints_urls["PERMISSIONS"], headers=headers)
+            response = requests.get(get_permissions_url, headers=headers)
             
             # Check the response
             if response.status_code == STATUS_CODES["SUCCESS"]:

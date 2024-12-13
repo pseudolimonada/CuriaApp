@@ -1,5 +1,11 @@
 # Backend
 
+python db_redeploy.py to generate all tables and populate products, admin user, farinha e afeto business.
+
+in .env dont forget to add app_admin_password
+
+
+
 ## API Specification
 
 API Specifications can be found [here](https://github.com/pseudolimonada/pgi2024/blob/00d9417b9ef9ab8cd160d5ee9e3485f17fdc1a89/specifications.md)
@@ -15,7 +21,7 @@ DROP DATABASE IF EXISTS pgi2024;
 
 CREATE DATABASE pgi2024;
 
-CREATE USER admin WITH ENCRYPTED PASSWORD 'admin';
+CREATE USER admin WITH ENCRYPTED PASSWORD 'password';
 
 GRANT ALL PRIVILEGES ON DATABASE pgi2024 TO admin;
 
@@ -41,6 +47,9 @@ GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO admin;
 ## .env (example)
 
 ```
+DB_USER = admin
+DB_PASS = admin
+DB_HOST = localhost
 DB_USER = admin
 DB_PASS = admin
 DB_HOST = localhost
