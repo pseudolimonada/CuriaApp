@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, g
-from db_models import Order, OrderProduct, CatalogProduct, Catalog
+from db_models import Order, OrderProduct, CatalogProduct, Catalog, User
 from extensions import db
 from constants import jwt_required, OrderStateType, serialize_date
 
@@ -20,9 +20,11 @@ def get_orders(business_id):
         order_list = []
         for order in orders:
             order_products = OrderProduct.query.filter_by(order_id=order.order_id).all()
+            user = User.query.get(order.user_id)
             order_product_list = []
             order_list.append(
                 {
+                    "user_name": user.user_name,
                     "order_id": str(order.order_id),
                     "order_date": serialize_date(order.order_date),
                     "order_state": OrderStateType(order.order_state).value,
