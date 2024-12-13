@@ -126,7 +126,6 @@ class Check_Orders_Screen(Column):
                 if response.status_code == STATUS_CODES["SUCCESS"]:
                     response_data = response.json()
                     self.__orders = response_data.get("orders", [])
-                    print(self.__orders)
                 elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
                     present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
                 else:

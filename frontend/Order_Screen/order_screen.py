@@ -559,12 +559,12 @@ class Order_Screen(Column):
         }
         for product_id in self.__current_date_catalog_edit.keys():
             if self.__current_date_catalog_edit[product_id]["state"]:
-                new_date_catalog[product_id] = self.__current_date_catalog_edit[product_id]["quantity"]
+                new_date_catalog["catalog_products"][product_id] = {"product_quantity_total": self.__current_date_catalog_edit[product_id]["quantity"]}
         
         headers = {
             "Authorization": f"{user_data["token"]}"
         }
-
+        
         url_template = Template(endpoints_urls["EDIT_CURRENT_DAY"])
         get_catalog_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"])
         
@@ -671,6 +671,9 @@ class Order_Screen(Column):
             # Sending request and getting response
             response = requests.get(get_catalog_url, headers=headers, params=params)
             
+            print(response.json())
+            print(self.__current_week_catalog)
+            
             # Check the response
             if response.status_code == STATUS_CODES["SUCCESS"]:
                 # Saving the catalog for each day
@@ -682,6 +685,7 @@ class Order_Screen(Column):
                 self.__current_week_catalog["Fri"] = response_data.get("Fri", {})
                 self.__current_week_catalog["Sat"] = response_data.get("Sat", {})
                 self.__current_week_catalog["Sun"] = response_data.get("Sun", {})
+                
                 return True
                 
             elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
@@ -755,7 +759,6 @@ class Order_Screen(Column):
         
         ###############################
         # Adding products rows according to the products in the catalog day
-        print(self.__current_week_catalog)
         for product_id in self.__current_week_catalog[self.__current_week_day].keys():
             if user_data["is_admin"]:
                 product_quantity_sold = self.__current_week_catalog[self.__current_week_day][product_id]["product_quantity_sold"]
@@ -763,7 +766,6 @@ class Order_Screen(Column):
                 product_row = self.__create_new_product_row_manager(self.__catalog[product_id]["product_title"], self.__catalog[product_id]["product_price"], product_quantity_sold, product_quantity_total)
             else:
                 product_scarcity = self.__current_week_catalog[self.__current_week_day][product_id]["product_scarcity"]
-                print(product_scarcity)
                 product_row = self.__create_new_product_row_client(product_id, self.__catalog[product_id]["product_title"], self.__catalog[product_id]["product_price"], product_scarcity)
             
             self.__products_column.controls.append(product_row)
@@ -825,7 +827,7 @@ class Order_Screen(Column):
                 self.__days_row.controls[days_to_monday].gradient=Selected_Gradient()
                 
                 self.__current_order["date"] = self.__current_date
-                self.__fill_products_column()
+                self.refresh_data(update_days_row=False)
                 self.__page.update()
     
     # Changes the product amount in the current order list.
@@ -928,7 +930,7 @@ class Order_Screen(Column):
                 # Resetting the current order and refreshing all data
                 self.reset_current_order()
                 self.__page.update()
-                self.refresh_data(True)
+                self.refresh_data(update_days_row=True)
             else:
                 ###############################
                 # Updating the current date and week day
