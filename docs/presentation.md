@@ -1,21 +1,46 @@
-% Title of presentation
-% Speaker Name
-% Date of talk
+% Curia
+% FarinhaSemBugs
+% \today
 
 ---
 
-# Slide 1: Introduction
+# Introdução
 
-- This is the introduction slide
-- Use bullet points for listing key points
+A gestão de reservas e encomendas pode ser um desafio para muitas pessoas e
+empresas. A nossa aplicação de reservas foi projetada para simplificar esse
+processo, oferecendo uma solução intuitiva e eficiente para gerir as suas
+reservas com facilidade.
 
 ---
 
-# Slide 2: Main Points
+# Problemas Comuns
 
-1. First main point
-2. Second main point
-3. Third main point
+- **Confusão nas datas**: Muitas vezes, as pessoas perdem prazos ou confundem
+  datas de reservas.
+- **Falta de organização**: Sem um sistema adequado, é fácil perder o controle
+  e esquecer compromissos importantes.
+- **Sobrecarga de informações**: Para quem trabalha com múltiplas reservas, é
+  difícil acompanhar todas as encomendas e check-ins.
+- **Comunicação ineficaz**: Falhas na comunicação podem levar a mal-entendidos
+  tanto para as empresas quanto para os clientes.
+
+---
+
+# Solução
+
+A nossa aplicação de reservas é a resposta para esses problemas. Com um design
+intuitivo e recursos abrangentes, a aplicação oferece:
+
+## Funcionalidades
+
+- **Calendário Integrado**: Interface de calendário que permite visualizar
+  todas as reservas em um só lugar.
+- **Notificações Automáticas**: Lembretes automáticos por e-mail ou SMS para
+  não esquecer datas importantes.
+- **Gestão de Cliente**: Banco de dados para armazenar informações de clientes,
+  facilitando o contato e acompanhamento das reservas.
+- **Relatórios Personalizados**: Geração de relatórios de reservas e encomendas
+  para análise de desempenho e tomada de decisões.
 
 ---
 
