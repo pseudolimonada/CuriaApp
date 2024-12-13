@@ -49,6 +49,10 @@ class Full_Order_Screen(Column):
         "English": "Deny",
         "Portuguese": "Negar"
     }
+    DELIVER_BUTTON_TEXT : dict = {
+        "English" : "Delivered",
+        "Portuguese": "Entregue"
+    }
     ALERT_DIALOG_TITLE_TEXT: dict = {
         "English": "Your Order Is Done",
         "Portuguese": "Encomenda Realizada"
@@ -68,6 +72,10 @@ class Full_Order_Screen(Column):
     ACCEPTED_ORDER_TEXT: dict = {
         "English": "Order accepted with success",
         "Portuguese": "Encomenda aceite com sucesso"
+    }
+    DELIVERED_ORDER_TEXT: dict = {
+        "English": "Order marked as delivered",
+        "Portuguese": "Encomenda marcada como entregue"
     }
     INTERNAL_ERROR_TEXT: dict = {
         "English": "An internal error occurred, please wait and try again...",
@@ -152,6 +160,12 @@ class Full_Order_Screen(Column):
         gradient=Primary_Gradient(),
         border_radius=20,
     )
+    __deliver_button : Container = Container(
+        alignment=alignment.center,
+        gradient=Primary_Gradient(),
+        border_radius=20,
+
+    )
     
     ###############################
     # Initializing and setting up the alert dialog
@@ -192,6 +206,22 @@ class Full_Order_Screen(Column):
         actions_alignment=MainAxisAlignment.CENTER
     )
     __accepted_message: AlertDialog = AlertDialog(
+        modal=True,
+        adaptive=True,
+        bgcolor=DIALOG_BG_COLOR,
+        title=Text(
+            color=MAIN_TEXT_COLOR,
+            text_align=TextAlign.CENTER,
+            size=20
+        ),
+        content=Icon(
+            name=icons.CHECK_CIRCLE,
+            color="#34c862",
+            size=100
+        ),
+        actions_alignment=MainAxisAlignment.CENTER
+    )
+    __delivered_message: AlertDialog = AlertDialog(
         modal=True,
         adaptive=True,
         bgcolor=DIALOG_BG_COLOR,
@@ -288,6 +318,21 @@ class Full_Order_Screen(Column):
                     overlay_color=BUTTON_OVERLAY_COLOR
                 )
             )
+            self.__deliver_button.content = ElevatedButton(
+                text=self.DELIVER_BUTTON_TEXT[configs["LANGUAGE"]],
+                icon=icons.DELIVERY_DINING,
+                icon_color="#606060",
+                adaptive=True,
+                on_click=self.__change_order_state,
+                data="deliver",
+                bgcolor="transparent",
+                color="#606060",
+                style=ButtonStyle(
+                    elevation=0,
+                    overlay_color=BUTTON_OVERLAY_COLOR
+                )
+            )
+
         else:
             self.__back_button.scale=1.2
             self.__confirm_order_button.content = ElevatedButton(
@@ -377,6 +422,26 @@ class Full_Order_Screen(Column):
         ]
         self.__accepted_message.title.value=self.ACCEPTED_ORDER_TEXT[configs["LANGUAGE"]]
     
+        self.__delivered_message.actions=[
+            Container(
+                ElevatedButton(
+                    text = self.ALERT_DIALOG_OK_TEXT[configs["LANGUAGE"]],
+                    adaptive=True,
+                    data = "deliver",
+                    bgcolor="transparent",
+                    color="#606060",
+                    on_click=self.__handle_close,
+                    style=ButtonStyle(
+                        elevation=0,
+                        enable_feedback=False
+                    )
+                ),
+                gradient = Primary_Gradient(),
+                border_radius=20
+            )
+        ]
+        self.__delivered_message.title.value=self.DELIVERED_ORDER_TEXT[configs["LANGUAGE"]]
+
     #############################################
     #               Layout Methods              #
     #############################################
@@ -472,6 +537,27 @@ class Full_Order_Screen(Column):
                                 controls=[
                                     self.__deny_order_button,
                                     self.__approve_order_button
+                                ],
+                                alignment=MainAxisAlignment.CENTER
+                            ),
+                            self.__back_button
+                        ],
+                        alignment=MainAxisAlignment.CENTER,
+                        horizontal_alignment=CrossAxisAlignment.CENTER,
+                        spacing=5
+                    ),
+                    alignment=alignment.center
+                )
+            )
+        elif user_data["is_admin"] and shared_vars["current_order"]["state"] == "waiting_delivery":
+            self.__back_button.scale = 0.9
+            self.__buttons_row.content.controls.append(
+                Container(
+                    content=Column(
+                        controls=[
+                            Row(
+                                controls=[
+                                    self.__deliver_button
                                 ],
                                 alignment=MainAxisAlignment.CENTER
                             ),
@@ -637,6 +723,9 @@ class Full_Order_Screen(Column):
             case "reject":
                 new_state = "rejected"
                 self.__general_message = self.__rejected_message
+            case "deliver":
+                new_state = "delivered"
+                self.__general_message = self.__delivered_message
 
         #Beginning of test
 
@@ -683,5 +772,7 @@ class Full_Order_Screen(Column):
     def __handle_close(self, e):
         if e.control.data == "deny":
             self.__page.close(self.__rejected_message)
-        else:
+        elif e.control.data == "approve":
             self.__page.close(self.__accepted_message)
+        else:
+            self.__page.close(self.__delivered_message)

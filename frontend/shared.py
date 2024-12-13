@@ -55,7 +55,7 @@ FILTER_BUTTON_TEXT: dict = {
     }
 } 
 
-TESTING = False
+TESTING = True
 
 configs = {
     "LANGUAGE": "English"
