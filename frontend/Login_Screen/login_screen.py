@@ -2,6 +2,7 @@ from flet import Column, MainAxisAlignment, Row, Page
 from shared import TESTING, STATUS_CODES, user_data, shared_vars, endpoints_urls
 from utils import Main_TextField_Container, Main_ElevatedButton_Container, present_snack_bar
 import requests
+from string import Template
 from Order_Screen.order_screen import Order_Screen
 from Full_Order_Screen.full_order_screen import Full_Order_Screen
 from Check_Orders_Screen.check_orders_screen import Check_Orders_Screen
@@ -105,6 +106,8 @@ class Login_Screen(Column):
         #        ------- REMOVE THIS IF CASE FOR REAL TEST !!!!!!! -------        #
         ###########################################################################
         if TESTING:
+            if self.name_textfield.content.value == "admin" and self.password_textfield.content.value == "admin":
+                user_data["is_admin"] = True
             self.__init_client_mode()
             shared_vars["main_container"].change_screen("order_screen")
         else:
@@ -123,11 +126,8 @@ class Login_Screen(Column):
                     # Getting the user data
                     response_data = response.json()
                     user_data["token"] = response_data.get("token")
-                    user_data["is_admin"] = response_data.get("is_admin")
-                    self.__init_client_mode()
-                    
-                    # Change screen
-                    shared_vars["main_container"].change_screen("order_screen")
+                    self.__get_permissions()
+
                 elif response.status_code == STATUS_CODES["INVALID_CREDENTIALS"]:
                     present_snack_bar(self.__page, self.INVALID_LOGIN_ERROR_TEXT, "Red")
                 elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
@@ -149,6 +149,8 @@ class Login_Screen(Column):
         #        ------- REMOVE THIS IF CASE FOR REAL TEST !!!!!!! -------        #
         ###########################################################################
         if TESTING:
+            if self.name_textfield.content.value == "admin" and self.password_textfield.content.value == "admin":
+                user_data["is_admin"] = True
             self.__init_client_mode()
             shared_vars["main_container"].change_screen("order_screen")
         else:
@@ -158,7 +160,7 @@ class Login_Screen(Column):
                 "user_name": self.name_textfield.content.value,
                 "user_password": self.password_textfield.content.value
             }
-
+            
             try:
                 # Sending request and getting response
                 response = requests.post(endpoints_urls["REGISTER"], json=payload)
@@ -168,11 +170,7 @@ class Login_Screen(Column):
                     # Getting the user data
                     response_data = response.json()
                     user_data["token"] = response_data.get("token")
-                    user_data["is_admin"] = response_data.get("is_admin")
-                    self.__init_client_mode()
-        
-                    # Change screen
-                    shared_vars["main_container"].change_screen("order_screen")
+                    self.__get_permissions()
                     
                 elif response.status_code == STATUS_CODES["INVALID_CREDENTIALS"]:
                     present_snack_bar(self.__page, self.INVALID_LOGIN_ERROR_TEXT, "Red")
@@ -185,6 +183,44 @@ class Login_Screen(Column):
             except requests.exceptions.RequestException as e:
                 # Handle network-related errors
                 present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
+    
+    # Gets the permissions of the user to know if it is an admin or not
+    def __get_permissions(self):
+        '''
+        Gets the permissions of the user to know if it is an admin or not
+        '''
+
+        headers = {
+            "Authorization": f"{user_data["token"]}"
+        }
+        
+        url_template = Template(endpoints_urls["PERMISSIONS"])
+        get_permissions_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"])
+        
+        try:
+            # Sending request and getting response
+            response = requests.get(get_permissions_url, headers=headers)
+            
+            # Check the response
+            if response.status_code == STATUS_CODES["SUCCESS"]:
+                # Getting the user data
+                response_data = response.json()
+                user_data["is_admin"] = response_data.get("is_admin")
+                self.__init_client_mode()
+                # Change screen
+                shared_vars["main_container"].change_screen("order_screen")
+                
+            elif response.status_code == STATUS_CODES["INVALID_CREDENTIALS"]:
+                present_snack_bar(self.__page, self.INVALID_LOGIN_ERROR_TEXT, "Red")
+            elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
+                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
+            elif response.status_code == STATUS_CODES["BAD_REQUEST"]:
+                present_snack_bar(self.__page, self.BAD_REQUEST_ERROR_TEXT, "Red")
+            else:
+                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
+        except requests.exceptions.RequestException as e:
+            # Handle network-related errors
+            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
     
     # Initializes all screen of a client user         
     def __init_client_mode(self):

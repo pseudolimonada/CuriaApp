@@ -121,7 +121,7 @@ class Check_Orders_Screen(Column):
             get_orders_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"])
 
             try:
-                response = requests.get(get_orders_url,headers =header)
+                response = requests.get(get_orders_url, headers=header)
 
                 if response.status_code == STATUS_CODES["SUCCESS"]:
                     response_data = response.json()
@@ -195,6 +195,7 @@ class Check_Orders_Screen(Column):
         Clears orders column and fills it with the orders according to __current_date and __current_filter
         '''
         #test order
+        
         if TESTING:
             self.__orders=[{"order_id":"1","user_name":"aquele","order_date":"11/11/2010","order_data":[{"product_id":"01","quantity":2},{"product_id":"02","quantity":3}], "order_state":"waiting_delivery"},{"order_id":"3","user_name":"aquele","order_date":"11/11","order_data":[{"product_id":"04","quantity":2}],"order_state":"waiting_validation"}] #product_id as a name for test, change it later
             self.__catalog={"01":{"product_title":"Pao","product_price":2.0},"02":{"product_title":"Broa","product_price":2.5},"03":{"product_title":"Uma cena","product_price":4.0},"04":{"product_title":"Bolo","product_price":5.00}}
