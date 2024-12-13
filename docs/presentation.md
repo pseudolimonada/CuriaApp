@@ -44,9 +44,15 @@ intuitivo e recursos abrangentes, a aplicação oferece:
 
 ---
 
-# Slide 3: Image
+# Infraestrutura
 
-![Image Description](https://cdn.filestackcontent.com/Krg875TyRVwr5OOumHAG/convert?cache=true&crop=126%2C64%2C1187%2C593&crop_first=true&quality=90&w=1920)
+![Diagrama](docs/diagram.png)
+
+---
+
+# Arquitetura
+
+![Arquitetura](docs/arquitetura.png)
 
 ---
 
