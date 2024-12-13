@@ -1,5 +1,5 @@
 from flet import Column, MainAxisAlignment, Row, Page, FontWeight, TextAlign, Container, alignment, padding
-from shared import TESTING, STATUS_CODES, user_data, shared_vars, endpoints_urls, MAIN_TEXT_COLOR
+from shared import TESTING, STATUS_CODES, user_data, shared_vars, endpoints_urls, MAIN_TEXT_COLOR, configs
 from utils import Main_TextField_Container, Main_ElevatedButton_Container, Text, present_snack_bar
 import requests
 from string import Template
@@ -18,17 +18,50 @@ class Login_Screen(Column):
     
     ###############################
     # Initializing the texts strings
-    NAME_TEXTFIELD_TEXT: str = "User Name"
-    NAME_TEXTFIELD_HINT_TEXT: str = "Insert your user name here"
-    PASSWORD_TEXTFIELD_TEXT: str = "Password"
-    PASSWORD_TEXTFIELD_HINT_TEXT: str = "Insert your password here"
-    LOGIN_BUTTON_TEXT: str = "LOGIN"
-    REGISTER_BUTTON_TEXT: str = "REGISTER"
-    INVALID_LOGIN_ERROR_TEXT: str = "Invalid Login Credentials..."
-    INTERNAL_ERROR_TEXT: str = "An internal error occurred, please wait and try again..."
-    BAD_REQUEST_ERROR_TEXT: str = "An error occurred, please verify if your app is updated..."
-    UNRECOGNIZED_ERROR_TEXT: str = "An unexpected error occurred, please verify if your app is updated..."
-    NETWORK_ERROR_TEXT: str = "Please verify your internet connection and try again..."
+    NAME_TEXTFIELD_TEXT: dict = {
+        "English": "Username",
+        "Portuguese": "Username"
+    }
+    NAME_TEXTFIELD_HINT_TEXT: dict = {
+        "English": "Insert your username here",
+        "Portuguese": "Insira aqui o seu username"
+    }
+    PASSWORD_TEXTFIELD_TEXT: dict = {
+        "English": "Password",
+        "Portuguese": "Password"
+    }
+    PASSWORD_TEXTFIELD_HINT_TEXT: dict = {
+        "English": "Insert your password here",
+        "Portuguese": "Insira aqui a sua password"
+    }
+    LOGIN_BUTTON_TEXT: dict = {
+        "English": "LOGIN",
+        "Portuguese": "LOGIN"
+    }
+    REGISTER_BUTTON_TEXT: dict = {
+        "English": "REGISTER",
+        "Portuguese": "REGISTAR"
+    }
+    INVALID_LOGIN_ERROR_TEXT: dict = {
+        "English": "Invalid Login Credentials...",
+        "Portuguese": "Credenciais de login inválidas..."
+    }
+    INTERNAL_ERROR_TEXT: dict = {
+        "English": "An internal error occurred, please wait and try again...",
+        "Portuguese": "Ocorreu um erro interno, por favor, espere e tente novamente..."
+    }
+    BAD_REQUEST_TEXT: dict = {
+        "English": "An unexpected error occurred, please verify if your app is updated...",
+        "Portuguese": "Ocorreu um erro inesperado, por favor, verifique se a sua aplicação está atualizada..."
+    }
+    UNRECOGNIZED_ERROR_TEXT: dict = {
+        "English": "An unexpected error occurred, please verify if your app is updated...",
+        "Portuguese": "Ocorreu um erro inesperado, por favor, verifique se a sua aplicação está atualizada..."
+    }
+    NETWORK_ERROR_TEXT: dict = {
+        "English": "Please verify your internet connection and try again...",
+        "Portuguese": "Por favor verifique a sua conexão à internet e tente novamente..."
+    }
     
     ###############################
     # Initializing the page object
@@ -41,7 +74,7 @@ class Login_Screen(Column):
             weight=FontWeight.BOLD,
             color=MAIN_TEXT_COLOR,
             text_align=TextAlign.CENTER,
-            font_family="Oswald_Bold"
+            font_family="Gliker_SemiBold"
         ),
         alignment=alignment.center,
         padding=padding.only(top=1, bottom=20, right=10, left=10)
@@ -49,26 +82,13 @@ class Login_Screen(Column):
     
     ###############################
     # Initializing and setting up the textfields
-    name_textfield: Main_TextField_Container = Main_TextField_Container(
-        label=NAME_TEXTFIELD_TEXT,
-        hint_text=NAME_TEXTFIELD_HINT_TEXT
-    )
-    password_textfield: Main_TextField_Container = Main_TextField_Container(
-        label=PASSWORD_TEXTFIELD_TEXT,
-        hint_text=PASSWORD_TEXTFIELD_HINT_TEXT,
-        password=True,
-        can_reveal_password=True
-    )
+    name_textfield: Main_TextField_Container
+    password_textfield: Main_TextField_Container
     credentials_column: Column
     
     # Buttons
-    login_button: Main_ElevatedButton_Container = Main_ElevatedButton_Container(
-        text=LOGIN_BUTTON_TEXT,
-        scale=1.5
-    )
-    register_button: Main_ElevatedButton_Container = Main_ElevatedButton_Container(
-        text=REGISTER_BUTTON_TEXT
-    )
+    login_button: Main_ElevatedButton_Container
+    register_button: Main_ElevatedButton_Container
     login_register_column: Column
     
     # Constructor
@@ -83,6 +103,18 @@ class Login_Screen(Column):
         
         self.__page = page
         
+        # Initializing the textfield
+        self.name_textfield = Main_TextField_Container(
+            label=self.NAME_TEXTFIELD_TEXT[configs["LANGUAGE"]],
+            hint_text=self.NAME_TEXTFIELD_HINT_TEXT[configs["LANGUAGE"]]
+        )
+        self.password_textfield = Main_TextField_Container(
+            label=self.PASSWORD_TEXTFIELD_TEXT[configs["LANGUAGE"]],
+            hint_text=self.PASSWORD_TEXTFIELD_HINT_TEXT[configs["LANGUAGE"]],
+            password=True,
+            can_reveal_password=True
+        )
+        
         # Setting the column with the text fields
         self.credentials_column = Column(
             controls=[
@@ -91,6 +123,15 @@ class Login_Screen(Column):
                 Row(controls=[self.password_textfield], alignment=MainAxisAlignment.CENTER)
             ],
             alignment=MainAxisAlignment.CENTER
+        )
+        
+        # Initializing the buttons
+        self.login_button = Main_ElevatedButton_Container(
+            text=self.LOGIN_BUTTON_TEXT[configs["LANGUAGE"]],
+            scale=1.5
+        )
+        self.register_button = Main_ElevatedButton_Container(
+            text=self.REGISTER_BUTTON_TEXT[configs["LANGUAGE"]]
         )
         
         # Setting the column with the buttons
@@ -143,16 +184,16 @@ class Login_Screen(Column):
                     self.__get_permissions()
 
                 elif response.status_code == STATUS_CODES["INVALID_CREDENTIALS"]:
-                    present_snack_bar(self.__page, self.INVALID_LOGIN_ERROR_TEXT, "Red")
+                    present_snack_bar(self.__page, self.INVALID_LOGIN_ERROR_TEXT[configs["LANGUAGE"]], "Red")
                 elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
-                    present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
+                    present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT[configs["LANGUAGE"]], "Red")
                 elif response.status_code == STATUS_CODES["BAD_REQUEST"]:
-                    present_snack_bar(self.__page, self.BAD_REQUEST_ERROR_TEXT, "Red")
+                    present_snack_bar(self.__page, self.BAD_REQUEST_ERROR_TEXT[configs["LANGUAGE"]], "Red")
                 else:
-                    present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
+                    present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT[configs["LANGUAGE"]], "Red")
             except requests.exceptions.RequestException as e:
                 # Handle network-related errors
-                present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
+                present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT[configs["LANGUAGE"]], "Red")
             
     def register(self, e):
         '''
@@ -187,16 +228,16 @@ class Login_Screen(Column):
                     self.__get_permissions()
                     
                 elif response.status_code == STATUS_CODES["INVALID_CREDENTIALS"]:
-                    present_snack_bar(self.__page, self.INVALID_LOGIN_ERROR_TEXT, "Red")
+                    present_snack_bar(self.__page, self.INVALID_LOGIN_ERROR_TEXT[configs["LANGUAGE"]], "Red")
                 elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
-                    present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
+                    present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT[configs["LANGUAGE"]], "Red")
                 elif response.status_code == STATUS_CODES["BAD_REQUEST"]:
-                    present_snack_bar(self.__page, self.BAD_REQUEST_ERROR_TEXT, "Red")
+                    present_snack_bar(self.__page, self.BAD_REQUEST_ERROR_TEXT[configs["LANGUAGE"]], "Red")
                 else:
-                    present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
+                    present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT[configs["LANGUAGE"]], "Red")
             except requests.exceptions.RequestException as e:
                 # Handle network-related errors
-                present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
+                present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT[configs["LANGUAGE"]], "Red")
     
     # Gets the permissions of the user to know if it is an admin or not
     def __get_permissions(self):
@@ -225,16 +266,16 @@ class Login_Screen(Column):
                 shared_vars["main_container"].change_screen("order_screen")
                 
             elif response.status_code == STATUS_CODES["INVALID_CREDENTIALS"]:
-                present_snack_bar(self.__page, self.INVALID_LOGIN_ERROR_TEXT, "Red")
+                present_snack_bar(self.__page, self.INVALID_LOGIN_ERROR_TEXT[configs["LANGUAGE"]], "Red")
             elif response.status_code >= STATUS_CODES["INTERNAL_ERROR"]:
-                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT, "Red")
+                present_snack_bar(self.__page, self.INTERNAL_ERROR_TEXT[configs["LANGUAGE"]], "Red")
             elif response.status_code == STATUS_CODES["BAD_REQUEST"]:
-                present_snack_bar(self.__page, self.BAD_REQUEST_ERROR_TEXT, "Red")
+                present_snack_bar(self.__page, self.BAD_REQUEST_ERROR_TEXT[configs["LANGUAGE"]], "Red")
             else:
-                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT, "Red")
+                present_snack_bar(self.__page, self.UNRECOGNIZED_ERROR_TEXT[configs["LANGUAGE"]], "Red")
         except requests.exceptions.RequestException as e:
             # Handle network-related errors
-            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT, "Red")
+            present_snack_bar(self.__page, self.NETWORK_ERROR_TEXT[configs["LANGUAGE"]], "Red")
     
     # Initializes all screen of a client user         
     def __init_client_mode(self):

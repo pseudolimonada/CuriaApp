@@ -63,8 +63,8 @@ def main(page: Page):
     page.padding = 0
     
     page.fonts = {
-        "Oswald_Regular": "/fonts/Oswald-Regular.ttf",
-        "Oswald_Bold": "/fonts/Oswald-Bold.ttf"
+        "Gliker_SemiBold": "/fonts/Gliker-SemiBold.ttf",
+        "Oswald_Regular": "/fonts/Oswald-Regular.ttf"
     }
     
     page.theme = Theme(

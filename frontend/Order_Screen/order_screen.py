@@ -48,7 +48,7 @@ class Order_Screen(Column):
         "Portuguese": "Alerta de Confirmação"
     }
     ALERT_DIALOG_CONTENT_TEXT: dict = {
-        "English": "By changing the day your current order will be cleared. If you still want to continue, press 'OK', otherwise press CANCEL.",
+        "English": "By changing the day, your current order will be cleared. If you still want to continue, press 'OK', otherwise press CANCEL.",
         "Portuguese": "Ao mudar o dia, a sua encomenda atual será esquecida. Se pretender continuar e mudar o dia, pressione 'OK', caso contrário pressione 'CANCELAR'."
     }
     ALERT_DIALOG_OK_TEXT: dict = {
