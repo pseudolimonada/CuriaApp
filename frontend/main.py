@@ -44,8 +44,8 @@ def main(page: Page):
     Program Function
     """
     
-    configs["LANGUAGE"] = "English"
-    #configs["LANGUAGE"] = "Portuguese"
+    #configs["LANGUAGE"] = "English"
+    configs["LANGUAGE"] = "Portuguese"
     user_data["is_admin"] = False
     shared_vars["current_business"]["name"] = "Farinha e Afeto"
     shared_vars["current_business"]["id"] = "1"

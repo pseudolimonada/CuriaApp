@@ -676,9 +676,6 @@ class Order_Screen(Column):
             # Sending request and getting response
             response = requests.get(get_catalog_url, headers=headers, params=params)
 
-            print(response.json())
-            print(self.__current_week_catalog)
-
             # Check the response
             if response.status_code == STATUS_CODES["SUCCESS"]:
                 # Saving the catalog for each day

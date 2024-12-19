@@ -670,7 +670,7 @@ class Full_Order_Screen(Column):
             "order_date": shared_vars["current_order"]["date"],
             "order_data": order_data
         }
-        
+
         # Setting the url for the request
         url_template = Template(endpoints_urls["POST_ORDER"])
         post_order_url = url_template.safe_substitute(business_id=shared_vars["current_business"]["id"])
