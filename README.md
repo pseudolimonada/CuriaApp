@@ -1,39 +1,46 @@
-# pgi2024
+# CuriaApp
 
-## Github Organization:
+## Introduction
 
-The branch organization is as follows:
-![alt text](image.png)
+The CuriaApp is an app developed to simplify the process of reserving local produce. 
 
-There is a backend branch and a frontend branch, called "end branches".
+![Login](assets/readme.png)
 
-With feature branches in each (try to keep a feature branch open for no later than a week). Whenever a feature branch gets merged into the respective end branch, the other end must be rebased to account for the changes.
+Managers can create a catalog of items with image, description and price, as well as which products are available in which days, and at which quantities, while clients can place orders that can be approved and marked as delivered by the managers.
 
-i.e I implement a backend-feature-1 and merge into backend. Then, i rebase frontend into backend.
+The app has a classic backend frontend separation, where a single mobile app is used for both managers and clients as the frontend, and a specialized api is deployed in a server to handle all the data.
 
-There is also a main branch. Once one of the end branches has a working prototype, it can perform a pull request to the main branch.
 
-## venv installation
 
-Install the venv
+## Installation
 
-```sh
+### Dependencies 
 
-python -m venv ./.venv
+You can install the project dependencies by doing:
+
+```
+pip install -r requirements.txt
 ```
 
-Source it (can be automated, google it 😬)
+### Backend
 
-On unix based systems
+You can run our backend by doing:
 
-```.sh
-source .venv/bin/activate
+```
+cd backend
+python app.py
+```
+### Backend
+
+You can run our frontend by doing:
+
+```
+cd frontend
+python main.py
 ```
 
-On windows
+## Credits
 
-```powershell
- .venv\Scripts\activate
-```
+## Introduction
 
-
+The Curia app was developed by Pedro Miguel Carvalho Lima, Luís Pedro de Sousa Oliveira Góis, Duarte José Antunes Silva, Tiago Henrique Aragão de Sousa and Gonçalo José Carrajola Gaio, for the Informatics Engineering Bachelor, as a project for the PGI course.
