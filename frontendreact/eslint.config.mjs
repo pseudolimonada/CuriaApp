@@ -19,12 +19,15 @@ const eslintConfig = [
   ),
 ];
 
-export default [
+const config = [
+  ...eslintConfig,
   {
-    files: ['**/*.{js,jsx}'],
+    files: ["**/*.{js,jsx,ts,tsx}"],
     plugins: { 'react-hooks': reactHooks },
     rules: {
       'react-hooks/react-compiler': 'error',
     }
   },
 ];
+
+export default config;
