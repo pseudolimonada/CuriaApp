@@ -8,12 +8,5 @@ const nextConfig: NextConfig = {
     },
   },
 };
-module.exports = {
-  eslint: {
-    rules: {
-      "react-hooks/react-compiler": "error",
-    },
-  },
-};
 
 export default nextConfig;
