@@ -4,12 +4,12 @@ const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
     reactCompiler: {
-      compilationMode: 'infer',
+      compilationMode: "infer",
     },
   },
   sassOptions: {
     additionalData: `$var: red;`,
-    implementation: 'sass-embedded',
+    implementation: "sass-embedded",
   },
 };
 
