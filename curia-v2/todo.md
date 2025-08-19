@@ -1,3 +1,24 @@
+- integrate api calls
+- create good mock data to show in a demo
+- add login view
+- fix double tapping calendar view week slider
+- add calendar view week picker
+- backend integration
+    - api calls
+    - products
+    - orders
+    - calendar
+    - messages
+    - permissions
+        - hide content based on permissions
+- manage account option in settings
+    - manage account modal
+        - delete account
+        - edit email/name
+        - cancel subscription
+- add message notifications
+- pwa support
+
 - add currency choosing
-- add language
-- add login
+- add language choosing
+- fix dark mode
