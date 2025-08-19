@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
   experimental: {
     reactCompiler: true,
   },
+  sassOptions: {
+    additionalData: `$var: red;`,
+    implementation: 'sass-embedded',
+  },
 };
 
 export default nextConfig;
