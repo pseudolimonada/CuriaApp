@@ -18,6 +18,7 @@ interface Product {
   name: string
   category: string
   color: string
+  price: number // Added
 }
 
 interface Order {
@@ -25,6 +26,7 @@ interface Order {
   customerName: string
   productId: string
   quantity: number
+  unitPrice: number // Added
   status: "pending" | "accepted" | "removed"
   date: string
 }
@@ -42,12 +44,12 @@ interface KanbanCalendarProps {
 }
 
 const mockOrders: Order[] = [
-  { id: "1", customerName: "John Smith", productId: "1", quantity: 2, status: "pending", date: "Monday" },
-  { id: "2", customerName: "Sarah Johnson", productId: "1", quantity: 1, status: "pending", date: "Monday" },
-  { id: "3", customerName: "Mike Wilson", productId: "2", quantity: 3, status: "pending", date: "Thursday" },
-  { id: "4", customerName: "Emma Davis", productId: "2", quantity: 1, status: "accepted", date: "Thursday" },
-  { id: "5", customerName: "Alex Brown", productId: "3", quantity: 2, status: "pending", date: "Thursday" },
-  { id: "6", customerName: "Lisa Garcia", productId: "4", quantity: 1, status: "pending", date: "Saturday" },
+  { id: "1", customerName: "John Smith", productId: "1", quantity: 2, unitPrice: 120, status: "pending", date: "Monday" },
+  { id: "2", customerName: "Sarah Johnson", productId: "1", quantity: 1, unitPrice: 120, status: "pending", date: "Monday" },
+  { id: "3", customerName: "Mike Wilson", productId: "2", quantity: 3, unitPrice: 950, status: "pending", date: "Thursday" },
+  { id: "4", customerName: "Emma Davis", productId: "2", quantity: 1, unitPrice: 950, status: "accepted", date: "Thursday" },
+  { id: "5", customerName: "Alex Brown", productId: "3", quantity: 2, unitPrice: 600, status: "pending", date: "Thursday" },
+  { id: "6", customerName: "Lisa Garcia", productId: "4", quantity: 1, unitPrice: 80, status: "pending", date: "Saturday" },
 ]
 
 const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -128,6 +130,11 @@ export function KanbanCalendar({
     "3": { set: 25, sold: 8 },
     "4": { set: 40, sold: 15 },
   })
+
+  const formatCurrency = (v: number) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(
+      Number.isFinite(v) ? v : 0,
+    )
 
   const getCurrentWeekDays = () => {
     return daysOfWeek
@@ -486,6 +493,9 @@ export function KanbanCalendar({
                         <Badge variant="secondary" className={cn("text-xs", product.color)}>
                           {product.category}
                         </Badge>
+                        <div className="text-[11px] font-medium mt-1 text-muted-foreground">
+                          {formatCurrency(product.price)}
+                        </div>
                       </div>
 
                       {!isManagementMode && (
@@ -570,38 +580,68 @@ export function KanbanCalendar({
       </div>
 
       <Dialog open={!!selectedDay} onOpenChange={() => setSelectedDay(null)}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden">
-          <DialogHeader>
-            <DialogTitle>Orders for {selectedDay}</DialogTitle>
-            <DialogDescription>Manage product quantities and process orders for this day</DialogDescription>
-          </DialogHeader>
+        <DialogContent
+          className="w-[95vw] sm:max-w-2xl max-h-[90vh] p-0 flex flex-col"
+        >
+          <div className="p-6 pb-4 border-b">
+            <DialogHeader>
+              <DialogTitle className="text-base sm:text-lg">Orders for {selectedDay}</DialogTitle>
+              <DialogDescription className="text-xs sm:text-sm">
+                Manage product quantities and process orders for this day
+              </DialogDescription>
+            </DialogHeader>
+          </div>
 
-          <div className="space-y-6 overflow-y-auto max-h-[60vh] pr-2">
+          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-8">
             {/* Product quantities section */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-sm">Product Quantities</h3>
+              <h3 className="font-semibold text-sm sm:text-base">Product Quantities</h3>
               {selectedDay &&
                 (scheduledProducts[selectedDay] || []).map((product) => (
-                  <div key={product.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className={cn("w-3 h-3 rounded-full", product.color.split(" ")[0])} />
-                      <span className="font-medium">{product.name}</span>
+                  <div
+                    key={product.id}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border rounded-lg bg-card/50"
+                  >
+                    <div className="flex items-start sm:items-center gap-3 min-w-0">
+                      <div className={cn("w-3 h-3 rounded-full mt-1 sm:mt-0 flex-shrink-0", product.color.split(" ")[0])} />
+                      <div className="min-w-0">
+                        <span className="font-medium block text-sm sm:text-base truncate">
+                          {product.name}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {formatCurrency(product.price)}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">Set:</span>
+                        <span className="text-xs sm:text-sm text-muted-foreground">Set:</span>
                         <Input
                           type="number"
                           value={productQuantities[product.id]?.set || 0}
                           onChange={(e) =>
-                            handleQuantityChange(product.id, "set", Number.parseInt(e.target.value) || 0)
+                            handleQuantityChange(
+                              product.id,
+                              "set",
+                              Number.isFinite(Number.parseInt(e.target.value))
+                                ? Number.parseInt(e.target.value)
+                                : 0,
+                            )
                           }
-                          className="w-16 h-8"
+                          className="w-20 h-8 text-sm"
                         />
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">Sold:</span>
-                        <span className="font-medium">{productQuantities[product.id]?.sold || 0}</span>
+                        <span className="text-xs sm:text-sm text-muted-foreground">Sold:</span>
+                        <span className="font-medium text-sm">
+                          {productQuantities[product.id]?.sold || 0}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs sm:text-sm text-muted-foreground">Revenue:</span>
+                        <span className="font-semibold text-sm">
+                          {formatCurrency((productQuantities[product.id]?.sold || 0) * product.price)}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -610,7 +650,9 @@ export function KanbanCalendar({
 
             {/* Orders section */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-sm">Orders ({getOrdersForDay(selectedDay || "").length})</h3>
+              <h3 className="font-semibold text-sm sm:text-base">
+                Orders ({getOrdersForDay(selectedDay || "").length})
+              </h3>
               <div className="space-y-2">
                 {getOrdersForDay(selectedDay || "").map((order) => {
                   const product = availableProducts.find((p) => p.id === order.productId)
@@ -618,21 +660,21 @@ export function KanbanCalendar({
                     <div
                       key={order.id}
                       className={cn(
-                        "flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-accent/50 transition-colors",
+                        "flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 border rounded-lg cursor-pointer hover:bg-accent/50 transition-colors",
                         order.status === "removed" && "opacity-50 bg-muted",
                       )}
                       onClick={() => onOrderClick?.(order)}
                     >
-                      <div className="flex items-center gap-3">
-                        <div className={cn("w-3 h-3 rounded-full", product?.color.split(" ")[0])} />
-                        <div>
-                          <span className="font-medium">{order.customerName}</span>
-                          <div className="text-sm text-muted-foreground">
-                            {product?.name} × {order.quantity}
+                      <div className="flex items-start sm:items-center gap-3 min-w-0">
+                        <div className={cn("w-3 h-3 rounded-full mt-1 sm:mt-0 flex-shrink-0", product?.color.split(" ")[0])} />
+                        <div className="min-w-0">
+                          <span className="font-medium block text-sm truncate">{order.customerName}</span>
+                          <div className="text-xs sm:text-sm text-muted-foreground truncate">
+                            {product?.name} × {order.quantity} @ {formatCurrency(order.unitPrice)}
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3 flex-wrap">
                         <Badge
                           variant={
                             order.status === "accepted"
@@ -641,6 +683,7 @@ export function KanbanCalendar({
                                 ? "secondary"
                                 : "outline"
                           }
+                          className="text-xs"
                         >
                           {order.status}
                         </Badge>

@@ -18,6 +18,7 @@ interface Order {
   productId: string
   productName: string
   quantity: number
+  unitPrice: number // Added
   status: "pending" | "accepted" | "removed"
   date: string
   actualDate: string
@@ -33,6 +34,7 @@ const mockOrdersData: Order[] = [
     productId: "1",
     productName: "Email Campaign Launch",
     quantity: 2,
+    unitPrice: 120,
     status: "pending",
     date: "Monday",
     actualDate: "24/01",
@@ -46,6 +48,7 @@ const mockOrdersData: Order[] = [
     productId: "1",
     productName: "Email Campaign Launch",
     quantity: 1,
+    unitPrice: 120,
     status: "accepted",
     date: "Monday",
     actualDate: "24/01",
@@ -59,6 +62,7 @@ const mockOrdersData: Order[] = [
     productId: "2",
     productName: "Website Redesign",
     quantity: 3,
+    unitPrice: 950,
     status: "pending",
     date: "Thursday",
     actualDate: "27/01",
@@ -72,6 +76,7 @@ const mockOrdersData: Order[] = [
     productId: "2",
     productName: "Website Redesign",
     quantity: 1,
+    unitPrice: 950,
     status: "accepted",
     date: "Thursday",
     actualDate: "27/01",
@@ -85,6 +90,7 @@ const mockOrdersData: Order[] = [
     productId: "3",
     productName: "API Development",
     quantity: 2,
+    unitPrice: 600,
     status: "pending",
     date: "Thursday",
     actualDate: "27/01",
@@ -98,6 +104,7 @@ const mockOrdersData: Order[] = [
     productId: "4",
     productName: "Blog Post Writing",
     quantity: 1,
+    unitPrice: 80,
     status: "removed",
     date: "Saturday",
     actualDate: "29/01",
@@ -108,10 +115,10 @@ const mockOrdersData: Order[] = [
 ]
 
 const mockProducts = [
-  { id: "1", name: "Email Campaign Launch" },
-  { id: "2", name: "Website Redesign" },
-  { id: "3", name: "API Development" },
-  { id: "4", name: "Blog Post Writing" },
+  { id: "1", name: "Email Campaign Launch", price: 120 },
+  { id: "2", name: "Website Redesign", price: 950 },
+  { id: "3", name: "API Development", price: 600 },
+  { id: "4", name: "Blog Post Writing", price: 80 },
 ]
 
 export function OrdersList() {
@@ -150,6 +157,7 @@ export function OrdersList() {
       productId: newOrder.productId,
       productName: selectedProduct.name,
       quantity: newOrder.quantity,
+      unitPrice: selectedProduct.price, // Added
       status: "pending",
       date: "Today",
       actualDate: new Date().toLocaleDateString().split("/").reverse().join("/"), // Format as DD/MM
@@ -178,6 +186,25 @@ export function OrdersList() {
       .join("")
       .toUpperCase()
       .slice(0, 2)
+  }
+
+  const formatCurrency = (v: number) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(v)
+
+  const totals = filteredOrders.reduce(
+    (acc, o) => {
+      const amount = o.unitPrice * o.quantity
+      acc.all += amount
+      if (o.status === "pending") acc.pending += amount
+      if (o.status === "accepted") acc.accepted += amount
+      return acc
+    },
+    { all: 0, pending: 0, accepted: 0 },
+  )
+
+  const safeNumber = (v: string, fallback = 0) => {
+    const n = Number.parseFloat(v)
+    return Number.isFinite(n) && n >= 0 ? n : fallback
   }
 
   return (
@@ -308,7 +335,7 @@ export function OrdersList() {
                       type="number"
                       min="1"
                       value={newOrder.quantity}
-                      onChange={(e) => setNewOrder({ ...newOrder, quantity: Number.parseInt(e.target.value) || 1 })}
+                      onChange={(e) => setNewOrder({ ...newOrder, quantity: Math.max(1, Math.trunc(safeNumber(e.target.value, 1))) })}
                       className="border-border/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
                     />
                   </div>
@@ -363,7 +390,7 @@ export function OrdersList() {
                     {isEditing ? (
                       <Input
                         value={editingValues.quantity}
-                        onChange={(e) => setEditingValues({ quantity: Number.parseInt(e.target.value) || 1 })}
+                        onChange={(e) => setEditingValues({ quantity: Math.max(1, Math.trunc(safeNumber(e.target.value, editingValues.quantity))) })}
                         className="w-12 h-6 text-xs text-center border-border/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
                         onClick={(e) => e.stopPropagation()}
                         type="number"
@@ -374,6 +401,10 @@ export function OrdersList() {
                         x{order.quantity}
                       </span>
                     )}
+                    {/* Added order amount */}
+                    <span className="text-[10px] ml-2 text-muted-foreground font-medium">
+                      {formatCurrency(order.unitPrice * order.quantity)}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -493,7 +524,10 @@ export function OrdersList() {
           <div className="text-sm text-muted-foreground">
             Showing 1-{Math.min(12, filteredOrders.length)} of {filteredOrders.length} orders
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
+            <div className="text-xs text-muted-foreground hidden md:block">
+              Pending: {formatCurrency(totals.pending)} | Accepted: {formatCurrency(totals.accepted)}
+            </div>
             <Button variant="outline" size="sm" disabled>
               Previous
             </Button>

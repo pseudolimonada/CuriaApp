@@ -1,0 +1,3 @@
+- add currency choosing
+- add language
+- add login

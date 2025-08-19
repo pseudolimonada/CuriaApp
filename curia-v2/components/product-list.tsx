@@ -27,6 +27,7 @@ interface Product {
   category: string
   color: string
   image?: string
+  price: number // Added
 }
 
 interface ProductListProps {
@@ -83,15 +84,17 @@ export function ProductList({
   const [showForm, setShowForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState<string | null>(null)
   const [deleteDialog, setDeleteDialog] = useState<string | null>(null)
-  const [editingValues, setEditingValues] = useState<{ name: string; category: string; image?: string }>({
+  const [editingValues, setEditingValues] = useState<{ name: string; category: string; image?: string; price: number }>({
     name: "",
     category: "",
+    price: 0,
   })
   const [newProduct, setNewProduct] = useState({
     name: "",
     category: "",
     color: "",
     image: "",
+    price: 0, // Added
   })
   const [imageUploadDialog, setImageUploadDialog] = useState<string | null>(null)
 
@@ -105,9 +108,9 @@ export function ProductList({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (newProduct.name && newProduct.category && newProduct.color) {
+    if (newProduct.name && newProduct.category && newProduct.color && Number.isFinite(newProduct.price) && newProduct.price > 0) {
       onCreateProduct(newProduct)
-      setNewProduct({ name: "", category: "", color: "", image: "" })
+      setNewProduct({ name: "", category: "", color: "", image: "", price: 0 })
       setShowForm(false)
     }
   }
@@ -120,6 +123,16 @@ export function ProductList({
       setNewProduct((prev) => ({ ...prev, image: imageUrl }))
     }
     setImageUploadDialog(null)
+  }
+
+  const formatCurrency = (v: number) =>
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(
+      Number.isFinite(v) ? v : 0,
+    )
+
+  const safeNumber = (v: string, fallback = 0) => {
+    const n = Number.parseFloat(v)
+    return Number.isFinite(n) && n >= 0 ? n : fallback
   }
 
   return (
@@ -276,12 +289,32 @@ export function ProductList({
                       {newProduct.color && <Badge className={newProduct.color}>{newProduct.category}</Badge>}
                     </div>
                   </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="price">Price</Label>
+                    <Input
+                      id="price"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={newProduct.price}
+                      onChange={(e) => setNewProduct({ ...newProduct, price: safeNumber(e.target.value, 0) })}
+                      placeholder="0.00"
+                      className="border-border/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                      required
+                    />
+                  </div>
                 </div>
 
                 <div className="flex gap-2 mt-4">
                   <Button
                     type="submit"
-                    disabled={!newProduct.name || !newProduct.category}
+                    disabled={
+                      !newProduct.name ||
+                      !newProduct.category ||
+                      !Number.isFinite(newProduct.price) ||
+                      newProduct.price <= 0
+                    }
                     variant="outline"
                     className="border-primary/20 text-primary hover:bg-primary/10 bg-transparent"
                   >
@@ -314,7 +347,12 @@ export function ProductList({
                   setEditingProduct(null)
                 } else {
                   setEditingProduct(product.id)
-                  setEditingValues({ name: product.name, category: product.category, image: product.image })
+                  setEditingValues({
+                    name: product.name,
+                    category: product.category,
+                    image: product.image,
+                    price: Number.isFinite(product.price) ? product.price : 0,
+                  })
                 }
               }}
             >
@@ -431,11 +469,26 @@ export function ProductList({
                           ))}
                         </SelectContent>
                       </Select>
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={editingValues.price}
+                        onChange={(e) => setEditingValues({ ...editingValues, price: safeNumber(e.target.value, editingValues.price) })}
+                        className="font-medium text-sm border-border/50 focus:border-primary focus:ring-1 focus:ring-primary/20 h-8"
+                        onClick={(e) => e.stopPropagation()}
+                        placeholder="Price"
+                      />
                     </div>
                   ) : (
                     <>
-                      <h3 className="font-medium text-sm mb-2 leading-tight truncate">{product.name}</h3>
-                      <Badge className={cn("text-xs mb-2", product.color)}>{product.category}</Badge>
+                      <h3 className="font-medium text-sm mb-1 leading-tight truncate">{product.name}</h3>
+                      <div className="flex items-center justify-between mb-1">
+                        <Badge className={cn("text-xs", product.color)}>{product.category}</Badge>
+                        <span className="text-[11px] font-medium text-muted-foreground">
+                          {formatCurrency(Number.isFinite(product.price) ? product.price : 0)}
+                        </span>
+                      </div>
                     </>
                   )}
                   {scheduledDays.length > 0 ? (
@@ -467,7 +520,18 @@ export function ProductList({
         <div className="text-sm text-muted-foreground">
           Showing 1-{Math.min(12, products.length)} of {products.length} products
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
+          <div className="text-xs text-muted-foreground hidden md:block">
+            Total value:{" "}
+            <span className="font-medium">
+              {formatCurrency(
+                products.reduce(
+                  (s, p) => s + (Number.isFinite(p.price) && p.price >= 0 ? p.price : 0),
+                  0,
+                ),
+              )}
+            </span>
+          </div>
           <Button variant="outline" size="sm" disabled>
             Previous
           </Button>
